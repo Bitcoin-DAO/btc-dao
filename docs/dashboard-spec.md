@@ -60,7 +60,7 @@ flowchart LR
 
 **Key feature: permissionless listing.** A DAO appears on the dashboard through its own `dao.listing` (3585), endorsed by `threshold` council members as the protocol already requires. Every DAO and every dashboard copy is independent; there is no curated list, no registry and no approval step.
 
-- **The dashboard listens** for endorsed listings on the public relays and starts reading any DAO that has one.
+- **The dashboard listens** for endorsed listings on the discovery relays (protocol section 7.4), where the app publishes a listing only when it has `"listed": true`. From each listing's `relays` field, the dashboard fetches the rest of the DAO's events.
 - **Spam limits itself.** An unendorsed listing is ignored. A listed DAO with no funded, reconciled treasury shows as such, and any copy may hide unfunded listings.
 - **Front page counts mainnet only.** DAOs in their practice or testnet stage are not counted in network totals. Whether testnet stages publish to relays at all is an open question (section 10).
 
@@ -68,7 +68,7 @@ flowchart LR
 
 Each DAO chooses what the dashboard shows from one form page in its own app. Every data point is a box; all boxes start unticked, and an unticked box means the dashboard does not display that data point.
 
-The form writes its choices into the listing, as a proposed optional `dashboard` field in the `dao.listing` content (an addition to protocol section 7.2, not a new kind):
+The form writes its choices into the optional `dashboard` field of the `dao.listing` content (protocol section 7.2):
 
 ```json
 "dashboard": {"listed": true, "show": ["profile", "totals", "treasury", "reconciliation", "counts", "proposals", "tallies"]}
@@ -169,7 +169,6 @@ These are not boxes on the form; the dashboard never shows them for any DAO.
 ## 10. Open questions
 
 - [ ] Should testnet stages (practice and testnet) publish their events to relays, or keep all data local to the DAO? The protocol currently publishes them through the DAO relay; the alternative is that only mainnet publishes, with the dashboard form enabled only at the mainnet stage.
-- [ ] Add the optional `dashboard` field to `dao.listing` in `protocol.md`?
 - [ ] Grace period before a confirmed, unmatched spend is marked unauthorised.
 - [ ] Should a DAO be able to hide which council keys signed (for example with a Taproot multisig)?
 - [ ] Who hosts the reference instance at btcdao.tech, and how do others run their own?
@@ -178,5 +177,6 @@ These are not boxes on the form; the dashboard never shows them for any DAO.
 ## 11. Tasks
 
 - [ ] Add the dashboard settings form page to the DAO app.
+- [ ] Pick the discovery relays shipped with the first release, and set up the btcdao.tech relay with the discovery policy.
 - [ ] Confirm kinds 3570–3586 and the `D` tag are free (already open in `decisions.md`): check the NIPs Event Kinds table, query large relays, search GitHub code. None appeared in the June 2026 registry ([mirror](https://d-central.tech/nostr-event-kinds-reference/)).
 - [ ] Write the protocol up as a draft NIP, with the app (publisher) and the dashboard (reader) as its two implementations, and submit a pull request to nostr-protocol/nips after the first mainnet DAO.
