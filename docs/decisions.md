@@ -58,6 +58,7 @@
 - [ ] Does SeedSigner's current firmware verify change against a loaded P2WSH multisig descriptor? Test before phase 2
 - [ ] Is passkey PRF supported on every member's phone? (Confirmed on the first Android phone tested)
 - [ ] Are kinds 3570–3586 and the `D` tag free in the Nostr registry?
+- [ ] Should testnet stages publish their events to relays, or keep all data local to the DAO, with only mainnet publishing? See `dashboard-spec.md` section 10
 - [ ] After UNO's testnet stage closes, replace the relay's D1 database with one under a generic name (`relay/README.md`, "To do"). Left as is until then
 - [ ] Legal check (Italy, UK): confirm keyless coordination software is not custody
 - [ ] Legal review of the drafted charter (`charter-template.it.md`, and UNO's copy) and the wallet guide
