@@ -27,7 +27,7 @@
     "quorum": "1/3",
     "simpleMajority": ["payout", "statement", "addMember"],
     "twoThirdsMajority": ["removeMember", "changeRules", "changeCouncil", "close"],
-    "payoutRound": "monthly, 1st of the month",
+    "payoutRound": "monthly",
     "timezone": "Europe/Rome",
     "lapseAfterRounds": 2,
     "maxFeeRateSatVb": 20,
