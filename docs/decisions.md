@@ -42,6 +42,7 @@
 | Recovery | Recovery sheet with the descriptor is essential: 3 seeds alone cannot recover a multisig |
 | Repo | `btc-dao` under the Bitcoin-DAO organisation; UNO is the first instance. Licence added last |
 | Protocol | Defined in `protocol.md`: Nostr events in a provisional kind block 3570–3586, all regular so history is kept; every event tagged with the DAO id |
+| Charter | A short core template in English, holding only principles; numbers and procedures stay in the settings. Everything else is an optional module in `docs/charter-modules/`. Each DAO sets its binding charter language in the settings (`charterLanguage`) |
 | DAO id | SHA-256 of the canonical (RFC 8785) genesis config; never changes |
 | Identity per DAO | The passkey-derived key is salted with the DAO id, so one passkey gives unlinkable identities in different DAOs |
 | Domains | `btcdao.tech` for the project (about, guides, fork kit, read-only dashboard); the mainnet DAO gets its own domain, chosen with its name by the council, with the relay on a subdomain; passkeys are tied to that domain so all its subdomains share them |
@@ -62,4 +63,5 @@
 - [ ] Should testnet stages publish their events to relays, or keep all data local to the DAO, with only mainnet publishing? See `dashboard-spec.md` section 10
 - [ ] After UNO's testnet stage closes, replace the relay's D1 database with one under a generic name (`relay/README.md`, "To do"). Left as is until then
 - [ ] Legal check (Italy, UK): confirm keyless coordination software is not custody
-- [ ] Legal review of the drafted charter (`charter-template.it.md`, and UNO's copy) and the wallet guide
+- [ ] Legal review of the core charter (`charter-template.en.md`), the personal data module, UNO's charter and the wallet guide
+- [ ] Rebuild UNO's charter from the core template plus the modules it needs (likely council handbook, use of funds, conduct, language, personal data, trial phase), with Italian as its binding language
