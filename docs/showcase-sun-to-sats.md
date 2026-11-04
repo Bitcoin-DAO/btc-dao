@@ -32,7 +32,7 @@ The key ceremonies match too: btckeys (Entropia, hand-stamped plates, SeedSigner
 ## 3. What remains to build
 
 1. **Distribution helper** in the DAO's app, from [`showcase/bridge-buffer-dashboard.html`](showcase/bridge-buffer-dashboard.html). Its core (split a total by share, show idle members at 0%) carries over. Its inputs change: members own panels, not miners, so the share comes from the distribution rule (section 4), not from hashrate per worker. Pool data is pasted at first; a small Cloudflare Worker can poll the pool later, because browsers cannot fetch pool stats directly.
-2. **Sun front page**, from [`showcase/sun-to-sats-treasury-prototype.html`](showcase/sun-to-sats-treasury-prototype.html): a read-only page in the Sun to Sats DAO's own copy of btc-dao, rebuilding state from relays and the chain like the app does.
+2. **Sun front page**: a preview with demo data is built at [`app/public/showcase/sun-to-sats/`](../app/public/showcase/sun-to-sats/index.html), published with the app at `/showcase/sun-to-sats/`. Its demo state is one JSON block shaped like the app's rebuilt state, so going live replaces that block. It started from [`showcase/sun-to-sats-treasury-prototype.html`](showcase/sun-to-sats-treasury-prototype.html): a read-only page in the Sun to Sats DAO's own copy of btc-dao, rebuilding state from relays and the chain like the app does.
 
 | In the prototype (mock data) | Real source |
 | --- | --- |
@@ -46,6 +46,8 @@ The key ceremonies match too: btckeys (Entropia, hand-stamped plates, SeedSigner
 Replaced by btc-dao: the PIN login and register form (join flow), the accrued balance and settlement threshold (monthly distribution proposal), and "update address" (recipient confirmation, see decision 4). The "Start with this" text and the layers section carry over.
 
 ## 4. Decisions before building
+
+Decided: weekly cadence (changeable by a rules vote), and payout addresses carried in each distribution proposal. Both need a small protocol change, drafted separately: weekly round dates, and a standing confirmation so members confirm their address once.
 
 1. **Distribution rule.** Equal split per member, or by panel ownership or energy share. With one shared miner, hashrate per worker cannot attribute income to members.
 2. **Reserve share.** What percentage of each month's income stays in the treasury for the Bridge Buffer.
