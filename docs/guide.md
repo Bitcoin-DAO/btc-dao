@@ -272,7 +272,7 @@ Used if the domain is lost, seized or not renewed. The DAO listing it relies on 
 
 1. The maintainer puts the site up at the new address. The relay on the old domain goes down with it; the public relays still hold every event.
 2. Three council members approve a new DAO listing naming the new address and relays.
-3. The council announces the new address in person or on a call, and the btcdao.tech dashboard shows it.
+3. The council announces the new address in person or on a call, and the btcdao.tech dashboard shows it if the DAO is listed.
 4. Members open the new address, check it is the approved one, scan their identity card and create a new passkey. Same identity, same votes, no re-verification.
 5. Members without a card go through key replacement.
 
@@ -280,7 +280,7 @@ Used if the domain is lost, seized or not renewed. The DAO listing it relies on 
 
 1. The maintainer announces each new version to members as a statement proposal, with what changes, before deploying it.
 2. Releases are signed and built reproducibly (S2), so anyone can check that the published files match the code.
-3. The app shows its version and build fingerprint on the Rules page; the DAO's listing records them, and the btcdao.tech dashboard flags DAOs running an outdated version or a build that does not match the signed release.
+3. The app shows its version and build fingerprint on the Rules page; the DAO's listing records them, and the btcdao.tech dashboard flags listed DAOs running an outdated version or a build that does not match the signed release.
 
 Funds stay safe whatever the software does, because council members check every payment on the SeedSigner screen. (Resolved G-16.)
 
