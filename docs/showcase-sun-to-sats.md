@@ -32,7 +32,7 @@ The key ceremonies match too: btckeys (Entropia, hand-stamped plates, SeedSigner
 ## 3. What remains to build
 
 1. **Distribution helper** in the DAO's app, from [`showcase/bridge-buffer-dashboard.html`](showcase/bridge-buffer-dashboard.html). Its core (split a total by share, show idle members at 0%) carries over. Its inputs change: members own panels, not miners, so the share comes from the distribution rule (section 4), not from hashrate per worker. Pool data is pasted at first; a small Cloudflare Worker can poll the pool later, because browsers cannot fetch pool stats directly.
-2. **Sun front page**: a preview with demo data is built at [`app/public/showcase/sun-to-sats/`](../app/public/showcase/sun-to-sats/index.html), published with the app at `/showcase/sun-to-sats/`. Its demo state is one JSON block shaped like the app's rebuilt state, so going live replaces that block. It started from [`showcase/sun-to-sats-treasury-prototype.html`](showcase/sun-to-sats-treasury-prototype.html): a read-only page in the Sun to Sats DAO's own copy of btc-dao, rebuilding state from relays and the chain like the app does.
+2. **Sun front page**: a preview with demo data is built at [`showcase/sun-to-sats/`](../showcase/sun-to-sats/index.html) and published at https://bitcoin-dao.github.io/btc-dao/showcase/sun-to-sats/. Its demo state is one JSON block shaped like the app's rebuilt state, so going live replaces that block. It started from [`showcase/sun-to-sats-treasury-prototype.html`](showcase/sun-to-sats-treasury-prototype.html): a read-only page in the Sun to Sats DAO's own copy of btc-dao, rebuilding state from relays and the chain like the app does.
 
 | In the prototype (mock data) | Real source |
 | --- | --- |
