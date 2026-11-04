@@ -47,7 +47,7 @@ Replaced by btc-dao: the PIN login and register form (join flow), the accrued ba
 
 ## 4. Decisions before building
 
-Decided: weekly cadence (changeable by a rules vote), and payout addresses carried in each distribution proposal. Both need a small protocol change, drafted separately: weekly round dates, and a standing confirmation so members confirm their address once.
+Decided: weekly cadence (changeable by a rules vote), and payout addresses carried in each distribution proposal. Both need a small protocol change, drafted in [`drafts/weekly-rounds-and-standing-addresses.md`](drafts/weekly-rounds-and-standing-addresses.md): weekly round dates, and a standing confirmation so members confirm their address once.
 
 1. **Distribution rule.** Equal split per member, or by panel ownership or energy share. With one shared miner, hashrate per worker cannot attribute income to members.
 2. **Reserve share.** What percentage of each week's income stays in the treasury for the Bridge Buffer.

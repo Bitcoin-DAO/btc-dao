@@ -52,7 +52,7 @@
 
 ## Open questions
 
-- [ ] Sun to Sats showcase (`showcase-sun-to-sats.md`): distribution rule and reserve share. Weekly cadence and standing payout addresses are decided; the protocol change for both is still to be drafted
+- [ ] Sun to Sats showcase (`showcase-sun-to-sats.md`): distribution rule and reserve share. Weekly cadence and standing payout addresses are decided; the protocol change for both is drafted for review in `drafts/weekly-rounds-and-standing-addresses.md`
 - [ ] Sun to Sats sunblocks (Layer 01, `showcase-sun-to-sats.md` section 6): distribution weights for base and panel shares, price risk on instalments, whether non-members can pledge, and how a pledge address goes on the public record
 - [ ] Legal check: does holding pledges for members count as holding client money (Italy, UK)? Add to the custody question below
 - [ ] Which funding model for UNO's mainnet DAO? Members to read `funding-models.md` and decide before the mainnet charter is drafted
