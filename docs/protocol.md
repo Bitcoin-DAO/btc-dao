@@ -369,7 +369,7 @@ A DAO publishes to the relays in its own config, and its DAO relay accepts only 
 
 - **What goes there:** each `dao.listing` and the `dao.endorse` events that endorse it (object `listing`). Nothing else is needed: the listing's `relays` field tells a dashboard where to fetch the rest of the DAO's events by `#D`.
 - **Who publishes:** the app publishes a listing and its endorsements to the discovery relays as well as to the DAO's own relays, but only when the listing has `"listed": true`. A DAO that does not opt in never appears there.
-- **Which relays:** a short list shipped with each btc-dao release, so every app and every dashboard starts from the same set. The project runs one (the btcdao.tech relay); the others are public relays. A dashboard may watch more relays, and a DAO may add more in its settings.
+- **Which relays:** a short list shipped with each btc-dao release, so every app and every dashboard starts from the same set. The project runs one (the btcdao.tech relay); the others are public relays. A dashboard may watch more relays.
 - **Policy:** a discovery relay accepts kinds 3585 and 3571 with any `D` tag, from any key, keeps every accepted event and never deletes. Dashboards validate every listing and endorsement against the DAO's own events before showing it, so a discovery relay needs no trust.
 - **Stages:** dashboards show trial stages (practice and testnet, read from the genesis config's `stage`) apart from mainnet DAOs and leave them out of network totals. Whether trial stages publish at all is open (`decisions.md`).
 
