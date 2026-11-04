@@ -193,15 +193,12 @@ Cases marked with a gap number tested a rule `protocol.md` did not settle when t
 | A-01 | Anchor whose digest matches the sorted covered ids and whose proof verifies | Shown as anchored at that block | 7.1 |
 | A-02 | Anchor whose `covers` leaves out a counted vote | Rejected | 7.1 |
 | A-03 | Pending proof replaced by an upgraded one with the same digest | Upgraded proof used | 7.1 |
-| L-01 | New listing with a new `site`, 3 endorsements | New address in effect; dashboard and restore screen show it | 7.2 |
+| L-01 | New listing with a new `site`, 3 endorsements | New address in effect; restore screen shows it, and the dashboard too if the DAO is listed | 7.2 |
 | L-02 | New listing with 2 endorsements | Old address stays | 7.2 |
 | L-03 | Client opened at an address that is not the endorsed `site` | Warning shown | 7.2 |
-| L-04 | Endorsed listing with `"dashboard": {"listed": true, "show": ["profile", "tallies"]}` | Dashboard shows the DAO's profile and tallies, and no other data point | 7.2 |
-| L-05 | Endorsed listing with no `dashboard` object | Address and build check work as usual; dashboard does not show the DAO | 7.2 |
+| L-04 | Endorsed listing with `"listed": true` | Dashboard shows the DAO's standard view | 7.2 |
+| L-05 | Endorsed listing without `listed` | Address and build check work as usual; dashboard does not show the DAO | 7.2 |
 | L-06 | Listed DAO publishes a new listing with `"listed": false`, 3 endorsements | Dashboard stops showing the DAO; its events stay on the relays | 7.2 |
-| L-07 | New listing changing `show`, 2 endorsements | Previous choices stay in effect | 7.2 |
-| L-08 | `show` contains an unknown name, alongside known ones | Unknown name ignored; known names applied | 7.2 |
-| L-09 | `show` contains `votes` but not `tallies` | Dashboard shows neither: `votes` needs `tallies` | 7.2, dashboard spec 5 |
 
 ## 14. Treasury housekeeping and closing
 
@@ -229,7 +226,7 @@ Cases for the app's publishing to discovery relays and for any dashboard. "Dashb
 | ID | Case | Expected | § |
 | --- | --- | --- | --- |
 | Q-01 | Listing with `"listed": true` reaches 3 endorsements | App publishes the listing and its 3 endorsements to the shipped discovery relays as well as the DAO's own relays | 7.4 |
-| Q-02 | Listing with `"listed": false`, or with no `dashboard` object | App does not publish it to discovery relays | 7.4 |
+| Q-02 | Listing with `"listed": false`, or without `listed` | App does not publish it to discovery relays | 7.4 |
 | Q-03 | Dashboard finds a listing on a discovery relay | Fetches the DAO's events by `#D` from the listing's `relays`, verifies genesis, settings and the listing's endorsements, then shows the DAO | 7.4, 8 |
 | Q-04 | Listing on a discovery relay whose endorsements are not by the DAO's council | Not shown | 7.4, 3.2 |
 | Q-05 | Listing on a discovery relay whose `relays` cannot be reached | Not shown until the DAO's events can be verified | 7.4 |

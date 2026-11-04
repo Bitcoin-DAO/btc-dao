@@ -340,17 +340,11 @@ Tags: `["e", <tally id>]`. Content: `{"digest": "<sha256>", "covers": ["<event i
 
 Content: `{"name": "UNO", "site": "https://...", "relays": ["wss://..."], "descriptor": "<public descriptor>", "software": "btc-dao 0.1.0", "build": "<sha256 of the release bundle>"}`. Takes effect with `threshold` endorsements. Dashboards list only endorsed listings, and flag any DAO whose `software` is older than the latest release or whose `build` does not match the signed release. The app shows its own version and build fingerprint on the Rules page, so members can compare.
 
-**Dashboard choices** (optional): the content may carry a `dashboard` object, written by the app's dashboard settings form:
-
-```json
-"dashboard": {"listed": true, "show": ["profile", "totals", "treasury", "reconciliation", "counts", "proposals", "tallies"]}
-```
-
-`show` lists the data points the DAO agrees to have displayed, from: `profile`, `totals`, `treasury`, `reconciliation`, `counts`, `proposals`, `proposal_text`, `payouts`, `tallies`, `votes`, `feed` (meanings in `dashboard-spec.md` section 5). Dashboards show a DAO only when the latest endorsed listing has `"listed": true`, and show only what `show` names. A listing with no `dashboard` object, or with `"listed": false`, keeps working for its other purposes (the DAO's address, the build check) but is not shown on dashboards. Withdrawing from dashboards is a new listing with `"listed": false`, endorsed like any other. The choices govern display only: every event stays public on the relays.
+**Dashboard switch** (optional): the content may carry `"listed": true`, set by the app's *show on public dashboards* switch. Dashboards show a DAO only when its latest endorsed listing has `"listed": true`. A listing without it, or with `"listed": false`, keeps working for its other purposes (the DAO's address, the build check) but is not shown on dashboards. Leaving dashboards is a new listing with `"listed": false`, endorsed like any other. The switch governs display only: every event stays public on the relays.
 
 The `site` of the latest endorsed listing is the DAO's address. Moving the DAO to a new domain is done by publishing a new listing and collecting `threshold` endorsements; no member needs re-verifying. The card-restore screen shows the endorsed address and its endorsements, and clients warn when they are opened at any other address. Members should never scan an identity card on an address the council has not endorsed.
 
-After a domain loss, members find the new address in two ways that do not depend on the lost domain: the project dashboard (btcdao.tech), which shows each DAO's latest endorsed `site`, and an announcement by the council in person or on a call. A DAO relay on the lost domain goes down with it. The public relays in the config still hold every event, so the new listing can be fetched there, and its `relays` field names the DAO's new relays.
+After a domain loss, members find the new address in two ways that do not depend on the lost domain: the project dashboard (btcdao.tech), which shows the latest endorsed `site` of each DAO that is listed, and an announcement by the council in person or on a call. A DAO relay on the lost domain goes down with it. The public relays in the config still hold every event, so the new listing can be fetched there, and its `relays` field names the DAO's new relays.
 
 ### 7.3 DAO relay
 
