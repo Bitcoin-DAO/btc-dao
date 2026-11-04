@@ -57,7 +57,8 @@
 - [ ] Can OpenTimestamps calendars be reached from the browser, or is a small helper needed?
 - [ ] Does SeedSigner's current firmware verify change against a loaded P2WSH multisig descriptor? Test before phase 2
 - [ ] Is passkey PRF supported on every member's phone? (Confirmed on the first Android phone tested)
-- [ ] Are kinds 3570–3586 and the `D` tag free in the Nostr registry?
+- [ ] Are kinds 3570–3586 free? Registry and GitHub checked on 4 November 2026: no NIP defines any kind from 3500 to 3699 (nostr-protocol/nips at commit 400d157), and GitHub code search found no Nostr use of these kinds. Still to do: query a few large relays for kinds 3570–3586 (for example `nak req -k 3570 -k 3585 wss://relay.damus.io`)
+- [ ] Keep the `D` tag or change it before v1? NIP-CC (Geocaching) already uses `D` for cache difficulty (values 1–5, kind 37516). No clash in practice, since btc-dao always filters `#D` together with kinds 3570–3586 and a DAO id is 64 hex characters; but the letter is shared, so either note that in the NIP draft or pick a letter no NIP uses
 - [ ] Should testnet stages publish their events to relays, or keep all data local to the DAO, with only mainnet publishing? See `dashboard-spec.md` section 10
 - [ ] After UNO's testnet stage closes, replace the relay's D1 database with one under a generic name (`relay/README.md`, "To do"). Left as is until then
 - [ ] Legal check (Italy, UK): confirm keyless coordination software is not custody
