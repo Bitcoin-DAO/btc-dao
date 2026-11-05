@@ -27,6 +27,7 @@ All 19 screens are in [`design/`](design/README.md).
 
 | Path | What it holds |
 | --- | --- |
+| `CHANGELOG.md` | What each tagged release changed. A DAO's copy runs one tagged release |
 | `docs/what-is-a-bitcoin-dao.md`, `docs/what-is-a-bitcoin-dao.it.md` | A plain-language introduction, in English and Italian: what a Bitcoin DAO is, how it works, what it can be used for |
 | `docs/wallet-guide.it.md`, `docs/wallet-guide.en.md` | "Your first bitcoin wallet in 5 minutes" for members, in Italian and English |
 | `docs/testnet-treasury.md` | The BTC DAO Testnet Treasury: the organisation's testnet4 wallet that funds every practice and testnet stage and gets the coins back when each one closes |
@@ -41,6 +42,7 @@ All 19 screens are in [`design/`](design/README.md).
 | `docs/test-cases.md` | Test cases every client must pass, test vectors, and the protocol gaps they exposed |
 | `docs/decisions.md` | Decisions taken so far and open questions |
 | `design/` | The mock-up screens (Italian) as source and PNG, plus the spec's diagrams |
+| `site/` | The DAO's own static pages and files (for example an about page), copied next to the app at build. Like `config/`, it belongs to the DAO: updating btc-dao never touches it. Empty here |
 | `app/` | The DAO's website: founding, sign-in, identity cards, treasury, proposals and votes, membership, payout rounds (the phase 1 prototype), with unit and end-to-end tests |
 | `relay/` | The DAO's own Nostr relay: Nosflare set up to keep only the DAO's events, with deployment steps for Cloudflare |
 | `tools/render-mockups/` | Regenerates the screen PNGs from the source files |
