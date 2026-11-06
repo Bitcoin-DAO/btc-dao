@@ -39,7 +39,8 @@
 - [x] Rejected proposal (fails on votes): UNO-0002, 0 yes, 2 no (UNO practice, v0.1.6, 6 Nov 2026)
 - [ ] Proposal without quorum
 - [ ] Vote changed before the close
-- [ ] Rule change, confirmed by the council (including the fee setting, once released)
+- [x] Rule change, confirmed by the council: UNO-0003, payouts monthly to weekly, rules version 2 (UNO practice, v0.1.6, 6 Nov 2026)
+- [ ] Rule change of the fee setting, once released
 - [ ] Statement proposal
 - [ ] Votes of the real length (days), with members voting on different days (Sandbox DAO)
 
@@ -100,3 +101,4 @@ From UNO's practice run, 6 November 2026:
 8. Receipts wait for depth: a receipt is published only after several confirmations (3 on testnet4, set in the config), and the round page shows "Confirmed in block … (1 of 3)" until then. Seen in round 2026-11: one confirmation, then a reorg.
 9. A source answering that it already has the transaction counts as accepted, not as an error.
 10. Any viewer's round page reads the chain: once the transaction confirms, it shows "Confirmed on chain, receipt waiting for a council member" until a council phone publishes the receipt. Receipts are published only by a council member's open app, so they can lag behind the chain.
+11. Rules page: show short voting periods in minutes or hours ("10 minutes", not "0.007 days").
