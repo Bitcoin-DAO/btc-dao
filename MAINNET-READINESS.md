@@ -60,6 +60,7 @@
 - [ ] A council member declines a round, with the reason shown
 - [ ] Payment that lapses after two rounds
 - [ ] Fee above the charter cap: the round waits (S5)
+- [ ] A confirmation removed by a reorg does not produce a receipt; the round waits again (seen on testnet4, 6 Nov 2026: round 2026-11 was mined, then its block dropped)
 - [ ] Closing: the whole balance returns to the BTC DAO Testnet Treasury
 
 ## 6. Hardware signing and recovery (UNO testnet)
@@ -96,3 +97,5 @@ From UNO's practice run, 6 November 2026:
 5. Fee setting in the DAO's rules, **fast** (default) or **economical**, changed by a rule-change vote. Fast aims for the next block with 25% headroom and a floor of 2 sat/vB; the charter cap stays, with a warning when the fast rate is above it; a check before broadcast if the rate has risen while signatures were collected; the fee shown to signers in sats, as a share of the payouts, and with its aim. No replace-by-fee.
 6. A broadcast goes to every chain source, not only the first that accepts.
 7. Founder guide: each member uses their own Google or Apple account for the passkey.
+8. Receipts wait for depth: a receipt is published only after several confirmations (3 on testnet4, set in the config), and the round page shows "Confirmed in block … (1 of 3)" until then. Seen in round 2026-11: one confirmation, then a reorg.
+9. A source answering that it already has the transaction counts as accepted, not as an error.
