@@ -53,7 +53,7 @@
 
 ## 5. Payout rounds
 
-- [ ] First payout confirmed on chain, receipt published, proposal shows paid (UNO practice, round 2026-11: broadcast reached the network on the second attempt, v0.1.6)
+- [x] First payout confirmed on chain, receipt published, proposal shows paid (UNO practice, round 2026-11, v0.1.6, 6 Nov 2026: 5,000 sats, fee 181, block 159459, tx `610238de…a3b`. Reached the network on the second attempt, through Blockbook; one reorg on the way)
 - [ ] A broadcast reaches the network first time, and the round confirms within a few blocks (fee setting released)
 - [ ] Round with several payouts
 - [ ] Signatures collected over days (Sandbox DAO, 3 of 5)
