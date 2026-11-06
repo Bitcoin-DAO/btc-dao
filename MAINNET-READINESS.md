@@ -36,7 +36,7 @@
 ## 3. Proposals and votes
 
 - [x] Payout proposal with recipient confirmation, voted and passed (UNO practice, 6 Nov 2026)
-- [ ] Rejected proposal (fails on votes)
+- [x] Rejected proposal (fails on votes): UNO-0002, 0 yes, 2 no (UNO practice, v0.1.6, 6 Nov 2026)
 - [ ] Proposal without quorum
 - [ ] Vote changed before the close
 - [ ] Rule change, confirmed by the council (including the fee setting, once released)
