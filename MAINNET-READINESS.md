@@ -51,6 +51,7 @@
 - [ ] Member removed by a two-thirds vote
 - [ ] Council change (a council member replaced, new descriptor)
 - [ ] Lost key: card restore, and key replacement when there is no card
+- [ ] Trial stages: a council member restores from the card, types the 12 words of the trial treasury key back in (v0.1.7), and signs a round
 
 ## 5. Payout rounds
 
