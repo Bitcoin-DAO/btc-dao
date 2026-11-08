@@ -47,7 +47,7 @@
 ## 4. Membership
 
 - [x] New member proposed, short code checked (two council checks), voted in, member list version 2 approved by the council: @member1 (UNO practice, v0.1.7, 8 Nov 2026)
-- [ ] Member leaves
+- [x] Member leaves: immediate, then member list version 5 approved by the council (@member1, UNO practice, v0.1.7, 8 Nov 2026)
 - [ ] Member removed by a two-thirds vote
 - [ ] Council change (a council member replaced, new descriptor)
 - [x] Lost key: card restore (@founder1) and key replacement without the card, remote, twice in a row, with member list versions 3 and 4 (@member1, now VNTH · SY98) (UNO practice, v0.1.7, 8 Nov 2026)
@@ -113,3 +113,4 @@ From UNO's practice run, 6 November 2026:
 19. After a browser's site data is cleared, its passkeys still appear (they live in the Google or Apple account) but open nothing, and the message asks "Did you pick the right passkey?". Say instead that this browser no longer has the key the passkey protects, and point to the card or "I lost my key and card". Name passkeys so old and new ones can be told apart.
 20. Key replacement: once the council has approved and checked the new key, the new key still waits for the next member list version, and the member's page shows only "On the member list: Not yet". Say what it is waiting for ("the council publishes the new member list"). A member who taps Sign in meanwhile gets a passkey error, because the passkey is only made at the end; Sign in should take someone with a replacement under way back to its waiting page.
 21. Two council members can each start a replacement for the same new key. Once one takes effect, the other can never complete (the key is already in use), yet it stays on every council member's Council page as "Approve", and counts in the to-do badge, for ever. Hide replacements whose new key is already in effect, or whose old key is no longer the member's, and stop a second replacement for a key that already has one under way.
+22. After leaving, the profile still offers member actions (Propose a new member, payout address, Print the card). Show only what a former member can do: the record, and joining again. Confirmations use the browser's own dialog ("The page at https://bitcoin-dao.github.io says"); use the app's own, in its language.
