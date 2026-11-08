@@ -50,7 +50,7 @@
 - [ ] Member leaves
 - [ ] Member removed by a two-thirds vote
 - [ ] Council change (a council member replaced, new descriptor)
-- [ ] Lost key: card restore, and key replacement when there is no card
+- [x] Lost key: card restore (@founder1) and key replacement without the card, remote, twice in a row, with member list versions 3 and 4 (@member1, now VNTH · SY98) (UNO practice, v0.1.7, 8 Nov 2026)
 - [~] Trial stages: a council member restores from the card and types the 12 words of the trial treasury key back in; same fingerprint (8c37eb1f) (UNO practice, v0.1.7, 8 Nov 2026). Still to do: sign a round with it
 
 ## 5. Payout rounds
