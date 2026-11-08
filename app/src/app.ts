@@ -4,7 +4,7 @@ import { stageError, stageOf, usable, type SiteConfig } from './core/config';
 import { KIND, sign, template, type Event } from './core/events';
 import { rebuild, type DaoState, type Member } from './core/state';
 import { parseDescriptor } from './core/descriptor';
-import { broadcast, loadTreasury, txStatus, type Broadcast, type TreasuryView } from './core/chain';
+import { broadcast, loadTreasury, txStatus, type Broadcast, type TreasuryView, type TxStatus } from './core/chain';
 import { finalizeRound } from './core/round';
 import type { RoundView } from './core/state';
 import { prfSalt, pubkeyOf, treasuryKeyFromMnemonic, unwrapSecret, wrapSecret } from './core/identity';
@@ -92,12 +92,17 @@ const broadcasted = new Map<string, number>();
 /** A broadcast that no source has seen after this long is sent again. */
 const REBROADCAST_MS = 10 * 60_000;
 const receipted = new Set<string>();
+/** What the chain last said about each open round's transaction (filled by council phones' sync, read by the Council page). */
+export const chainSeen = new Map<string, TxStatus>();
 
 /**
  * Where the app reads the chain: the site's current list first, then the one recorded at founding.
  * A source is a site setting, not a rule: it can show data but never move coins (every payment is
  * checked against the treasury's descriptor), so a DAO can add a source without a vote.
  */
+/** Confirmations before a receipt: the site's setting, else the founding one, else 3. */
+export const receiptDepth = () => Math.max(1, state.site?.receiptConfirmations ?? state.dao?.founded?.config.receiptConfirmations ?? 3);
+
 export const chainApis = () => [...new Set([...usable(state.site?.chainApi ?? []), ...usable(state.dao?.founded?.config.chainApi ?? [])])];
 
 /** Combine the round's signatures, finalise and broadcast. Anyone may do this; doing it twice is harmless. */
@@ -126,7 +131,10 @@ async function autoRounds() {
         /* someone else may have broadcast it, or the API is down: try again next sync */
       }
     }
-    if (st?.confirmed && st.block_height && !r.receipt && !receipted.has(txid)) {
+    if (st) chainSeen.set(txid, st);
+    else chainSeen.delete(txid);
+    // The receipt waits for depth: a block can be dropped by a reorg, and a receipt cannot be taken back.
+    if (st?.confirmed && st.block_height && (st.confirmations ?? 0) >= receiptDepth() && !r.receipt && !receipted.has(txid)) {
       receipted.add(txid);
       try {
         await signAndPublish(KIND.receipt, { txid, block_height: st.block_height }, [['e', r.event.id]]);
@@ -190,6 +198,9 @@ export async function sync() {
       const cached = treasuryCache.get<TreasuryView>(daoId);
       if (cached) setState({ treasury: cached.view, treasuryAt: cached.at });
     }
+    // Another open page of this site may have read the treasury since: use its reading rather than asking again.
+    const shared = treasuryCache.get<TreasuryView>(daoId);
+    if (shared && shared.at > (state.treasuryAt ?? 0)) setState({ treasury: shared.view, treasuryAt: shared.at, treasuryError: undefined });
     // One read at a time, and not on every sync: repeated reads pile up and public APIs throttle them.
     const age = Date.now() - (state.treasuryAt ?? 0);
     const sinceTry = Date.now() - lastTreasuryTry;

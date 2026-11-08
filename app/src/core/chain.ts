@@ -43,6 +43,8 @@ export interface TreasuryView {
   changeIndex: number; // lowest unused change address
   movements: Movement[];
   utxos: Utxo[];
+  /** Which source answered, for "Read from the blockchain … via …". */
+  source?: string;
 }
 
 export type Fetcher = (url: string) => Promise<unknown>;
@@ -68,11 +70,23 @@ const defaultFetch: Fetcher = async url => {
       throw new Error(reachable ? 'answers, but does not let this site read it (CORS or too many requests)' : 'cannot be reached (Failed to fetch)');
     }
     if (!r.ok) throw new Error(r.status === 429 ? '429 too many requests' : `${r.status}`);
+    lastUpstream = r.headers.get('X-Gateway-Source') ?? undefined; // a chain gateway names the service behind it
     return await r.json();
   } finally {
     clearTimeout(timer);
   }
 };
+
+/** The service behind a chain gateway for the latest answer, when the source is a gateway. */
+let lastUpstream: string | undefined;
+/** The source that gave the latest successful answer, for "Read from the blockchain … via …". */
+let lastAnswer: { api: string; upstream?: string } | undefined;
+
+/** A short name for a source: its host, with the service behind it when the source is a chain gateway. */
+export function sourceLabel(api: string, upstream?: string): string {
+  const host = explorerOf(api).replace(/^https?:\/\//, '').split('/')[0];
+  return upstream ? `${upstream} · ${host.split('.')[0]}` : host;
+}
 
 /** A chain source from the config's chainApi: an Esplora API, or a Blockbook server written "blockbook:<address>". */
 export interface Source {
@@ -147,18 +161,20 @@ function blockbookRequest(base: string, path: string): Request | undefined {
       conv: r => {
         const t = r as BbTx;
         if (t?.txid !== id) throw new Error(`${base}: transaction not known`);
-        return (t.confirmations ?? 0) > 0 ? { confirmed: true, block_height: t.blockHeight } : { confirmed: false };
+        return (t.confirmations ?? 0) > 0 ? { confirmed: true, block_height: t.blockHeight, confirmations: t.confirmations } : { confirmed: false };
       },
     };
   }
   if (path === '/v1/fees/recommended')
     return {
-      url: `${base}/api/v2/estimatefee/3`,
+      url: `${base}/api/v2/estimatefee/2`, // within two blocks: Bitcoin Core's shortest estimate
       conv: r => {
         const satVb = Math.ceil(num((r as { result?: string }).result) * 1e5); // BTC per kvB to sat per vB
-        return { halfHourFee: satVb, hourFee: satVb, minimumFee: 1 };
+        return { fastestFee: satVb, halfHourFee: satVb, hourFee: satVb, minimumFee: 1 };
       },
     };
+  if (path === '/blocks/tip/height')
+    return { url: `${base}/api`, conv: r => num((r as { blockbook?: { bestHeight?: number } }).blockbook?.bestHeight) || undefined };
   return undefined;
 }
 
@@ -191,8 +207,10 @@ async function get<T>(apis: string[], path: string, f: Fetcher, until = Infinity
       const req = requestFor(api, path);
       if (!req) continue;
       try {
+        lastUpstream = undefined;
         const r = req.conv(await f(req.url)) as T;
         failedAt.delete(api);
+        lastAnswer = { api, upstream: lastUpstream };
         return r;
       } catch (e) {
         last = e;
@@ -268,54 +286,99 @@ export async function loadTreasury(d: ParsedDescriptor, network: Network, apis: 
     }
   }
 
-  return { balance, unconfirmed, donationAddress, donationIndex, changeIndex, movements, utxos };
+  const by = lastAnswer;
+  return { balance, unconfirmed, donationAddress, donationIndex, changeIndex, movements, utxos, source: by ? sourceLabel(by.api, by.upstream) : undefined };
 }
 
-/** Fee rate for confirmation within about half an hour (mempool.space API). */
-export async function feeRate(apis: string[], f: Fetcher = defaultFetch): Promise<number> {
-  const r = await get<{ halfHourFee: number; hourFee: number; minimumFee: number }>(apis, '/v1/fees/recommended', f);
-  return Math.max(1, r.halfHourFee || r.hourFee || r.minimumFee || 1);
+/** How a DAO chooses its rounds' fee, set in its rules ("fast" unless changed by a rule-change vote). */
+export type FeePolicy = 'fast' | 'economical';
+export const feePolicyOf = (rules: { [k: string]: unknown }): FeePolicy => (rules.feePolicy === 'economical' ? 'economical' : 'fast');
+
+export interface FeeSuggestion {
+  /** The rate to use, in sat/vB, before the DAO's cap. */
+  rate: number;
+  /** The network's rate for the next block now. */
+  next: number;
+}
+
+/**
+ * The rate for a round. Fast: aim for the next block, with a quarter more as headroom for the hours or
+ * days the council may take to sign, and never under 2 sat/vB. Economical: the network's rate for
+ * confirmation within about an hour.
+ */
+export async function suggestFee(apis: string[], policy: FeePolicy, f: Fetcher = defaultFetch): Promise<FeeSuggestion> {
+  const r = await get<{ fastestFee?: number; halfHourFee?: number; hourFee?: number; economyFee?: number; minimumFee?: number }>(apis, '/v1/fees/recommended', f);
+  const next = Math.max(1, r.fastestFee || r.halfHourFee || r.hourFee || 1);
+  const rate = policy === 'fast' ? Math.max(2, Math.ceil(next * 1.25)) : Math.max(1, r.hourFee || r.economyFee || r.minimumFee || 1);
+  return { rate, next };
+}
+
+/** The latest block's height. */
+export async function tipHeight(apis: string[], f: Fetcher = defaultFetch): Promise<number> {
+  const h = await get<number | undefined>(apis, '/blocks/tip/height', f);
+  if (!h || !Number.isFinite(h)) throw new Error('no chain tip');
+  return h;
 }
 
 export interface Broadcast {
   txid: string;
-  /** The source that accepted the transaction, as written in `chainApi`. */
+  /** The first source that accepted the transaction, as written in `chainApi`. */
   source: string;
+  /** Every source that accepted it ("already known" counts). */
+  accepted: string[];
+  /** Sources that refused it, with their reasons. */
+  refused: { source: string; reason: string }[];
+  /** What a chain gateway reported for the services behind it. */
+  behind: string[];
 }
 
+/** A source answering that it already has the transaction has accepted it. */
+const ALREADY = /already|txn-already|known|exists|in block ?chain/i;
+
 /**
- * Send a signed transaction to each source in turn until one accepts it.
- * A source has accepted only when it answers with the transaction's own id: an unstable service
- * can answer 200 with a holding page, and that must not read as "broadcast".
+ * Send a signed transaction to every source at once, so it reaches several nodes, and report what each said.
+ * A source has accepted only when it answers with the transaction's own id (or says it already has it):
+ * an unstable service can answer 200 with a holding page, and that must not read as "broadcast".
  */
 export async function broadcast(apis: string[], hex: string, txid: string): Promise<Broadcast> {
-  let last: unknown;
-  for (const api of inOrder(apis)) {
+  const tries = apis.map(async api => {
     const s = sourceOf(api);
+    let gateway: string | null = null;
+    let ok = false;
+    let reason = '';
     try {
       if (s.kind === 'blockbook') {
         const r = await fetch(`${s.base}/api/v2/sendtx/`, { method: 'POST', body: hex, headers: { 'Content-Type': 'text/plain' } });
+        gateway = r.headers.get('X-Gateway-Broadcast');
         const j = (await r.json().catch(() => ({}))) as { result?: string; error?: string | { message?: string } };
-        if (r.ok && j.result?.trim() === txid) return { txid, source: api };
-        last = new Error(`${explorerOf(api).replace(/^https?:\/\//, '')}: ${typeof j.error === 'string' ? j.error : (j.error?.message ?? `${r.status}`)}`);
+        reason = typeof j.error === 'string' ? j.error : (j.error?.message ?? `${r.status}`);
+        ok = (r.ok && j.result?.trim() === txid) || ALREADY.test(reason);
       } else {
         const r = await fetch(s.base + '/tx', { method: 'POST', body: hex, headers: { 'Content-Type': 'text/plain' } });
+        gateway = r.headers.get('X-Gateway-Broadcast');
         const text = (await r.text()).trim();
-        if (r.ok && text === txid) return { txid, source: api };
-        last = new Error(`${explorerOf(api).replace(/^https?:\/\//, '')}: ${r.ok ? 'unexpected answer' : text.slice(0, 200) || r.status}`);
+        reason = r.ok ? (text === txid ? '' : 'unexpected answer') : text.slice(0, 200) || `${r.status}`;
+        ok = (r.ok && text === txid) || ALREADY.test(reason);
       }
-      failedAt.set(api, Date.now());
     } catch (e) {
-      last = e;
-      failedAt.set(api, Date.now());
+      reason = (e as Error).message || String(e);
     }
-  }
-  throw last ?? new Error('no chain API');
+    if (!ok) failedAt.set(api, Date.now());
+    return { api, ok, reason, gateway };
+  });
+  const results = await Promise.all(tries);
+  const accepted = results.filter(x => x.ok).map(x => x.api);
+  const refused = results.filter(x => !x.ok).map(x => ({ source: x.api, reason: x.reason }));
+  const behind = results.flatMap(x => (x.gateway ? x.gateway.split(' · ') : []));
+  if (!accepted.length) throw new Error(refused.map(x => `${sourceLabel(x.source)}: ${x.reason}`).join(' · ') || 'no chain API');
+  return { txid, source: accepted[0], accepted, refused, behind: [...new Set(behind)] };
 }
 
 export interface TxStatus {
   confirmed: boolean;
   block_height?: number;
+  /** Blocks on top of it, its own included: 1 just after it is mined. */
+  confirmations?: number;
 }
 
 /** Where the transaction stands, or undefined when no source knows it (or none answers properly). */
@@ -324,8 +387,26 @@ export async function txStatus(apis: string[], txid: string, f: Fetcher = defaul
     const st = await get<TxStatus>(apis, `/tx/${txid}/status`, f);
     // Only a real status counts: anything else (an error object, a holding page) means "not known".
     if (!st || typeof st.confirmed !== 'boolean') return undefined;
-    return st.confirmed ? { confirmed: true, block_height: st.block_height } : { confirmed: false };
+    if (!st.confirmed) return { confirmed: false };
+    let confirmations = st.confirmations;
+    if (confirmations === undefined && st.block_height) {
+      try {
+        confirmations = Math.max(1, (await tipHeight(apis, f)) - st.block_height + 1);
+      } catch {
+        /* unknown depth: treated as not deep enough */
+      }
+    }
+    return { confirmed: true, block_height: st.block_height, confirmations };
   } catch {
     return undefined;
   }
 }
+
+/** Which sources know the transaction, asked all at once (for "On the network: seen by …"). */
+export async function txSeenBy(apis: string[], txid: string, f: Fetcher = defaultFetch): Promise<string[]> {
+  const seen = await Promise.all(apis.map(async api => ((await txStatus([api], txid, f)) ? api : undefined)));
+  return seen.filter((x): x is string => !!x);
+}
+
+/** The source of the latest successful answer. */
+export const lastSource = () => lastAnswer;

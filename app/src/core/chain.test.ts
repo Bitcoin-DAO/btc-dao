@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { broadcast, explorerOf, feeRate, loadTreasury, pushPageOf, sourceOf, txStatus, type Fetcher } from './chain';
+import { broadcast, explorerOf, feePolicyOf, loadTreasury, pushPageOf, sourceLabel, sourceOf, suggestFee, txSeenBy, txStatus, type Fetcher } from './chain';
 import { parseDescriptor, treasuryAddress } from './descriptor';
 
 // UNO's practice treasury (2 of 2), as founded on 6 November 2026.
@@ -41,7 +41,8 @@ const blockbook: Fetcher = async url => {
   }
   if ((m = u.pathname.match(/^\/api\/v2\/utxo\/([^/]+)$/))) return m[1] === A0 ? [{ txid: TXID, vout: 1, value: '10000', confirmations: 65 }] : [];
   if (u.pathname === `/api/v2/tx/${TXID}`) return { txid: TXID, confirmations: 65, blockHeight: 159356 };
-  if (u.pathname === '/api/v2/estimatefee/3') return { result: '0.00002' };
+  if (u.pathname === '/api/v2/estimatefee/2') return { result: '0.00002' };
+  if (u.pathname === '/api') return { blockbook: { bestHeight: 159420 } };
   throw new Error(`404 ${url}`);
 };
 
@@ -84,8 +85,10 @@ describe('chain sources', () => {
   });
 
   it('turns Blockbook fee estimates and transaction status into the app\'s terms', async () => {
-    expect(await feeRate([`blockbook:${BB}`], blockbook)).toBe(2); // 0.00002 BTC/kvB = 2 sat/vB
-    expect(await txStatus([`blockbook:${BB}`], TXID, blockbook)).toEqual({ confirmed: true, block_height: 159356 });
+    // 0.00002 BTC/kvB = 2 sat/vB for the next block: fast adds a quarter (rounded up), economical takes it as it is.
+    expect(await suggestFee([`blockbook:${BB}`], 'fast', blockbook)).toEqual({ rate: 3, next: 2 });
+    expect(await suggestFee([`blockbook:${BB}`], 'economical', blockbook)).toEqual({ rate: 2, next: 2 });
+    expect(await txStatus([`blockbook:${BB}`], TXID, blockbook)).toEqual({ confirmed: true, block_height: 159356, confirmations: 65 });
   });
 
   it('does not take an unknown transaction for one on the network', async () => {
@@ -99,25 +102,80 @@ describe('chain sources', () => {
   });
 });
 
+describe('fees and depth', () => {
+  const esplora = (fees: Record<string, number>, tip = 159460, height = 159459): Fetcher => async url => {
+    if (url.endsWith('/v1/fees/recommended')) return fees;
+    if (url.endsWith('/blocks/tip/height')) return tip;
+    if (url.endsWith('/status')) return { confirmed: true, block_height: height };
+    throw new Error(`404 ${url}`);
+  };
+  const ES = 'https://esplora.example/api';
+
+  it('fast aims for the next block with a quarter more, never under 2; economical takes the hour rate', async () => {
+    expect(await suggestFee([ES], 'fast', esplora({ fastestFee: 1, halfHourFee: 1, hourFee: 1 }))).toEqual({ rate: 2, next: 1 });
+    expect(await suggestFee([ES], 'fast', esplora({ fastestFee: 12, halfHourFee: 8, hourFee: 5 }))).toEqual({ rate: 15, next: 12 });
+    expect(await suggestFee([ES], 'economical', esplora({ fastestFee: 12, halfHourFee: 8, hourFee: 5 }))).toEqual({ rate: 5, next: 12 });
+  });
+
+  it('reads the policy from the rules: fast unless the members chose economical', () => {
+    expect(feePolicyOf({})).toBe('fast');
+    expect(feePolicyOf({ feePolicy: 'economical' })).toBe('economical');
+    expect(feePolicyOf({ feePolicy: 'nonsense' })).toBe('fast');
+  });
+
+  it('counts confirmations from the chain tip when the source gives only a height', async () => {
+    expect(await txStatus([ES], TXID, esplora({}, 159461, 159459))).toEqual({ confirmed: true, block_height: 159459, confirmations: 3 });
+    expect(await txStatus([ES], TXID, esplora({}, 159459, 159459))).toEqual({ confirmed: true, block_height: 159459, confirmations: 1 });
+  });
+
+  it('says which sources know a transaction', async () => {
+    const f: Fetcher = async url => {
+      if (url.startsWith('https://esplora.example')) return { confirmed: false };
+      throw new Error('400');
+    };
+    expect(await txSeenBy([ES, `blockbook:${BB}`], TXID, f)).toEqual([ES]);
+  });
+
+  it('names a source by its host, and the service behind a gateway', () => {
+    expect(sourceLabel('https://mempool.space/testnet4/api')).toBe('mempool.space');
+    expect(sourceLabel('blockbook:https://btc-dao-gateway.btcdao.workers.dev/bb', 'blockbook.tbtc.zelcore.io')).toBe('blockbook.tbtc.zelcore.io · btc-dao-gateway');
+  });
+});
+
 describe('broadcast', () => {
   afterEach(() => vi.unstubAllGlobals());
   const txid = 'cd'.repeat(32);
-  const answer = (body: string, ok = true) => Promise.resolve(new Response(body, { status: ok ? 200 : 400 }));
+  const answer = (body: string, ok = true, headers: Record<string, string> = {}) => Promise.resolve(new Response(body, { status: ok ? 200 : 400, headers }));
 
-  it('counts a source as accepting only when it answers with the transaction id', async () => {
+  it('sends to every source at once and reports what each said', async () => {
     const seen: string[] = [];
     vi.stubGlobal('fetch', (url: string) => {
       seen.push(url);
       if (url.startsWith('https://esplora.example')) return answer('<html>Service temporarily unavailable</html>');
-      return answer(JSON.stringify({ result: txid }));
+      return answer(JSON.stringify({ result: txid }), true, { 'X-Gateway-Broadcast': 'bb.example: accepted · es.example: min relay fee not met' });
     });
     const sent = await broadcast(['https://esplora.example/api', `blockbook:${BB}`], '00', txid);
-    expect(sent).toEqual({ txid, source: `blockbook:${BB}` });
-    expect(seen).toEqual(['https://esplora.example/api/tx', `${BB}/api/v2/sendtx/`]);
+    expect(sent).toEqual({
+      txid,
+      source: `blockbook:${BB}`,
+      accepted: [`blockbook:${BB}`],
+      refused: [{ source: 'https://esplora.example/api', reason: 'unexpected answer' }],
+      behind: ['bb.example: accepted', 'es.example: min relay fee not met'],
+    });
+    expect(seen.sort()).toEqual([`${BB}/api/v2/sendtx/`, 'https://esplora.example/api/tx'].sort());
   });
 
-  it('fails when no source returns the id', async () => {
-    vi.stubGlobal('fetch', () => answer(JSON.stringify({ error: { message: 'min relay fee not met' } }), false));
-    await expect(broadcast([`blockbook:${BB}`], '00', txid)).rejects.toThrow('min relay fee not met');
+  it('counts "already known" as accepted', async () => {
+    vi.stubGlobal('fetch', () => answer('sendrawtransaction RPC error: {"code":-27,"message":"Transaction already in block chain"}', false));
+    const sent = await broadcast(['https://esplora.example/api'], '00', txid);
+    expect(sent.accepted).toEqual(['https://esplora.example/api']);
+  });
+
+  it('fails with every source\'s reason when none accepts', async () => {
+    vi.stubGlobal('fetch', (url: string) =>
+      url.includes('sendtx') ? answer(JSON.stringify({ error: { message: 'min relay fee not met' } }), false) : Promise.reject(new TypeError('Failed to fetch')));
+    await expect(broadcast([`blockbook:${BB}`, 'https://esplora.example/api'], '00', txid)).rejects.toThrow(
+      /blockbook\.example: min relay fee not met · esplora\.example: Failed to fetch/,
+    );
   });
 });

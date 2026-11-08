@@ -48,6 +48,7 @@ const GET_PATHS: Record<Kind, RegExp[]> = {
     new RegExp(`^/api/v2/utxo/${ADDR}$`),
     new RegExp(`^/api/v2/tx/${TXID}$`),
     /^\/api\/v2\/estimatefee\/\d{1,3}$/,
+    /^\/api$/, // status: the chain tip
   ],
   esplora: [
     new RegExp(`^/address/${ADDR}$`),
@@ -63,14 +64,15 @@ const GET_PATHS: Record<Kind, RegExp[]> = {
 /** Blockbook query parameters the app uses; anything else is dropped. */
 const BB_QUERY = ['details', 'pageSize', 'page', 'from', 'to'];
 
-/** How long an answer may be reused, in seconds: settled transactions for an hour, fees for a minute, the rest briefly. */
+/** How long an answer may be reused, in seconds: settled transactions for an hour, fees for a minute, the rest briefly (the chain tip included). */
 function ttl(kind: Kind, path: string, body: string): number {
   if (/estimatefee|fees|fee-estimates/.test(path)) return 60;
   if (/\/tx\//.test(path)) {
     try {
       const j = JSON.parse(body);
-      const confirmed = kind === 'bb' ? (j.confirmations ?? 0) > 0 : (j.confirmed ?? j.status?.confirmed) === true;
-      return confirmed ? 3600 : 5; // an unconfirmed answer is the one that changes
+      // Blockbook's answer carries the confirmation count, which the app needs to grow: keep it briefly until deep.
+      if (kind === 'bb') return (j.confirmations ?? 0) >= 6 ? 3600 : 5;
+      return (j.confirmed ?? j.status?.confirmed) === true ? 3600 : 5; // Esplora: the block height does not change
     } catch {
       return 5;
     }
@@ -85,7 +87,14 @@ function cors(req: Request, env: Env): Record<string, string> | 'refused' {
   if (!origin) return {}; // a page opened directly, or a non-browser client
   const ok = list(env.ALLOWED_ORIGINS).includes(origin) || /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
   if (!ok) return 'refused';
-  return { 'Access-Control-Allow-Origin': origin, Vary: 'Origin', 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type' };
+  return {
+    'Access-Control-Allow-Origin': origin,
+    Vary: 'Origin',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    // The app shows which service answered and what each said to a broadcast.
+    'Access-Control-Expose-Headers': 'X-Gateway-Source, X-Gateway-Broadcast, X-Gateway-Cache',
+  };
 }
 
 function reply(status: number, body: string, type: string, headers: Record<string, string>): Response {
@@ -186,6 +195,8 @@ async function broadcast(kind: Kind, env: Env, hex: string, h: Record<string, st
     const base = [...list(env.BLOCKBOOK), ...list(env.ESPLORA)][i];
     return `${hostOf(base)}: ${x.status === 'fulfilled' ? (x.value.ok ? 'accepted' : x.value.msg) : why(x.reason)}`;
   });
+  // Kept in the Worker's logs (Cloudflare dashboard → the gateway → Observability), so a lost broadcast can be looked up.
+  console.log(JSON.stringify({ broadcast: txid, accepted, sources: reasons }));
   if (accepted) {
     cache.clear(); // balances and statuses change
     return kind === 'bb'
@@ -282,7 +293,7 @@ export default {
     if (p === '/esplora/tx/push' && es[0]) return Response.redirect(`${explorerOf('esplora', es[0])}/tx/push`, 302);
 
     // The APIs.
-    const kind: Kind | undefined = p.startsWith('/bb/api/') ? 'bb' : p.startsWith('/esplora/api/') ? 'esplora' : undefined;
+    const kind: Kind | undefined = p === '/bb/api' || p.startsWith('/bb/api/') ? 'bb' : p.startsWith('/esplora/api/') ? 'esplora' : undefined;
     if (!kind) return reply(404, JSON.stringify({ error: 'not found' }), 'application/json', h);
     const path = kind === 'bb' ? p.slice('/bb'.length) : p.slice('/esplora/api'.length);
 

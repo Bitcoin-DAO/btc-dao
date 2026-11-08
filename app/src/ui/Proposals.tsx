@@ -8,6 +8,7 @@ import { formatShortCode, shortCode } from '../core/shortcode';
 import { parseJson } from '../core/util';
 import { Address, Footer, Header, errText, go } from './parts';
 import { PaymentLine } from './Round';
+import { cadenceOf } from '../core/time';
 
 export const typeLabel = (type: string) => t(`type.${type}` as 'type.payout');
 
@@ -289,7 +290,27 @@ function Payload({ p }: { p: ProposalView }) {
   }
 }
 
-export const EDITABLE_RULES = ['votingPeriodDays', 'quorum', 'payoutRound', 'lapseAfterRounds', 'maxFeeRateSatVb', 'treasuryCapSats'] as const;
+export const EDITABLE_RULES = ['votingPeriodDays', 'quorum', 'payoutRound', 'lapseAfterRounds', 'maxFeeRateSatVb', 'feePolicy', 'treasuryCapSats'] as const;
+
+/** A voting period in words: practice votes in minutes, short ones in hours, the rest in days. */
+export function periodText(days: number): string {
+  const minutes = Math.round(days * 24 * 60);
+  if (minutes < 120) return t('period.minutes', { n: minutes });
+  if (days < 2) return t('period.hours', { n: Math.round(days * 24) });
+  return t('setup.days', { n: Number(days.toFixed(2)) });
+}
+
+/** A rule's value as members read it. */
+export function ruleValue(key: string, v: unknown): string {
+  switch (key) {
+    case 'votingPeriodDays': return typeof v === 'number' ? periodText(v) : String(v);
+    case 'payoutRound': return cadenceOf(v as string) === 'weekly' ? t('setup.weekly') : t('setup.monthly');
+    case 'feePolicy': return v === 'economical' ? t('fee.economical') : t('fee.fast');
+    case 'maxFeeRateSatVb': return `${v} sat/vB`;
+    case 'treasuryCapSats': return `${fmtSats(Number(v))} sats`;
+    default: return String(v);
+  }
+}
 
 export function ruleLabel(key: string) {
   switch (key) {
@@ -299,6 +320,7 @@ export function ruleLabel(key: string) {
     case 'treasuryCapSats': return t('setup.cap');
     case 'lapseAfterRounds': return t('np.ruleLapse');
     case 'payoutRound': return t('setup.payouts');
+    case 'feePolicy': return t('fee.label');
     default: return key;
   }
 }

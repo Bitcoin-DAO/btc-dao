@@ -19,7 +19,7 @@ const check = (cond, what) => {
   if (!cond) failures++;
 };
 const shot = (page, name) => page.screenshot({ path: `${SHOTS}/${name}.png`, fullPage: true });
-const seen = loc => loc.first().waitFor({ timeout: 30000 }).then(() => true, () => false);
+const seen = (loc, timeout = 30000) => loc.first().waitFor({ timeout }).then(() => true, () => false);
 
 async function phone(browser, label) {
   const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, locale: 'it-IT', permissions: ['clipboard-read', 'clipboard-write'] });
@@ -124,7 +124,8 @@ async function signUp(page, name, council) {
   log('@anna prepares the round and signs; @marco signs; broadcast');
   await open(a, '#/council');
   await a.getByRole('link', { name: 'Prepara il giro di pagamenti' }).click();
-  await a.getByText('Consigliata ora: 2 sat/vB').waitFor({ timeout: 30000 });
+  // Fast policy: the next block's rate plus a quarter, rounded up (mock: 3 sat/vB on Esplora, 2 on Blockbook).
+  check(await seen(a.getByText(/Per il prossimo blocco, con un margine: (4|3) sat\/vB/)), 'fast fee suggested for the next block, with headroom');
   await a.getByRole('button', { name: 'Prepara la transazione' }).click();
   await a.getByText('Riepilogo').waitFor();
   await shot(a, '01-prepare');
@@ -173,11 +174,21 @@ async function signUp(page, name, council) {
   await B.page.getByRole('button', { name: 'Trasmetti la transazione' }).click();
   check(await seen(B.page.getByText(/Accettata da 127\.0\.0\.1|Sulla rete ✓/)), 'broadcast accepted, with the source named');
   check(await seen(B.page.getByText(/Sulla rete ✓/)), 'broadcast seen on the network');
+  check(await seen(B.page.getByText(/La conoscono 1 fonti su 1/)), 'sources that know the transaction are named');
+  check(await seen(B.page.getByText(/punta al prossimo blocco/)), 'fee shown as a share of the payouts, with its aim');
 
   log('Confirmation and receipt');
+  // Anyone's round page shows the depth from the chain until the receipt (which waits for 3 confirmations).
+  let depth = false;
+  for (let i = 0; i < 15 && !depth; i++) {
+    await open(f, `#/round/${rid}`);
+    depth = await seen(f.getByText(/di 3 conferme/), 4000);
+    if (await f.getByText(/^Confermata nel blocco \d+\.$/).count()) break;
+  }
+  check(depth, 'confirmation depth shown before the receipt');
   await new Promise(r => setTimeout(r, 6000));
   await open(a, `#/round/${rid}`);
-  check(await seen(a.getByText(/Confermata nel blocco/)), 'receipt published by a council phone');
+  check(await seen(a.getByText(/^Confermata nel blocco \d+\.$/), 60000), 'receipt published by a council phone after 3 confirmations');
   await open(f, `#/p/${pid}`);
   check(await seen(f.getByText(/Pagato ✓ nel giro/)), 'proposal shows paid');
   await shot(f, '03-paid');

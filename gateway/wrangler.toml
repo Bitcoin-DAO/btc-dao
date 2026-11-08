@@ -12,3 +12,7 @@ BLOCKBOOK = "https://blockbook.tbtc.zelcore.io"
 ESPLORA = "https://mempool.space/testnet4/api,https://testnetscan.com/btc-testnet4/api"
 # Requests per visitor per minute.
 RATE_PER_MIN = "120"
+
+# Worker logs, so each broadcast's answers can be looked up later (free plan).
+[observability]
+enabled = true

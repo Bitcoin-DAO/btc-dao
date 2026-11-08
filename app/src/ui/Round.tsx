@@ -1,10 +1,10 @@
 // Payout rounds (protocol 6.1-6.3): prepare (council), check and sign, broadcast, receipt.
 import { useEffect, useState } from 'preact/hooks';
 import { mnemonicToSeedSync } from '@scure/bip39';
-import { broadcastRound, chainApis, refreshTreasury, signAndPublish, useApp } from '../app';
+import { broadcastRound, chainApis, receiptDepth, refreshTreasury, signAndPublish, useApp } from '../app';
 import { fmtSats, t } from '../i18n';
 import { KIND } from '../core/events';
-import { explorerOf, feeRate as suggestedFeeRate, pushPageOf, txStatus } from '../core/chain';
+import { explorerOf, feePolicyOf, pushPageOf, sourceLabel, suggestFee, txSeenBy, txStatus, type Broadcast, type TxStatus } from '../core/chain';
 import { parseDescriptor } from '../core/descriptor';
 import { buildRound, finalizeRound, masterFromSeed, memberSignatures, signWithMnemonicKey, type BuiltRound } from '../core/round';
 import { cadenceOf, roundLabel } from '../core/time';
@@ -13,6 +13,12 @@ import { Address, Footer, Header, errText, go } from './parts';
 import { useNameOf } from './Proposals';
 
 
+/** "Fee 278 sats is 6.1% of what the round pays · aims for the next block". */
+function feeLine(fee: number, paid: number, policy: 'fast' | 'economical'): string {
+  const share = paid > 0 ? `${((100 * fee) / paid).toLocaleString(undefined, { maximumFractionDigits: 1 })}%` : '—';
+  return t('rd.feeShare', { fee: fmtSats(fee), share, aim: t(policy === 'fast' ? 'rd.aimFast' : 'rd.aimEconomical') });
+}
+
 export function PrepareRound() {
   const app = useApp();
   const s = app.dao!;
@@ -20,6 +26,7 @@ export function PrepareRound() {
   const settings = s.settings[s.settings.length - 1].content;
   const max = settings.rules.maxFeeRateSatVb;
   const apis = chainApis();
+  const policy = feePolicyOf(settings.rules);
   const [suggested, setSuggested] = useState<number>();
   const [rate, setRate] = useState('');
   const [built, setBuilt] = useState<BuiltRound>();
@@ -30,10 +37,10 @@ export function PrepareRound() {
   const [opened] = useState(() => Date.now());
   useEffect(() => {
     void refreshTreasury();
-    suggestedFeeRate(apis).then(r => {
-      setSuggested(r);
-      setRate(String(Math.min(r, max)));
-    }).catch(() => setRate('1'));
+    suggestFee(apis, policy).then(f => {
+      setSuggested(f.rate);
+      setRate(String(Math.min(f.rate, max)));
+    }).catch(() => setRate('2'));
   }, []);
 
   if (!app.isCouncil || !app.secret) return <><Header /><main><p class="lead">{t('cn.notCouncil')}</p></main><Footer /></>;
@@ -101,10 +108,10 @@ export function PrepareRound() {
             <label class="field">
               {t('rd.feeRate', { max })}
               <input type="text" inputMode="numeric" value={rate} onInput={e => (setRate((e.target as HTMLInputElement).value.replace(/[^\d.]/g, '')), setBuilt(undefined))} />
-              {suggested !== undefined && <span class="small" style="font-weight:400">{t('rd.feeSuggested', { rate: suggested })}</span>}
+              {suggested !== undefined && <span class="small" style="font-weight:400">{t(policy === 'fast' ? 'rd.feeFast' : 'rd.feeEconomical', { rate: suggested })}</span>}
             </label>
-            {aboveCap && <p class="warnbox">{t('rd.feeAboveCap', { max })}</p>}
-            <button type="button" class="btn secondary" disabled={!rateOk || !live || aboveCap} onClick={build}>{t('rd.build')}</button>
+            {aboveCap && <p class="warnbox">{t('rd.feeAboveCap', { max, rate: suggested! })}</p>}
+            <button type="button" class="btn secondary" disabled={!rateOk || !live} onClick={build}>{t('rd.build')}</button>
             {!live && (app.treasuryLoading || !app.treasuryError) && <p class="small">{t('rd.readingCoins')}</p>}
             {!live && !app.treasuryLoading && app.treasuryError && (
               <p class="small">{t('rd.coinsError', { msg: app.treasuryError })} <button type="button" class="btn link" onClick={() => refreshTreasury()}>{t('retry')}</button></p>
@@ -118,6 +125,7 @@ export function PrepareRound() {
             <div class="kv"><span>{t('rd.total')}</span><span class="mono">{fmtSats(close ? built.inputs.reduce((a, u) => a + u.value, 0) - built.fee : outputs.reduce((a, o) => a + o.amount_sat, 0))}</span></div>
             {built.change && <div class="kv"><span>{t('rd.change')}</span><span class="mono">{fmtSats(built.change.value)}</span></div>}
             <div class="kv"><span>{t('rd.fee')}</span><span class="mono">{fmtSats(built.fee)} · {r} sat/vB</span></div>
+            <p class="small">{feeLine(built.fee, close ? built.inputs.reduce((a, u) => a + u.value, 0) - built.fee : outputs.reduce((a, o) => a + o.amount_sat, 0), policy)}</p>
             <button type="button" class="btn primary" disabled={busy} onClick={publish}>{t('rd.publish')}</button>
           </div>
         )}
@@ -138,20 +146,30 @@ export function RoundDetail({ id }: { id: string }) {
   const [ext, setExt] = useState(false);
   const [pasted, setPasted] = useState('');
   const [copied, setCopied] = useState(false);
-  const [onChain, setOnChain] = useState<boolean>();
-  const [sentVia, setSentVia] = useState<string>();
+  const [st, setSt] = useState<TxStatus | null>(); // undefined: not asked yet; null: no source knows it
+  const [seen, setSeen] = useState<string[]>([]);
+  const [sent, setSent] = useState<Broadcast>();
+  const [risen, setRisen] = useState<number>();
+  const onChain = st === undefined ? undefined : !!st;
+  const sentVia = sent ? sourceLabel(sent.source) : undefined;
   const [checked, setChecked] = useState(false); // asked the sources since the last broadcast
   const r = s.rounds.find(x => x.event.id === id);
   const apis = chainApis();
 
-  // Ask the sources whether they know the transaction; while it is ready but unconfirmed, ask again every minute.
+  // Ask the sources whether they know the transaction; until the receipt, ask again every 20 seconds.
   useEffect(() => {
     if (!r?.inspection) return;
     const txid = r.inspection.txid;
-    const check = () => void txStatus(chainApis(), txid).then(st => setOnChain(!!st));
+    const check = () =>
+      void txStatus(chainApis(), txid).then(x => {
+        setSt(x ?? null);
+        if (x && !r.receipt) void txSeenBy(chainApis(), txid).then(setSeen);
+      });
     check();
     if (!r.ready || r.receipt) return;
-    const timer = setInterval(check, 60_000);
+    // Has the network's fee for the next block risen above the round's while signatures were collected?
+    void suggestFee(chainApis(), 'fast').then(f => setRisen(f.next > r.content.fee_rate_sat_vb ? f.next : undefined)).catch(() => undefined);
+    const timer = setInterval(check, 20_000); // members watch the confirmations grow
     return () => clearInterval(timer);
   }, [r?.inspection?.txid, r?.ready, r?.receipt?.id]);
 
@@ -194,12 +212,13 @@ export function RoundDetail({ id }: { id: string }) {
     } catch { /* shown as the round's errors */ }
   }
   const doBroadcast = () => run(async () => {
-    const sent = await broadcastRound(r);
-    setSentVia(explorerOf(sent.source).replace(/^https?:\/\//, ''));
+    const b = await broadcastRound(r);
+    setSent(b);
     setChecked(false);
-    setTimeout(() => void txStatus(chainApis(), sent.txid).then(st => {
-      setOnChain(!!st);
+    setTimeout(() => void txStatus(chainApis(), b.txid).then(x => {
+      setSt(x ?? null);
       setChecked(true);
+      if (x) void txSeenBy(chainApis(), b.txid).then(setSeen);
     }), 5000);
   });
   const height = r.receipt ? (JSON.parse(r.receipt.content).block_height as number) : undefined;
@@ -236,6 +255,7 @@ export function RoundDetail({ id }: { id: string }) {
             <hr class="divider" />
             <div class="kv"><span>{t('rd.inputs')}</span><span class="mono">{ins.inputs.length} · {fmtSats(ins.inputs.reduce((a, x) => a + x.value, 0))}</span></div>
             <div class="kv"><span>{t('rd.fee')}</span><span class="mono">{fmtSats(ins.fee)} · {r.content.fee_rate_sat_vb} sat/vB</span></div>
+            <p class="small">{feeLine(ins.fee, ins.outputs.filter(o => o.change === undefined).reduce((a, o) => a + o.value, 0), feePolicyOf(settings.rules))}</p>
           </section>
         )}
 
@@ -267,9 +287,12 @@ export function RoundDetail({ id }: { id: string }) {
           {r.status === 'open' && r.ready && (
             <>
               <p class="ok">{t('rd.ready')}</p>
+              {risen !== undefined && !st?.confirmed && <p class="warnbox">{t('rd.feeRisen', { now: risen, round: r.content.fee_rate_sat_vb })}</p>}
+              {sent && <BroadcastReport b={sent} />}
               {onChain ? (
                 <>
                   <p class="small">{t('rd.broadcasted')}</p>
+                  {seen.length > 0 && <p class="small">{t('rd.seenBy', { n: seen.length, m: apis.length, list: seen.map(x => sourceLabel(x)).join(', ') })}</p>}
                   {/* A source may know the transaction without passing it to miners: let anyone send it again. */}
                   <p class="small">{t('rd.stuck')}</p>
                   <button type="button" class="btn secondary" disabled={busy} onClick={doBroadcast}>{t('rd.again')}</button>
@@ -305,7 +328,17 @@ export function RoundDetail({ id }: { id: string }) {
         {ins && (onChain || r.receipt) && (
           <section class="card">
             <div class="kv"><span>{t('rd.txid')}</span><a class="mono" href={`${explorerOf(apis[0] ?? '')}/tx/${ins.txid}`} target="_blank" rel="noopener">{ins.txid.slice(0, 16)}…</a></div>
-            {height ? <p class="ok">{t('rd.receipt', { h: height })}</p> : <p class="small">{t('rd.waitingConfirm')}</p>}
+            {height ? (
+              <p class="ok">{t('rd.receipt', { h: height })}</p>
+            ) : st?.confirmed ? (
+              // Anyone sees the confirmation from the chain; the receipt follows from a council phone once it is deep enough.
+              <p class="small">
+                {t('rd.confirmedDepth', { h: st.block_height ?? '?', n: Math.min(st.confirmations ?? 1, receiptDepth()), m: receiptDepth() })}{' '}
+                {(st.confirmations ?? 0) >= receiptDepth() ? t('rd.receiptWaiting') : ''}
+              </p>
+            ) : (
+              <p class="small">{t('rd.waitingConfirm')}</p>
+            )}
           </section>
         )}
       </main>
@@ -329,4 +362,15 @@ export function PaymentLine({ id }: { id: string }) {
 
 export function openRound(s: { rounds: RoundView[] }) {
   return s.rounds.find(r => r.status === 'open');
+}
+
+/** What each source said to a broadcast, and what a chain gateway reported for the services behind it. */
+function BroadcastReport({ b }: { b: Broadcast }) {
+  return (
+    <div class="small stack" style="gap:2px">
+      <span>{t('rd.acceptedBy', { list: b.accepted.map(x => sourceLabel(x)).join(', ') })}</span>
+      {b.behind.length > 0 && <span>{t('rd.behind', { list: b.behind.join(' · ') })}</span>}
+      {b.refused.map(x => <span>{t('rd.refusedBy', { source: sourceLabel(x.source), reason: x.reason })}</span>)}
+    </div>
+  );
 }

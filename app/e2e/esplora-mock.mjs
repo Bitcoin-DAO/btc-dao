@@ -79,6 +79,9 @@ function accept(rawHex) {
   return txid;
 }
 
+// New blocks keep coming, so confirmations grow (the app waits for 3 before a receipt).
+setInterval(() => height++, 4000);
+
 http.createServer((req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -101,6 +104,7 @@ http.createServer((req, res) => {
     return;
   }
   if (url === '/api/v1/fees/recommended') return send(200, { fastestFee: 3, halfHourFee: 2, hourFee: 1, economyFee: 1, minimumFee: 1 });
+  if (url === '/api/blocks/tip/height') return send(200, String(height), 'text/plain');
   let m;
   if ((m = url.match(/^\/api\/tx\/([0-9a-f]{64})\/status$/))) {
     const t = txs.get(m[1]);
@@ -139,7 +143,8 @@ function blockbook(req, url, query, send) {
     });
     return;
   }
-  if (url === '/api/v2/estimatefee/3') return send(200, { result: '0.00002' });
+  if (url === '/api/v2/estimatefee/3' || url === '/api/v2/estimatefee/2') return send(200, { result: '0.00002' });
+  if (url === '/api') return send(200, { blockbook: { bestHeight: height }, backend: { blocks: height } });
   let m;
   if ((m = url.match(/^\/api\/v2\/tx\/([0-9a-f]{64})$/))) {
     const t = txs.get(m[1]);

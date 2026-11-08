@@ -41,6 +41,7 @@ export function Home() {
               {cfg.network !== 'mainnet' && <span class="small">{t('home.testValue')}</span>}
               <span class="small">
                 {app.treasuryAt && t('home.readAt', { time: fmtTime(app.treasuryAt, app.lang) })}
+                {app.treasuryAt && tr?.source && ` · ${t('home.via', { source: tr.source })}`}
                 {app.treasuryLoading ? ` · ${t('home.updating')}` : app.treasuryError ? ` · ${t('home.notUpdated')}` : ''}
               </span>
               {app.treasuryError && !app.treasuryLoading && (

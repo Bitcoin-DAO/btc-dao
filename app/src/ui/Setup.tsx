@@ -1,4 +1,5 @@
 // Prepare the founding (protocol 3.5): basics, council, founders, publish and approve.
+import { periodText, ruleValue } from './Proposals';
 import { useEffect, useState } from 'preact/hooks';
 import { publishSigned, sync, useApp } from '../app';
 import { fmtSats, t } from '../i18n';
@@ -161,10 +162,11 @@ export function Setup() {
             </div>
             <div class="card">
               <h3>{t('setup.rules')}</h3>
-              <div class="kv"><span>{t('setup.voting')}</span><span>{t('setup.days', { n: site.rules.votingPeriodDays })}</span></div>
+              <div class="kv"><span>{t('setup.voting')}</span><span>{periodText(site.rules.votingPeriodDays)}</span></div>
               <div class="kv"><span>{t('setup.quorum')}</span><span>{t('setup.quorumVal', { q: site.rules.quorum })}</span></div>
               <div class="kv"><span>{t('setup.payouts')}</span><span>{cadenceOf(site.rules.payoutRound) === 'weekly' ? t('setup.weekly') : t('setup.monthly')}</span></div>
               <div class="kv"><span>{t('setup.maxFee')}</span><span>{site.rules.maxFeeRateSatVb} sat/vB</span></div>
+          <div class="kv"><span>{t('fee.label')}</span><span>{ruleValue('feePolicy', site.rules.feePolicy)}</span></div>
               <div class="kv"><span>{t('setup.cap')}</span><span>{fmtSats(site.rules.treasuryCapSats)} sats</span></div>
               <div class="kv"><span>{t('setup.charter')}</span><span class="mono">{charterSha256.slice(0, 8)} …</span></div>
             </div>

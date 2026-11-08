@@ -69,6 +69,19 @@ describe('reading', () => {
     expect(calls).toHaveLength(1);
   });
 
+  it('keeps a shallow transaction\'s answer only briefly, so its confirmations can grow', async () => {
+    let conf = 1;
+    route = () => json({ txid: 'ab'.repeat(32), confirmations: conf });
+    const path = `/bb/api/v2/tx/${'ab'.repeat(32)}`;
+    await get(path);
+    conf = 2;
+    vi.useFakeTimers();
+    vi.advanceTimersByTime(6000);
+    const r = await get(path);
+    vi.useRealTimers();
+    expect(((await r.json()) as { confirmations: number }).confirmations).toBe(2);
+  });
+
   it('returns a real "not found" as an answer, after asking every source', async () => {
     route = () => json({ error: 'txid not found' }, 400);
     const r = await get(`/bb/api/v2/tx/${'cd'.repeat(32)}`);
@@ -98,6 +111,20 @@ describe('who may use it', () => {
     expect((await get(`/bb/api/v2/utxo/${A}`, 'https://evil.example')).status).toBe(403);
     expect((await get(`/bb/api/v2/utxo/${A}`, 'http://localhost:5173')).headers.get('Access-Control-Allow-Origin')).toBe('http://localhost:5173');
     expect((await get('/status', null)).status).toBe(200);
+  });
+
+  it('lets the app read which service answered', async () => {
+    route = () => json({ result: '0.00001' });
+    const r = await get('/bb/api/v2/estimatefee/2');
+    expect(r.headers.get('Access-Control-Expose-Headers')).toContain('X-Gateway-Source');
+    expect(r.headers.get('X-Gateway-Source')).toBe('bb.example');
+  });
+
+  it('answers the chain tip from Blockbook\'s status', async () => {
+    route = () => json({ blockbook: { bestHeight: 159900 } });
+    const r = await get('/bb/api');
+    expect(((await r.json()) as { blockbook: { bestHeight: number } }).blockbook.bestHeight).toBe(159900);
+    expect(calls).toEqual(['GET https://bb.example/api']);
   });
 
   it('answers the browser preflight', async () => {
@@ -141,9 +168,13 @@ describe('broadcasting', () => {
       if (url === 'https://es2.example/api/tx') return new Response(id, { status: 200 });
       return new Response('error', { status: 400 });
     };
+    const log = vi.spyOn(console, 'log').mockImplementation(() => undefined);
     const r = await post('/bb/api/v2/sendtx/', HEX);
     expect(r.status).toBe(200);
     expect(await r.json()).toEqual({ result: id });
+    expect(r.headers.get('X-Gateway-Broadcast')).toMatch(/es2\.example: accepted/);
+    expect(JSON.parse(log.mock.calls[0][0] as string)).toMatchObject({ broadcast: id, accepted: true });
+    log.mockRestore();
     expect(calls.filter(c => c.startsWith('POST')).sort()).toEqual([
       'POST https://bb.example/api/v2/sendtx/',
       'POST https://es1.example/testnet4/api/tx',
