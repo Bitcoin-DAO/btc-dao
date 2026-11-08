@@ -29,7 +29,8 @@
 
 - [x] Balance, movements and funding address read through an unstable indexer, with the remembered reading shown (UNO practice, v0.1.4)
 - [ ] Second chain source used when the first fails. Not proven: Zelcore's Blockbook refuses reads from web pages (CORS), shown by v0.1.8 on 8 Nov 2026, so on 6 Nov mempool.space most likely did all the work. Works in the end-to-end tests against a mock
-- [ ] The DAO's own chain gateway as the first chain source (design: `docs/chain-gateway.md`; provider behind it now, own node optional later)
+- [x] The DAO's own chain gateway as the first chain source: v1 (public services read server-side) deployed, read the treasury and broadcast UNO's closing round while mempool.space was down (v0.1.9, 8 Nov 2026)
+- [ ] Gateway v2: own pruned node with a watch-only wallet behind the gateway, before mainnet (`docs/chain-gateway.md`)
 - [ ] Change returned by a round is shown and spent in the next round
 - [ ] Treasury read with many movements (10 or more)
 
@@ -51,7 +52,7 @@
 - [ ] Member removed by a two-thirds vote
 - [ ] Council change (a council member replaced, new descriptor)
 - [x] Lost key: card restore (@founder1) and key replacement without the card, remote, twice in a row, with member list versions 3 and 4 (@member1, now VNTH · SY98) (UNO practice, v0.1.7, 8 Nov 2026)
-- [~] Trial stages: a council member restores from the card and types the 12 words of the trial treasury key back in; same fingerprint (8c37eb1f) (UNO practice, v0.1.7, 8 Nov 2026). Still to do: sign a round with it
+- [x] Trial stages: a council member restores from the card, types the 12 words of the trial treasury key back in (same fingerprint, 8c37eb1f) and signs a round with it: closing round 2026-W45 (UNO practice, v0.1.7–v0.1.9, 8 Nov 2026)
 
 ## 5. Payout rounds
 
