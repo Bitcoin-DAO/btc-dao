@@ -22,7 +22,7 @@
 - [x] Founding in person and remote, 2 of 2, short codes checked (UNO practice, v0.1.1–v0.1.5, 6 Nov 2026)
 - [ ] Remote founding with strangers, 3 of 5, through the group (Sandbox DAO)
 - [ ] Passkeys on iPhone (Safari) and Android (Chrome), and a passkey synced to a second device
-- [ ] Identity card printed, then used to restore on a new phone
+- [x] Identity card used to restore on a phone with its site data cleared: same identity, new passkey (UNO practice, @founder1, v0.1.7, 8 Nov 2026)
 - [ ] Sign-in on a phone that has never seen the DAO, from the site address only
 
 ## 2. Treasury reading
@@ -51,7 +51,7 @@
 - [ ] Member removed by a two-thirds vote
 - [ ] Council change (a council member replaced, new descriptor)
 - [ ] Lost key: card restore, and key replacement when there is no card
-- [ ] Trial stages: a council member restores from the card, types the 12 words of the trial treasury key back in (v0.1.7), and signs a round
+- [~] Trial stages: a council member restores from the card and types the 12 words of the trial treasury key back in; same fingerprint (8c37eb1f) (UNO practice, v0.1.7, 8 Nov 2026). Still to do: sign a round with it
 
 ## 5. Payout rounds
 
@@ -103,3 +103,6 @@ From UNO's practice run, 6 November 2026:
 9. A source answering that it already has the transaction counts as accepted, not as an error.
 10. Any viewer's round page reads the chain: once the transaction confirms, it shows "Confirmed on chain, receipt waiting for a council member" until a council phone publishes the receipt. Receipts are published only by a council member's open app, so they can lag behind the chain.
 11. Rules page: show short voting periods in minutes or hours ("10 minutes", not "0.007 days").
+12. Stop browser translation: the page starts marked as Italian, so Chrome offers to translate it, and translated "UNO" as "A". Mark the page `translate="no"` (the app has its own EN · IT switch) and set the starting language from the visitor's choice before the first paint.
+13. After a card restore, the header still shows "Sign in" until the next page; it should show the member's name at once.
+14. A page for council members, opened while signed out, says only "This page is for council members"; it should offer Sign in and Come back with your card.
