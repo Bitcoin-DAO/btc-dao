@@ -37,6 +37,8 @@ export interface AppState {
 }
 
 let state: AppState = { loading: true, events: [], lang: prefs.lang() ?? (navigator.language?.startsWith('it') ? 'it' : 'en') };
+// The page's language is the visitor's choice from the first paint, so browsers do not offer to translate it.
+document.documentElement.lang = state.lang;
 const listeners = new Set<() => void>();
 
 export const getState = () => state;
@@ -347,9 +349,13 @@ export async function restoreFromCard(secret: string, name: string): Promise<'wr
 }
 
 /** The name shown in the phone's passkey list: practice passkeys say so, since stages share a domain. */
+/** The passkey's name in the phone's password manager, dated so an old one can be told from a new one. */
 export function passkeyName(name: string): string {
   const s = state.site ? stageOf(state.site) : 'testnet';
-  return s === 'practice' ? `${name} · ${state.site!.name} (${state.lang === 'en' ? 'practice' : 'prova generale'})` : `${name} · ${state.site?.name ?? ''}`;
+  const day = new Date().toISOString().slice(0, 10);
+  return s === 'practice'
+    ? `${name} · ${state.site!.name} (${state.lang === 'en' ? 'practice' : 'prova generale'}) · ${day}`
+    : `${name} · ${state.site?.name ?? ''} · ${day}`;
 }
 
 /**

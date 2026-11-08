@@ -51,7 +51,7 @@ async function addViaPaste(page, buttonName, code, remote = false) {
   await page.getByRole('button', { name: 'Usa', exact: true }).click();
   try { await page.getByText('Leggete il codice breve').waitFor({ timeout: 8000 }); }
   catch (e) { await page.screenshot({ path: SHOTS + '/fail-addViaPaste.png', fullPage: true }); console.log(await page.locator('main').innerText()); throw e; }
-  if (remote) await page.getByLabel('Iscrizione in videochiamata').check();
+  if (remote) await page.getByLabel('Iscrizione a distanza').check();
   await page.getByRole('button', { name: 'Coincide: aggiungi' }).click();
 }
 
@@ -138,6 +138,12 @@ async function decodeQrIn(page, selector) {
   const card = await decodeQrIn(f0, '.idcard');
   fs.writeFileSync(__dirname + '/out/card.txt', card ?? '');
   await f0.locator('.idcard').screenshot({ path: `${SHOTS}/09-identity-card.png` });
+  {
+    // Printing gives the card alone, on one page (no blank second page, no page header or footer).
+    const pdf = (await f0.pdf({ format: 'A4' })).toString('latin1');
+    const pages = (pdf.match(/\/Type\s*\/Page[^s]/g) ?? []).length;
+    check(pages === 1, `identity card prints on one page (${pages})`);
+  }
   await f0.emulateMedia({ media: 'screen' });
   check(/^BTCDAO:1:[0-9A-F]{8}:[0-9A-F]{64}$/.test(card ?? ''), 'card QR decodes to BTCDAO:1:…');
 
@@ -187,6 +193,7 @@ async function decodeQrIn(page, selector) {
   await np.getByRole('button', { name: 'Sì, sono io' }).click();
   await np.getByRole('button', { name: 'Crea con impronta o volto' }).click();
   await np.getByText('Bentornato, @elena ✓').waitFor({ timeout: 15000 });
+  check(await np.locator('.btn-head.solid', { hasText: '@elena' }).first().waitFor({ timeout: 5000 }).then(() => true, () => false), 'header shows the member at once after the restore');
   await np.goto(URL0 + '#/profile');
   await np.getByRole('button', { name: 'Esci da questo telefono' }).click();
   await np.goto(URL0 + '#/join');

@@ -2,6 +2,58 @@
 
 Each release is a git tag (`v0.1.1`). A DAO's copy runs one tagged release and records it in its README; a release moves to a DAO's next stage only after passing the one before ([guide, section 8](docs/guide.md#8-the-three-stages-practice-testnet-mainnet)).
 
+## v0.2.0 · 8 November 2026
+
+The findings from UNO's practice run (6–8 November 2026, `docs/runs/2026-11-uno-practice.md`): 25 of 28 built, the rest noted in `MAINNET-READINESS.md`.
+
+**Fees**
+- A new rule, **round fees**: **fast** (the default) aims for the next block with a quarter more as headroom for the time signatures take, never under 2 sat/vB; **economical** aims for about an hour. Members change it by a rule-change vote.
+- When the network asks more than the DAO's cap, the round goes at the cap with a warning, instead of being blocked.
+- The round shows its fee as a share of what it pays, with its aim; the round page warns if the next-block fee has risen above the round's while signatures were collected.
+
+**Broadcasts and confirmations**
+- A broadcast goes to every chain source at once, and the round page lists which accepted, which refused and why, plus what a chain gateway reported for the services behind it. "Already known" counts as accepted.
+- "On the network ✓" says which sources know the transaction.
+- **Receipts wait for depth:** a council phone publishes the receipt only after 3 confirmations (`receiptConfirmations` in the config), so a reorg cannot leave a false receipt.
+- Everyone's round page shows the confirmations as they grow ("Confirmed in block … (1 of 3)") and says when the receipt is waiting for a council member. It checks every 20 seconds.
+- The Council page checks the chain: a round already on the network is no longer offered for broadcast or counted as a to-do.
+
+**Treasury reading**
+- The reading names its source ("Read from the blockchain: 15:24 · via blockbook.tbtc.zelcore.io · btc-dao-gateway").
+- Open pages of the same site share one reading instead of each asking the chain.
+
+**Chain gateway**
+- Lets the app read which service answered and each broadcast's results; logs every broadcast's answers to the Worker's logs; answers the chain tip; keeps a shallow transaction's answer only briefly, so its confirmations can grow.
+
+**Founding**
+- On testnet4 the founders choose the vote length: **practice** (10-minute votes) or **live** (the site file's, 3 days by default). Members switch later by a rule-change vote; the DAO and its record carry on. A **practice mode** banner shows while votes are shorter than a day.
+- A warning when the threshold equals the council size: one lost key would lock the treasury and block key replacement.
+- After publishing the founding settings: who has approved, who has not yet, and what happens next.
+- The first donation card is a **Fund the treasury** step, naming the BTC DAO Testnet Treasury on testnet.
+
+**Members and keys**
+- Key replacements that can never complete (the new key already in use, or a later one won) are hidden; a second replacement for a key already under way is stopped; replacing a council member's key when the others cannot reach the threshold is explained, not left waiting.
+- The waiting pages say when an approved member or new key is waiting for the council to publish the member list; Sign in points a phone with a sign-up or replacement under way back to its page.
+- After clearing a browser's data, the sign-in message explains that the passkey no longer has a key to open and points to the card or "I lost my key and card". Passkeys are named with the date they were made.
+- A former member's profile shows only their record and **Join again**.
+- Council pages opened while signed out offer Sign in and Come back with your card.
+
+**Wording and pages**
+- Browser translation is off (it rewrote "UNO" and proposals' binding text); the page's language is set before the first paint.
+- "Remote" everywhere instead of "video call".
+- Voting periods read in minutes, hours or days; vote-length changes are offered as 10 minutes, 1, 3 or 7 days.
+- The home page says a round can be prepared as soon as payments are approved.
+- Payout proposals: **Share** the recipient's confirmation link, with the DAO, proposal, amount and link in one message.
+- The app's own confirmation dialogs, in its language, instead of the browser's.
+- The identity card prints alone, on one page, without the browser's header and footer.
+
+**Docs**
+- Guide: own Google or Apple account per founder; practice or live votes; a spare key on the council.
+
+**Tests**
+- Unit (64): fee policy, depth from the chain tip, sources that know a transaction, broadcasting to every source, source names, vote length at founding. Gateway (18).
+- End-to-end, Esplora, Blockbook and through the gateway: fast fee suggested, fee share and aim, sources named, depth shown to a member before the receipt, receipt after 3 confirmations; the card prints on one page; the header shows the member right after a restore; a former member is offered no member actions. The mock chain keeps mining so confirmations grow.
+
 ## v0.1.10 · 8 November 2026
 
 Found in UNO's closing round: one of mempool.space's servers still reported the transaction while no miner had it, so the round page showed "On the network ✓" and offered no way to send it again.

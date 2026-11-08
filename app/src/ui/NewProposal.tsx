@@ -6,7 +6,8 @@ import { KIND } from '../core/events';
 import { DUST, proposalSchemaError, validAddress, type ProposalContent, type ProposalType } from '../core/state';
 import { cadenceOf } from '../core/time';
 import { Footer, Header, errText, go } from './parts';
-import { EDITABLE_RULES, ruleLabel, ruleValue, typeLabel } from './Proposals';
+import { EDITABLE_RULES, periodText, ruleLabel, ruleValue, typeLabel } from './Proposals';
+import { PRACTICE_VOTE_DAYS } from '../core/config';
 import { feePolicyOf } from '../core/chain';
 
 const TYPES: ProposalType[] = ['payout', 'statement', 'remove_member', 'change_rules', 'close'];
@@ -171,7 +172,16 @@ export function NewProposal() {
               </select>
             </label>
             <span class="small">{t('np.current', { v: ruleValue(rule, current) })}</span>
-            {rule === 'feePolicy' ? (
+            {rule === 'votingPeriodDays' ? (
+              // Vote length as members think of it: practice minutes or whole days.
+              <label class="field">
+                {t('np.newValue')}
+                <select value={value} onChange={e => setValue((e.target as HTMLSelectElement).value)} style="min-height:48px;border:1px solid var(--field);border-radius:8px;padding:0 12px;font:inherit;font-size:16px;background:#fff">
+                  <option value="">—</option>
+                  {[PRACTICE_VOTE_DAYS, 1, 3, 7].map(d => <option value={String(d)}>{periodText(d)}</option>)}
+                </select>
+              </label>
+            ) : rule === 'feePolicy' ? (
               <label class="field">
                 {t('np.newValue')}
                 <select value={value} onChange={e => setValue((e.target as HTMLSelectElement).value)} style="min-height:48px;border:1px solid var(--field);border-radius:8px;padding:0 12px;font:inherit;font-size:16px;background:#fff">

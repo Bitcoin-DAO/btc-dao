@@ -7,7 +7,7 @@ import { parseFounderCode, type FounderCode } from '../core/identity';
 import { formatShortCode, shortCode } from '../core/shortcode';
 import { nextRoster, nextSettings, type Candidate, type DaoState, type RekeyView, type Verified } from '../core/state';
 import { hashJson, parseJson } from '../core/util';
-import { Footer, Header, ScanModal, ShortCode, errText } from './parts';
+import { CouncilOnly, Footer, Header, ScanModal, ShortCode, errText } from './parts';
 import { useNameOf } from './Proposals';
 
 /**
@@ -66,15 +66,7 @@ export function Council() {
   const [oldKey, setOldKey] = useState('');
   const [done, setDone] = useState<string>();
 
-  if (!app.isCouncil || !app.secret || !app.me) {
-    return (
-      <>
-        <Header />
-        <main><p class="lead">{t('cn.notCouncil')}</p></main>
-        <Footer />
-      </>
-    );
-  }
+  if (!app.isCouncil || !app.secret || !app.me) return <CouncilOnly />;
   const me = app.me.person;
   const m = s.settings[s.settings.length - 1].content.threshold;
 

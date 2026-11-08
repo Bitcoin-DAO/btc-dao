@@ -131,12 +131,22 @@ export function ProposalDetail({ id }: { id: string }) {
       setBusy(false);
     }
   };
+  const link = `${app.site!.site.replace(/\/$/, '')}/#/confirm/${p.event.id}`;
   const copyLink = async () => {
     try {
-      await navigator.clipboard.writeText(`${app.site!.site.replace(/\/$/, '')}/#/confirm/${p.event.id}`);
+      await navigator.clipboard.writeText(link);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch { /* ignore */ }
+  };
+  // One message the recipient can trust before opening it: which DAO, which payment, how much, then the link.
+  const shareLink = async () => {
+    const amount = ((p.content.payload.outputs as Output[] | undefined) ?? []).reduce((a, o) => a + o.amount_sat, 0);
+    const text = t('pd.shareText', { label: proposalLabel(app.site!.name, p.number), title: p.content.title, amount: fmtSats(amount), link });
+    try {
+      if (navigator.share) await navigator.share({ text });
+      else await navigator.clipboard.writeText(text);
+    } catch { /* cancelled */ }
   };
 
   const record = app.events
@@ -177,7 +187,12 @@ export function ProposalDetail({ id }: { id: string }) {
                 )}
               </div>
             ))}
-            {!p.confirmed && <button type="button" class="btn secondary" onClick={copyLink}>{copied ? t('home.copied') : t('pd.confirmLink')}</button>}
+            {!p.confirmed && (
+              <>
+                <button type="button" class="btn secondary" onClick={shareLink}>{t('pd.shareLink')}</button>
+                <button type="button" class="btn link" style="align-self:flex-start" onClick={copyLink}>{copied ? t('home.copied') : t('pd.confirmLink')}</button>
+              </>
+            )}
           </section>
         )}
 

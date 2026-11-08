@@ -9,7 +9,7 @@ import { parseDescriptor } from '../core/descriptor';
 import { buildRound, finalizeRound, masterFromSeed, memberSignatures, signWithMnemonicKey, type BuiltRound } from '../core/round';
 import { cadenceOf, roundLabel } from '../core/time';
 import { proposalLabel, type Output, type RoundView } from '../core/state';
-import { Address, Footer, Header, errText, go } from './parts';
+import { CouncilOnly, Address, Footer, Header, errText, go, askText } from './parts';
 import { useNameOf } from './Proposals';
 
 
@@ -43,7 +43,7 @@ export function PrepareRound() {
     }).catch(() => setRate('2'));
   }, []);
 
-  if (!app.isCouncil || !app.secret) return <><Header /><main><p class="lead">{t('cn.notCouncil')}</p></main><Footer /></>;
+  if (!app.isCouncil || !app.secret) return <CouncilOnly />;
 
   const waiting = s.proposals.filter(p => s.payments.get(p.event.id)?.status === 'waiting');
   const close = waiting.find(p => p.content.type === 'close');
@@ -200,8 +200,8 @@ export function RoundDetail({ id }: { id: string }) {
     await signAndPublish(KIND.sign, { psbt }, [['e', r.event.id]]);
     setExt(false);
   });
-  const decline = () => {
-    const reason = prompt(t('rd.declineReason'));
+  const decline = async () => {
+    const reason = await askText(t('rd.declineReason'));
     if (reason) void run(() => signAndPublish(KIND.sign, { decline: reason }, [['e', r.event.id]]));
   };
   // The finished transaction, offered so anyone can push it by hand until it is seen on the network.

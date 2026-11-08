@@ -9,7 +9,7 @@ import {
 import { KIND, sign, template } from './events';
 import { rebuild } from './state';
 import type { SiteConfig } from './config';
-import { buildGenesis } from './config';
+import { PRACTICE_VOTE_DAYS, buildGenesis, isPracticeVotes } from './config';
 
 const MNEMONICS = [
   'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about',
@@ -129,6 +129,14 @@ function founding() {
 describe('founding (protocol 3.1, 3.2, 3.5)', () => {
   it('drops placeholder relays from the genesis', () => {
     expect(founding().genesis.relays).toEqual(['wss://relay.example']);
+  });
+
+  it('records the vote length chosen at founding, keeping the site file\'s otherwise', () => {
+    const base = { name: 'UNO', description: 'd', council: [], founders: [], threshold: 1, descriptor: 'x', charterSha256: 'ab'.repeat(32) };
+    expect(buildGenesis(site, base).rules.votingPeriodDays).toBe(site.rules.votingPeriodDays);
+    expect(buildGenesis(site, { ...base, votingPeriodDays: PRACTICE_VOTE_DAYS }).rules.votingPeriodDays).toBe(10 / 1440);
+    expect(isPracticeVotes(PRACTICE_VOTE_DAYS)).toBe(true);
+    expect(isPracticeVotes(3)).toBe(false);
   });
 
   it('is pending until threshold distinct council endorsements, then founded', () => {

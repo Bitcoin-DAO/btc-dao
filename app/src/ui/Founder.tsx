@@ -8,7 +8,7 @@ import type { GenesisCandidate } from '../core/state';
 import { shortCode, formatShortCode } from '../core/shortcode';
 import { createPasskey, passkeysAvailable } from '../lib/passkey';
 import { store, type PendingFounder } from '../lib/store';
-import { Header, PrintCard, Qr, ShortCode, Steps, errText, go } from './parts';
+import { Header, PrintCard, Qr, ShortCode, Steps, errText, go, askConfirm } from './parts';
 import { Candidate } from './Candidate';
 
 export function Founder() {
@@ -61,7 +61,7 @@ export function Founder() {
 
 /** Throws away this phone's sign-up, and the setup draft, which belongs to the identity being thrown away. */
 async function restartSignup(site: string) {
-  if (!confirm(t('fs.restartConfirm'))) return;
+  if (!(await askConfirm(t('fs.restartConfirm'), t('fs.restart'), true))) return;
   await store.clearPending(site);
   await store.clearSetup(site);
   setState({ pending: undefined });

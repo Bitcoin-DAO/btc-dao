@@ -74,7 +74,7 @@ export function Home() {
             <p class="warn">{tr.balance > cap ? t('home.overCap', { cap: fmtSats(cap) }) : t('home.capReached', { cap: fmtSats(cap) })}</p>
           </section>
         ) : (
-          <Donate address={tr.donationAddress} />
+          <Donate address={tr.donationAddress} first={tr.balance === 0 && tr.movements.length === 0} testnet={cfg.testnetTreasury?.name} />
         ))}
 
         {app.isCouncil && app.me && councilTodo(app.dao!, app.me.person) > 0 && (
@@ -94,6 +94,7 @@ export function Home() {
             <span class="small">{t('home.nextRound')}</span>
             <strong style="font-size:22px">{nextRoundDate}</strong>
             <span class="small">{t('home.nextRoundText', { n: waiting.length, sats: fmtSats(waitingSats) })}</span>
+            {waiting.length > 0 && <span class="small">{t('home.roundEarly')}</span>}
           </div>
         ))}
 
@@ -159,7 +160,7 @@ function firstAddress(descriptor: string, network: Parameters<typeof parseDescri
   return treasuryAddress(parseDescriptor(descriptor, network), network, 0, 0).address;
 }
 
-function Donate({ address }: { address: string }) {
+function Donate({ address, first, testnet }: { address: string; first?: boolean; testnet?: string }) {
   const [copied, setCopied] = useState(false);
   const copy = async () => {
     try {
@@ -172,7 +173,9 @@ function Donate({ address }: { address: string }) {
   };
   return (
     <section class="card">
-      <h2>{t('home.donate')}</h2>
+      <h2>{first ? t('home.fundTitle') : t('home.donate')}</h2>
+      {first && <p class="small">{t('home.fundText')}</p>}
+      {first && testnet && <p class="note">{t('home.fundTestnet', { name: testnet })}</p>}
       <div class="qr-wrap"><Qr text={`bitcoin:${address}`} size={200} label={address} /></div>
       <Address value={address} />
       <button type="button" class="btn dark" onClick={copy}>{copied ? t('home.copied') : t('home.copy')}</button>

@@ -92,6 +92,8 @@ export function buildGenesis(site: SiteConfig, fill: {
   threshold: number;
   descriptor: string;
   charterSha256: string;
+  /** The vote length chosen at founding, if not the site file's. */
+  votingPeriodDays?: number;
 }): DaoConfig {
   const { daoId: _ignored, ...base } = site;
   return {
@@ -104,6 +106,10 @@ export function buildGenesis(site: SiteConfig, fill: {
     descriptor: fill.descriptor,
     relays: usable(site.relays),
     chainApi: usable(site.chainApi),
-    rules: { ...site.rules, charterSha256: fill.charterSha256 },
+    rules: { ...site.rules, ...(fill.votingPeriodDays ? { votingPeriodDays: fill.votingPeriodDays } : {}), charterSha256: fill.charterSha256 },
   };
 }
+
+/** Practice votes last 10 minutes; anything under a day counts as practice. */
+export const PRACTICE_VOTE_DAYS = 10 / 1440;
+export const isPracticeVotes = (days: number) => days < 1;

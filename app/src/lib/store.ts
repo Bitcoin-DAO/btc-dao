@@ -49,6 +49,8 @@ export interface SetupState {
   council: SetupCouncil[];
   founders: SetupFounder[];
   threshold: number;
+  /** Vote length chosen at founding, in days (practice: 10 minutes). Unset: the site file's. */
+  votingPeriodDays?: number;
   genesisId?: string;
   daoId?: string;
   genesisJson?: string;
