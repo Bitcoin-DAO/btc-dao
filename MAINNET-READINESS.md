@@ -46,7 +46,7 @@
 
 ## 4. Membership
 
-- [ ] New member proposed, short code checked, voted in
+- [x] New member proposed, short code checked (two council checks), voted in, member list version 2 approved by the council: @member1 (UNO practice, v0.1.7, 8 Nov 2026)
 - [ ] Member leaves
 - [ ] Member removed by a two-thirds vote
 - [ ] Council change (a council member replaced, new descriptor)
@@ -108,3 +108,5 @@ From UNO's practice run, 6 November 2026:
 14. A page for council members, opened while signed out, says only "This page is for council members"; it should offer Sign in and Come back with your card.
 15. Replacing a council member's key needs approvals from other council members up to the threshold. When the threshold equals the council size (UNO practice's 2 of 2), it can never be reached, because the member who lost their key cannot approve. The Replace page should say so before anyone starts, instead of leaving a replacement waiting for ever.
 16. Founding setup: warn when the threshold equals the council size. One lost key then blocks both the treasury and key replacements. Recommend at least one spare (3 of 5, 2 of 3).
+17. Printing the identity card gives a blank second page and the browser's own header and footer (URL, date): the print style hides the rest of the page but keeps its space. Remove it from the print layout and set page margins so only the card prints, on one page.
+18. The candidate page says "in person: 1 check · on a video call: 2", while the council chooses "remote", and remote joining needs no call. Use the same words in both places.
