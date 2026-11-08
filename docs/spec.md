@@ -320,6 +320,26 @@ The public pages:
 - **Members:** the current roster, its version history, and the council with each member's key fingerprint.
 - **Rules:** the governance values in force and when each last changed.
 - **Recovery:** the recovery sheet, downloadable as PDF.
+- **History:** the DAO's major changes, newest first (below).
+
+### DAO history
+
+The DAO name in the header opens the history page, as a member's name opens their profile. It lists the changes that shape what the DAO is, newest at the top, each with its date and a link to the proposal and tally that caused it. It needs no new events: every entry is derived from signed, endorsed records the app already rebuilds.
+
+| Entry | Derived from | Shows |
+| --- | --- | --- |
+| Founded | `dao.genesis` and its endorsements | Date, founding council and founders, threshold, funding model, stage (practice, testnet, mainnet) |
+| Council changed | Settings version with a new council, its `change_council` proposal and migration receipt | Who left, who joined, the reason, old and new threshold, the migration txid |
+| Rules changed | Settings version from a `change_rules` proposal | Only the values that changed, as from → to; a charter change shows the new charter's hash and language |
+| Funding model changed | As rules changed, when `rules.fundingModel` changes | Old and new model, shown in its dashboard colour |
+| Address moved | Endorsed `dao.listing` with a new `site` | Old and new address, the endorsing council members |
+| Software upgraded | Endorsed `dao.listing` with a new `software` or `build` | Version and build fingerprint |
+| Listed or unlisted | Endorsed `dao.listing` that flips `listed` | On or off the public dashboards |
+| Closed | Final settings version with `"closed": true` | Destination and the closing round's txid |
+
+Membership is not listed entry by entry, which would turn the page into a log. Instead the page shows a running count beside each entry (members and council at that date), and the Members page keeps the full roster history. A disputed roster or settings version appears as an entry of its own, flagged, until the council resolves it.
+
+The page is public, like the rest of the record, and reads the same on every client because it follows the roster and settings chains (protocol section 8). A trial stage shows its stage at the top, so a practice DAO's history is never mistaken for a live one.
 
 ### Anchoring
 
