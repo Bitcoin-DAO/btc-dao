@@ -106,3 +106,5 @@ From UNO's practice run, 6 November 2026:
 12. Stop browser translation: the page starts marked as Italian, so Chrome offers to translate it, and translated "UNO" as "A". Mark the page `translate="no"` (the app has its own EN · IT switch) and set the starting language from the visitor's choice before the first paint.
 13. After a card restore, the header still shows "Sign in" until the next page; it should show the member's name at once.
 14. A page for council members, opened while signed out, says only "This page is for council members"; it should offer Sign in and Come back with your card.
+15. Replacing a council member's key needs approvals from other council members up to the threshold. When the threshold equals the council size (UNO practice's 2 of 2), it can never be reached, because the member who lost their key cannot approve. The Replace page should say so before anyone starts, instead of leaving a replacement waiting for ever.
+16. Founding setup: warn when the threshold equals the council size. One lost key then blocks both the treasury and key replacements. Recommend at least one spare (3 of 5, 2 of 3).
