@@ -64,7 +64,7 @@
 - [ ] Payment that lapses after two rounds
 - [ ] Fee above the charter cap: the round waits (S5)
 - [ ] A confirmation removed by a reorg does not produce a receipt; the round waits again (seen on testnet4, 6 Nov 2026: round 2026-11 was mined, then its block dropped)
-- [ ] Closing: the whole balance returns to the BTC DAO Testnet Treasury
+- [x] Closing: the whole balance returns to the BTC DAO Testnet Treasury: UNO-0005, two-thirds vote, round 2026-W45, 4,541 sats back, block 159889 (UNO practice, v0.1.10, 8 Nov 2026). Reached a miner only after a manual push to Blockbook (finding 27)
 
 ## 6. Hardware signing and recovery (UNO testnet)
 
