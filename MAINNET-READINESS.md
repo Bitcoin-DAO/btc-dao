@@ -29,7 +29,7 @@
 
 - [x] Balance, movements and funding address read through an unstable indexer, with the remembered reading shown (UNO practice, v0.1.4)
 - [ ] Second chain source used when the first fails. Not proven: Zelcore's Blockbook refuses reads from web pages (CORS), shown by v0.1.8 on 8 Nov 2026, so on 6 Nov mempool.space most likely did all the work. Works in the end-to-end tests against a mock
-- [ ] Our own indexer as a chain source (needed before mainnet)
+- [ ] The DAO's own chain gateway as the first chain source (design: `docs/chain-gateway.md`; provider behind it now, own node optional later)
 - [ ] Change returned by a round is shown and spent in the next round
 - [ ] Treasury read with many movements (10 or more)
 
