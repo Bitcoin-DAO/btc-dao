@@ -1,6 +1,6 @@
-# btc-dao dashboard spec (draft 0.2)
+# btc-dao dashboard spec (draft 0.3)
 
-November 2026. The read-only dashboard at btcdao.tech, built on the events in [`protocol.md`](protocol.md). It adds no new event kinds. It is needed once the first DAO reaches mainnet; until then, only the parts in the DAO app (section 4) and local reconciliation during the trial stages are built.
+November 2026 (draft 0.3: ticker, DAO identity and announcements added 9 November). The read-only dashboard at btcdao.tech, built on the events in [`protocol.md`](protocol.md). It adds no new event kinds. It is needed once the first DAO reaches mainnet; until then, only the parts in the DAO app (section 4) and local reconciliation during the trial stages are built.
 
 ## 1. Purpose and principles
 
@@ -95,10 +95,13 @@ Every listed DAO gets the same standard view. There are no per-item display choi
 - BTC held in mainnet treasuries, summed from their descriptors, with the part held for members shown apart.
 - Spends reconciled to date.
 - Proposals currently open for voting.
+- **Ticker:** a running line of what is happening across all listed DAOs, newest first: proposal opened, passed or failed, payout paid, council changed, announcement published. Each item names the DAO and links to the proposal or transaction page that proves it. Facts only, read from the DAOs' own events, never from their Nostr notes.
 
 **DAO page**, like an address page in a block explorer:
 
 - Name, site, stage, software version and build check (protocol section 7.2).
+- **Identity:** the DAO's npub and its NIP-05 name on the DAO's own domain (`dao@<domain>`), shown only when the domain confirms it, with a link to follow the DAO on Nostr.
+- **Announcements:** the text of each passed Announcement proposal, word for word, newest first, each linked to its proposal page. These are the DAO's only official words; nothing else a DAO posts is shown.
 - Funding model (`rules.fundingModel`): shown as a label with a colour, never colour alone. Grant, production, mutual, revolving, or "not stated" when unset or unknown.
 - **Steady I/O** beside the funding model, with the 12-month totals in and out and a monthly chart (section 2a).
 - The reconciliation badge: authorised spends and **unauthorised spends: 0**, with the time of the last check.
@@ -117,7 +120,7 @@ Every listed DAO gets the same standard view. There are no per-item display choi
 
 A proposal that moves no funds stops at step 4. A passed payout not paid by its second round date shows as lapsed (protocol section 6.1).
 
-**Later, not in the first version:** health figures (time from tally to payment, turnout, share of payouts paid before they lapse) and a live event feed on the front page.
+**Later, not in the first version:** health figures (time from tally to payment, turnout, share of payouts paid before they lapse).
 
 ## 6. Never displayed
 
@@ -156,6 +159,8 @@ flowchart LR
 - [ ] Add the *show on public dashboards* switch to the DAO app's settings page, setting `listed` in the listing.
 - [ ] Run reconciliation locally in the DAO app during the trial stages.
 - [ ] Pick the discovery relays shipped with the first release, and set up the btcdao.tech relay with the discovery policy.
+- [ ] Ticker on the front page, from the events the dashboard already reads (needs no new kind).
+- [ ] DAO page: identity (npub, verified NIP-05) and Announcements, once the Announcement category exists (`NEXT-RELEASE.md`, outward comms).
 - [ ] Confirm kinds 3570–3589 are unused on large relays (`decisions.md`).
 - [ ] Write the protocol up as a draft NIP, with the app (publisher) and the dashboard (reader) as its two implementations, and submit it to nostr-protocol/nips after the first mainnet DAO.
 
@@ -166,3 +171,4 @@ flowchart LR
 - [ ] How a pledge address is put on the public record, so dashboards can find it: a statement proposal at first, a `pledge` proposal type later?
 - [ ] Should a DAO be able to hide which council keys signed on chain (for example with a Taproot multisig)?
 - [ ] Who hosts the reference instance at btcdao.tech, and how do others run their own?
+- [ ] Should btcdao.tech have its own npub that posts the ticker to Nostr? It would be one operator relaying every listed DAO's facts: useful reach, but the first voice that is not a DAO's own.
