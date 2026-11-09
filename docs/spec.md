@@ -363,6 +363,7 @@ A new DAO is a fork of the repo plus its own `dao.config.json`; everything that 
 | `descriptor` | Treasury descriptor with checksum | `wsh(sortedmulti(3, …))#…` |
 | `relays` | DAO relay first, then public relays | trial: a Nosflare relay on Cloudflare plus 2 public relays; mainnet: wss://relay.\<the DAO's domain> plus 2 public relays |
 | `chainApi` | Chain sources, in order of preference: Esplora APIs (mempool.space style) and Blockbook servers, written `blockbook:<address>`. A source that fails is asked last for five minutes. The site's current list is used first, then the one recorded at founding: a source can show data but never move coins | public explorers, own node later |
+| `broadcastPages` | Optional. Web pages where a signed transaction can be pasted by hand ("Send it by hand"). The app never reads them, so a service that works only in a browser can be listed. Unset: each chain source's own page | `["https://blockbook.tbtc.zelcore.io/sendtx", "https://mempool.space/testnet4/tx/push"]` |
 | `rules` | Voting period, quorum, majorities, payout cadence and time zone, lapse limit, fee-rate cap, treasury cap | 7 days; 1/3; simple and 2/3; monthly, Europe/Rome; 2 rounds; 20 sat/vB; 5,000,000 sats |
 | `branding` | Logo, colours | — |
 

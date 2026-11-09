@@ -536,3 +536,27 @@ describe('weekly rounds and standing payout addresses (4.2, 6.1)', () => {
     expect(s.rounds.find(r => r.event.id === late.id)?.errors.join('; ')).toContain('not confirmed by its recipient');
   });
 });
+
+describe('treasury key status (5.5)', () => {
+  it('lists a council key its holder reported lost, until the holder reports it found', () => {
+    const d = dao();
+    const fp = treasuryKeyFromMnemonic(MNEMONICS[2], 'testnet4').fingerprint.toLowerCase();
+    d.ev(KIND.keystatus, { fingerprint: fp, state: 'lost' }, d.c[2], d.T);
+    let s = d.state(d.T + 10);
+    expect(s.lostKeys).toEqual([{ person: s.personOf(pubkeyOf(d.c[2])), fingerprint: fp, at: d.T }]);
+    d.ev(KIND.keystatus, { fingerprint: fp, state: 'found' }, d.c[2], d.T + 20);
+    s = d.state(d.T + 30);
+    expect(s.lostKeys).toEqual([]);
+  });
+
+  it('ignores notices about someone else\'s key, from non-council members, or malformed', () => {
+    const d = dao();
+    const fp2 = treasuryKeyFromMnemonic(MNEMONICS[2], 'testnet4').fingerprint.toLowerCase();
+    d.ev(KIND.keystatus, { fingerprint: fp2, state: 'lost' }, d.c[1], d.T); // c1 about c2's key
+    d.ev(KIND.keystatus, { fingerprint: fp2, state: 'lost' }, d.f[0], d.T); // a founder, not council
+    d.ev(KIND.keystatus, { fingerprint: fp2, state: 'gone' }, d.c[2], d.T); // unknown state
+    const s = d.state(d.T + 10);
+    expect(s.lostKeys).toEqual([]);
+    expect(s.rejected.filter(r => r.reason.startsWith('keystatus')).length).toBe(3);
+  });
+});

@@ -75,7 +75,7 @@ Restoring: the app scans the card, checks the `dao8` prefix matches this DAO, ch
 
 ## 2. Kinds
 
-All DAO events are **regular** events (kinds 1000–9999), so relays keep every one and the full history stays auditable. The numbers below are a provisional block (3570–3586) and must be checked against the Nostr kind registry before v1.
+All DAO events are **regular** events (kinds 1000–9999), so relays keep every one and the full history stays auditable. The numbers below are a provisional block (3570–3590) and must be checked against the Nostr kind registry before v1.
 
 | Kind | Name | Signed by | Section |
 | --- | --- | --- | --- |
@@ -96,6 +96,10 @@ All DAO events are **regular** events (kinds 1000–9999), so relays keep every 
 | 3584 | `dao.anchor` | Any member | 7.1 |
 | 3585 | `dao.listing` | Council member | 7.2 |
 | 3586 | `dao.keywrap` | Member | 5.4 |
+| 3587 | `dao.draft` | Member (the draft's author) | 8.1 |
+| 3588 | `dao.post` | Member | 8.2 |
+| 3589 | `dao.withdraw` | The draft's author | 8.3 |
+| 3590 | `dao.keystatus` | Council member | 5.5 |
 
 Compared with the spec v0.1 event table, this adds `dao.settings` (versions of the rules, council and descriptor get their own event, like rosters), `dao.confirm` (recipient address confirmation), `dao.tally` (requirement S3), the three onboarding events and `dao.keywrap` (passkey-protected identity keys).
 
@@ -307,6 +311,14 @@ Tags: `["c", <sha256 of the passkey credential id, hex>]`. Content: `{"nonce": "
 
 Signed by the identity key it protects, which shows the publisher held that key. Valid when the signer is on the roster or is a candidate with a valid `dao.verify`. The latest event per `c` tag counts. After a passkey sign-in, a client fetches it with the filter `{"kinds": [3586], "#D": [dao_id], "#c": [sha256(credential id)]}` and opens it with the PRF output. The ciphertext is public; its security rests on the 32-byte PRF output, which never leaves the passkey's device.
 
+### 5.5 `dao.keystatus`
+
+```json
+{ "fingerprint": "73c5da0a", "state": "lost" }
+```
+
+A council member tells the DAO that their own treasury key, the one with this fingerprint in the settings in force, is lost (`"lost"`) or back (`"found"`, after typing its words in again). Valid when the signer is on the council at `created_at` and the fingerprint is theirs. The latest notice per member and fingerprint counts; a council change that replaces the key ends it. Clients show the keys left against the threshold ("no spare", "stuck"). It changes nothing in the treasury: the remedy is a council change (`change_council`).
+
 ## 6. Treasury
 
 ### 6.1 `dao.round`
@@ -383,12 +395,12 @@ After a domain loss, members find the new address in two ways that do not depend
 
 Each DAO runs one relay of its own beside at least two public relays. Its policy:
 
-- accept only events of kinds 3570–3586 that carry the DAO's `["D", <dao_id>]` tag, and reject everything else;
+- accept only events of kinds 3570–3590 that carry the DAO's `["D", <dao_id>]` tag, and reject everything else;
 - accept them from any key, because candidates and payout recipients who are not members must be able to publish; clients validate every event anyway;
 - no payment for access, and rate limits per key and per connection to keep spam small;
 - keep every accepted event; never delete.
 
-The reference setup is Nosflare on Cloudflare Workers, configured in `relay/`: pay-to-relay and sign-in off, only kinds 3570–3586, a required `D` tag (pinned to the DAO id once it exists), and pruning off. For UNO's stages it runs at a `workers.dev` address under the Bitcoin-DAO organisation's Cloudflare account; a mainnet DAO runs its own on its own domain. Any relay with the same policy can replace it.
+The reference setup is Nosflare on Cloudflare Workers, configured in `relay/`: pay-to-relay and sign-in off, only kinds 3570–3590, a required `D` tag (pinned to the DAO id once it exists), and pruning off. For UNO's stages it runs at a `workers.dev` address under the Bitcoin-DAO organisation's Cloudflare account; a mainnet DAO runs its own on its own domain. Any relay with the same policy can replace it.
 
 ### 7.4 Discovery relays
 

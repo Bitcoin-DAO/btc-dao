@@ -134,3 +134,6 @@ label.check input { width: 24px; height: 24px; margin: 0; flex: none; accent-col
 .idcard .nm { font-weight: 600; font-size: 11pt; }
 .idcard .sc { font-family: var(--mono); font-size: 11pt; font-weight: 600; }
 .idcard .fine { font-size: 6.5pt; color: #333; }
+
+.words { columns: 2; column-gap: 24px; margin: 4px 0; padding-left: 28px; font-size: 16px; line-height: 2; }
+.words li { break-inside: avoid; }

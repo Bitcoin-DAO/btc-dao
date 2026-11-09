@@ -217,6 +217,8 @@ export interface DaoState {
   payments: Map<string, Payment>; // passed payouts and closes
   closed: boolean;
   keywraps: Map<string, { pubkey: string; nonce: string; ct: string; at: number }>;
+  /** Council treasury keys their holders have reported lost (dao.keystatus), for the keys in the current settings. */
+  lostKeys: { person: string; fingerprint: string; at: number }[];
   rejected: Rejected[];
   personOf(key: string): string;
   /** Current key of a person. */
@@ -362,7 +364,7 @@ export function rebuild(site: SiteConfig, events: Event[], prefer?: string, now 
     now, founded, pending: founded ? [] : candidates, conflict: foundedAll.length > 1,
     rosters: [], settings: [], rosterCandidates: [], settingsCandidates: [], rosterDisputed: false, settingsDisputed: false,
     members: [], proposals: [], verifies: [], rekeys: [], leaves: new Map(), pendingRoster: [], pendingSettings: [],
-    rounds: [], payments: new Map(), closed: false,
+    rounds: [], payments: new Map(), lostKeys: [], closed: false,
     keywraps: new Map(), rejected,
     personOf: k => k, keyOf: p => p, isCouncilAt: () => false, memberAt: () => false,
     rosterAt: () => { throw new Error('not founded'); }, settingsAt: () => { throw new Error('not founded'); },
@@ -960,8 +962,28 @@ export function rebuild(site: SiteConfig, events: Event[], prefer?: string, now 
     keywraps.set(c, { pubkey: e.pubkey, nonce: body.nonce, ct: body.ct, at: e.created_at });
   }
 
+  // Key status (protocol 5.5): the holder's latest notice about the treasury key with this fingerprint counts.
+  const latestNotice = new Map<string, { lost: boolean; at: number }>();
+  for (const e of ofKind(KIND.keystatus)) {
+    const c = parseJson<{ fingerprint?: string; state?: string }>(e.content);
+    const fp = c?.fingerprint?.toLowerCase();
+    if (!fp || (c!.state !== 'lost' && c!.state !== 'found')) { rejected.push({ event: e, reason: 'keystatus: malformed' }); continue; }
+    const entry = settingsAt(e.created_at).content.council.find(x => personOf(x.identityKey) === personOf(e.pubkey));
+    if (!entry || entry.fingerprint.toLowerCase() !== fp) { rejected.push({ event: e, reason: 'keystatus: not the signer\'s council key' }); continue; }
+    const k = `${personOf(e.pubkey)}:${fp}`;
+    const prev = latestNotice.get(k);
+    if (!prev || e.created_at >= prev.at) latestNotice.set(k, { lost: c!.state === 'lost', at: e.created_at });
+  }
+  const lostKeys = settings[settings.length - 1].content.council
+    .map(x => ({ person: personOf(x.identityKey), fingerprint: x.fingerprint.toLowerCase() }))
+    .flatMap(x => {
+      const n = latestNotice.get(`${x.person}:${x.fingerprint}`);
+      return n?.lost ? [{ ...x, at: n.at }] : [];
+    });
+
   return {
     ...empty,
+    lostKeys,
     rosters, settings, rosterCandidates, settingsCandidates, rosterDisputed, settingsDisputed,
     members, rules: settings[settings.length - 1].content.rules, proposals, verifies, rekeys, leaves,
     pendingRoster, pendingSettings, rounds, payments, closed: closedNow, keywraps,
