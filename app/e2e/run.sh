@@ -1,7 +1,7 @@
 #!/bin/bash
 # End-to-end tests: a local relay (relay/ under wrangler), a mock chain API, the built app, Playwright.
 # Needs: npm install in app/ and relay/, Playwright with Chromium, ffmpeg (camera test).
-# Usage: bash e2e/run.sh [founding|governance|payouts|all]
+# Usage: bash e2e/run.sh [founding|governance|discussion|payouts|all]
 #   CHAIN=blockbook: the mock chain answers as Blockbook only
 #   CHAIN=gateway: the app reads the mock chain only through the chain gateway (gateway/ under wrangler)
 set -e
@@ -50,6 +50,10 @@ fi
 if [ "$WHICH" = all ] || [ "$WHICH" = governance ]; then
   start_relay
   node "$HERE/governance.e2e.cjs"
+fi
+if [ "$WHICH" = all ] || [ "$WHICH" = discussion ]; then
+  start_relay
+  node "$HERE/discussion.e2e.cjs"
 fi
 if [ "$WHICH" = all ] || [ "$WHICH" = payouts ]; then
   start_relay

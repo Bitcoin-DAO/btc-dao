@@ -80,6 +80,8 @@ export interface ProposalContent {
   title: string;
   summary: string;
   link?: { url: string; sha256?: string };
+  /** The discussion draft and version this proposal was submitted from (protocol 4.5). */
+  draft?: { id: string; version: number };
   lang: string;
   payload: Record<string, any>;
 }
@@ -243,8 +245,8 @@ export function quorumFraction(q: unknown): number {
 
 export const DUST = 546;
 
-const isStr = (x: unknown, max: number) => typeof x === 'string' && x.trim().length > 0 && x.length <= max;
-const isKey = (x: unknown) => typeof x === 'string' && /^[0-9a-f]{64}$/.test(x);
+export const isStr = (x: unknown, max: number) => typeof x === 'string' && x.trim().length > 0 && x.length <= max;
+export const isKey = (x: unknown) => typeof x === 'string' && /^[0-9a-f]{64}$/.test(x);
 
 export function validAddress(addr: unknown, network: DaoConfig['network']): boolean {
   if (typeof addr !== 'string') return false;
@@ -276,6 +278,7 @@ export function proposalSchemaError(c: ProposalContent, network: DaoConfig['netw
   if (!isStr(c.summary, 500)) return 'summary';
   if (typeof c.lang !== 'string') return 'lang';
   if (c.link !== undefined && !(c.link && typeof c.link.url === 'string' && /^https?:\/\//.test(c.link.url))) return 'link';
+  if (c.draft !== undefined && !(c.draft && isKey(c.draft.id) && Number.isInteger(c.draft.version) && c.draft.version >= 1)) return 'draft';
   const p = c.payload;
   if (!p || typeof p !== 'object') return 'payload';
   switch (c.type) {

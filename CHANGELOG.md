@@ -2,6 +2,19 @@
 
 Each release is a git tag (`v0.1.1`). A DAO's copy runs one tagged release and records it in its README; a release moves to a DAO's next stage only after passing the one before ([guide, section 8](docs/guide.md#8-the-three-stages-practice-testnet-mainnet)).
 
+## v0.3.0 · not yet released (branch `discussion`)
+
+**Discussion** (protocol section 4.5): proposals now start in public, as **idea → draft → discuss → proposal**, in the DAO's own record instead of an outside forum.
+- A **Discussion** page lists every thread by last activity, with a "New" mark and a count in the footer for threads with news since this phone last opened them (kept on the phone only).
+- **New idea:** a title and a line open a thread at once. The author then posts numbered versions (v2, v3…) with the proposal fields, each starting from the one before.
+- **Posts:** flat, plain text, links clickable; only members and council post. Anyone with the link can read; **Share** sends it.
+- **Submit:** the author submits a chosen version as a normal proposal; the draft freezes, so the text voted is the text discussed, and the thread carries on through the vote. **Withdraw** closes a draft that was not submitted; it stays visible.
+- The proposal page shows **Discussion** (link to the thread) and **Version** (the one submitted) instead of the external link box. Proposals published directly still work and get a thread of their own.
+- Three new event kinds: 3587 `dao.draft`, 3588 `dao.post`, 3589 `dao.withdraw`; a proposal can name its `draft`. Votes, tallies and the treasury are unchanged.
+- **Relay:** accepts kinds 3570–3589. Redeploy it before a DAO's site moves to this release.
+
+**Tests:** unit (9 new: versions, author and member checks, freeze, withdrawal, submission matching its version, same-second order, threads for direct proposals); end-to-end `discussion` (idea to vote on four phones and a visitor).
+
 ## v0.2.0 · 8 November 2026
 
 The findings from UNO's practice run (6–8 November 2026, `docs/runs/2026-11-uno-practice.md`): 25 of 28 built, the rest noted in `MAINNET-READINESS.md`.

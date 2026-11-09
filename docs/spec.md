@@ -303,9 +303,9 @@ All payouts passed since the last round go out together in one monthly transacti
 
 ## Event formats
 
-All DAO activity is signed Nostr events, published to the DAO's own relay plus at least two public relays. The DAO relay runs Nosflare on Cloudflare, set to accept only the DAO's event kinds (3570–3586) carrying its D tag, with paid access turned off. Every client rebuilds the DAO's state from these events and the chain; nothing is trusted because a server said so.
+All DAO activity is signed Nostr events, published to the DAO's own relay plus at least two public relays. The DAO relay runs Nosflare on Cloudflare, set to accept only the DAO's event kinds (3570–3589) carrying its D tag, with paid access turned off. Every client rebuilds the DAO's state from these events and the chain; nothing is trusted because a server said so.
 
-Every event carries a `D` tag holding the DAO id and a `v` tag with the protocol version. The DAO id is the SHA-256 of the canonical genesis config, so it never changes. Kinds 3570–3586 are a provisional block of regular events, so relays keep the full history.
+Every event carries a `D` tag holding the DAO id and a `v` tag with the protocol version. The DAO id is the SHA-256 of the canonical genesis config, so it never changes. Kinds 3570–3589 are a provisional block of regular events, so relays keep the full history.
 
 The events, their fields and validity rules are defined in one place only: [`protocol.md`](protocol.md), section 2 lists them all. Another team can write a compatible client from it alone.
 
@@ -459,6 +459,6 @@ Repo: btc-dao. Stack: static site, bundled and pinned libraries (`@scure/btc-sig
 - [ ] Which host for the mainnet site? The trial runs on GitHub Pages at bitcoin-dao.github.io/uno-practice and /uno-testnet. Domains decided: btcdao.tech for the project; the mainnet DAO's domain follows the name its council chooses.
 - [ ] Can OpenTimestamps calendars be reached from the browser, or is a small helper needed?
 - [ ] Does SeedSigner's current firmware verify change against a loaded P2WSH multisig descriptor? Test before phase 2.
-- [ ] Are kinds 3570–3586 and the D tag free in the Nostr kind registry?
+- [ ] Are kinds 3570–3589 and the D tag free in the Nostr kind registry?
 - [ ] Legal check (Italy, UK): confirm keyless coordination software is not custody.
 - [ ] Decided: the software repo is named btc-dao; UNO is its first instance.

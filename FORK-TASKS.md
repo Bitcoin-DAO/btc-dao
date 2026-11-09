@@ -8,7 +8,7 @@
 
 ## Summary
 
-- **The rule:** a btc-dao DAO is one that speaks the protocol in `docs/protocol.md` (event kinds 3570–3586 with its `D` tag) over a Bitcoin multisig treasury. Everything else a fork may change.
+- **The rule:** a btc-dao DAO is one that speaks the protocol in `docs/protocol.md` (event kinds 3570–3589 with its `D` tag) over a Bitcoin multisig treasury. Everything else a fork may change.
 - **The request:** to be decided by the owner (for example a link back to btc-dao). Not yet stated.
 - **The model:** fork and run separately. One DAO per codebase; each DAO owns its hosting, relays and keys. The dashboard only reads.
 - **The release condition:** UNO restores and spends its testnet4 treasury without the website, the first mainnet DAO completes three monthly rounds without developer help, and a second group deploys from the kit and runs one testnet4 round.
@@ -77,7 +77,7 @@
 - [ ] A second group deploys its own DAO from the kit and runs one testnet4 round.
 
 ### 8. Code, protocol and security
-- [ ] `docs/protocol.md`: every event format as exact JSON, with kind numbers and versioning. Kinds 3570–3586 are still provisional.
+- [ ] `docs/protocol.md`: every event format as exact JSON, with kind numbers and versioning. Kinds 3570–3589 are still provisional.
 - [ ] State rules written down, with test cases for edge cases (S4).
 - [ ] S1 to S6 met and tested on testnet4 (phase 1).
 - [ ] S7: change verified against the loaded descriptor on SeedSigner (phase 2, hard gate).

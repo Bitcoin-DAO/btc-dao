@@ -1,9 +1,10 @@
-// New proposal (protocol 4.1). New members go through the sponsor flow instead.
+// New proposal (protocol 4.1), or a new version of a discussion draft (4.5.1). New members go through the sponsor flow instead.
 import { useState } from 'preact/hooks';
 import { signAndPublish, useApp } from '../app';
 import { fmtSats, t } from '../i18n';
 import { KIND } from '../core/events';
 import { DUST, proposalSchemaError, validAddress, type ProposalContent, type ProposalType } from '../core/state';
+import { pinnedVersion, type DraftFields } from '../core/discussion';
 import { cadenceOf } from '../core/time';
 import { Footer, Header, errText, go } from './parts';
 import { EDITABLE_RULES, periodText, ruleLabel, ruleValue, typeLabel } from './Proposals';
@@ -12,25 +13,47 @@ import { feePolicyOf } from '../core/chain';
 
 const TYPES: ProposalType[] = ['payout', 'statement', 'remove_member', 'change_rules', 'close'];
 
-export function NewProposal() {
+/** The form's starting values from a version card, so a new version starts from the last one. */
+function formOf(f?: DraftFields) {
+  const p = f?.payload ?? {};
+  const out = (p.outputs as { address: string; amount_sat: number; member?: string }[] | undefined)?.[0];
+  const ch = (p.changes as { path: string; to: unknown }[] | undefined)?.[0];
+  return {
+    type: (f?.type && TYPES.includes(f.type) ? f.type : 'payout') as ProposalType,
+    title: f?.title ?? '',
+    summary: f?.summary ?? '',
+    recipient: typeof p.recipient === 'string' ? p.recipient : '',
+    address: out?.address ?? (typeof p.destination === 'string' ? p.destination : ''),
+    amount: out ? String(out.amount_sat) : '',
+    forMember: out?.member ?? '',
+    member: typeof p.member_key === 'string' ? p.member_key : '',
+    reason: typeof p.reason === 'string' ? p.reason : '',
+    rule: (ch && EDITABLE_RULES.includes(ch.path.slice(6) as (typeof EDITABLE_RULES)[number]) ? ch.path.slice(6) : 'votingPeriodDays') as (typeof EDITABLE_RULES)[number],
+    value: ch && ch.to !== null && ch.to !== undefined ? String(ch.to) : '',
+  };
+}
+
+export function NewProposal({ draftId }: { draftId?: string }) {
   const app = useApp();
   const s = app.dao!;
   const network = app.site!.network;
-  const [type, setType] = useState<ProposalType>('payout');
+  const thread = draftId ? app.discussion?.threads.find(x => x.id === draftId && x.isDraft) : undefined;
+  const latest = thread ? pinnedVersion(thread) : undefined;
+  const [init] = useState(() => formOf(latest?.fields));
+  const [type, setType] = useState<ProposalType>(init.type);
   const returnTo = s.founded!.config.testnetTreasury ?? app.site!.testnetTreasury;
   const returnOk = !!returnTo && validAddress(returnTo.address, network);
-  const [title, setTitle] = useState('');
-  const [summary, setSummary] = useState('');
-  const [link, setLink] = useState('');
-  const [recipient, setRecipient] = useState('');
-  const [address, setAddress] = useState('');
-  const [amount, setAmount] = useState('');
+  const [title, setTitle] = useState(init.title);
+  const [summary, setSummary] = useState(init.summary);
+  const [recipient, setRecipient] = useState(init.recipient);
+  const [address, setAddress] = useState(init.address);
+  const [amount, setAmount] = useState(init.amount);
   const [iAm, setIAm] = useState(false);
-  const [member, setMember] = useState('');
-  const [forMember, setForMember] = useState('');
-  const [reason, setReason] = useState('');
-  const [rule, setRule] = useState<(typeof EDITABLE_RULES)[number]>('votingPeriodDays');
-  const [value, setValue] = useState('');
+  const [member, setMember] = useState(init.member);
+  const [forMember, setForMember] = useState(init.forMember);
+  const [reason, setReason] = useState(init.reason);
+  const [rule, setRule] = useState<(typeof EDITABLE_RULES)[number]>(init.rule);
+  const [value, setValue] = useState(init.value);
   const [msg, setMsg] = useState<string>();
   const [busy, setBusy] = useState(false);
 
@@ -66,12 +89,25 @@ export function NewProposal() {
   if (type === 'remove_member') payload = { member_key: member, reason: reason.trim() };
   if (type === 'change_rules') payload = { changes: [{ path: `rules.${rule}`, from: stored ?? null, to: parsedValue }] };
   if (type === 'close') payload = { destination: addr };
-  const content: ProposalContent = {
-    type, title: title.trim(), summary: summary.trim(), lang: app.lang, payload,
-    ...(link.trim() ? { link: { url: link.trim() } } : {}),
-  };
+  const content: ProposalContent = { type, title: title.trim(), summary: summary.trim(), lang: app.lang, payload };
   const schemaErr = proposalSchemaError(content, network);
   const ok = !schemaErr && !addrError && !amtError && !(type === 'change_rules' && (parsedValue === undefined || parsedValue === current || (rule === 'payoutRound' && parsedValue === cadenceOf(current))));
+
+  // A version card or a new draft: the same fields, numbered, opening (or continuing) a thread.
+  const nextVersion = thread ? thread.versions.length + 1 : 1;
+  const postVersion = async () => {
+    setMsg(undefined);
+    setBusy(true);
+    try {
+      const fields: DraftFields = { version: nextVersion, title: content.title, summary: content.summary, lang: content.lang, type: content.type, payload: content.payload };
+      const { event } = await signAndPublish(KIND.draft, fields, thread ? [['e', thread.id]] : []);
+      go(`/d/${thread ? thread.id : event.id}`);
+    } catch (e) {
+      setMsg(errText(e));
+    } finally {
+      setBusy(false);
+    }
+  };
 
   const publish = async () => {
     setMsg(undefined);
@@ -102,7 +138,9 @@ export function NewProposal() {
     <>
       <Header />
       <main>
-        <h1>{t('np.title')}</h1>
+        <h1>{thread ? t('np.versionTitle', { n: nextVersion }) : t('np.title')}</h1>
+        {thread && <p class="small">{t('np.versionHint', { title: thread.title })}</p>}
+        {draftId && !thread && <p class="warnbox">{t('dt.notFound')}</p>}
         <label class="field">
           {t('np.type')}
           <select value={type} onChange={e => {
@@ -120,7 +158,6 @@ export function NewProposal() {
           <textarea maxLength={500} value={summary} style="font-family:inherit;font-size:16px" onInput={e => setSummary((e.target as HTMLTextAreaElement).value)} />
           <span class="small" style="font-weight:400">{t('np.summaryHint')} {summary.length}/500</span>
         </label>
-        <label class="field">{t('np.link')}<input type="text" inputMode="url" placeholder="https://" value={link} onInput={e => setLink((e.target as HTMLInputElement).value)} /></label>
 
         {type === 'payout' && (
           <div class="card">
@@ -141,7 +178,7 @@ export function NewProposal() {
             <label class="field">{t('np.amount')}<input type="text" inputMode="numeric" value={amount} onInput={e => setAmount((e.target as HTMLInputElement).value.replace(/[^\d]/g, ''))} /></label>
             {amount && !amtError && <span class="small">{fmtSats(amt)} sats</span>}
             {amtError && <p class="error">{amtError}</p>}
-            {!(payee && payeeStanding?.address === addr) && (
+            {!thread && !(payee && payeeStanding?.address === addr) && (
               <>
                 <label class="check"><input type="checkbox" checked={iAm} onChange={e => setIAm((e.target as HTMLInputElement).checked)} />{t('np.iAmRecipient')}</label>
                 {!iAm && <p class="small">{t('np.recipientLater')}</p>}
@@ -211,11 +248,19 @@ export function NewProposal() {
             {returnOk && <p class="note">{t('np.returnNote', { name: returnTo!.name })}</p>}
             <label class="field">{t('np.destination')}<input type="text" class="mono" autoComplete="off" spellcheck={false} value={address} onInput={e => setAddress((e.target as HTMLInputElement).value)} /></label>
             {addrError && <p class="error">{addrError}</p>}
-            <label class="check"><input type="checkbox" checked={iAm} onChange={e => setIAm((e.target as HTMLInputElement).checked)} />{t('np.iAmRecipient')}</label>
+            {!thread && <label class="check"><input type="checkbox" checked={iAm} onChange={e => setIAm((e.target as HTMLInputElement).checked)} />{t('np.iAmRecipient')}</label>}
           </div>
         )}
 
-        <button type="button" class="btn primary" disabled={!ok || busy} onClick={publish}>{t('np.publish')}</button>
+        {thread ? (
+          <button type="button" class="btn primary" disabled={!ok || busy || thread.status !== 'open'} onClick={postVersion}>{t('np.postVersion', { n: nextVersion })}</button>
+        ) : (
+          <>
+            <button type="button" class="btn primary" disabled={!ok || busy} onClick={postVersion}>{t('np.discussFirst')}</button>
+            <p class="small">{t('np.discussFirstHint')}</p>
+            <button type="button" class="btn secondary" disabled={!ok || busy} onClick={publish}>{t('np.publish')}</button>
+          </>
+        )}
         {msg && <p class="warnbox">{msg}</p>}
       </main>
       <Footer />

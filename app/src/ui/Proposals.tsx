@@ -3,12 +3,13 @@ import { useState } from 'preact/hooks';
 import { signAndPublish, useApp } from '../app';
 import { fmtDate, fmtDateTime, fmtLeft, fmtSats, t } from '../i18n';
 import { KIND, tagValue, type Event } from '../core/events';
-import { proposalLabel, type Choice, type Output, type ProposalView } from '../core/state';
+import { proposalLabel, type Choice, type Output, type ProposalContent, type ProposalView } from '../core/state';
 import { formatShortCode, shortCode } from '../core/shortcode';
 import { parseJson } from '../core/util';
 import { Address, Footer, Header, errText, go } from './parts';
 import { PaymentLine } from './Round';
 import { cadenceOf } from '../core/time';
+import { postCount } from './Discussion';
 
 export const typeLabel = (type: string) => t(`type.${type}` as 'type.payout');
 
@@ -72,7 +73,7 @@ export function Proposals() {
       <main>
         <div class="row">
           <h1>{t('props.title')}</h1>
-          {app.me && app.secret && <button type="button" class="btn dark" onClick={() => go('/new')}>{t('props.new')}</button>}
+          {app.me && app.secret && <button type="button" class="btn dark" onClick={() => go('/idea')}>{t('dt.newIdea')}</button>}
         </div>
         {list.length === 0 && <p class="small">{t('props.none')}</p>}
         {list.map(p => <ProposalCard p={p} />)}
@@ -169,7 +170,8 @@ export function ProposalDetail({ id }: { id: string }) {
           <h3>{t('pd.what')}</h3>
           <p style="white-space:pre-wrap">{c.summary}</p>
           {c.link && <a href={c.link.url} target="_blank" rel="noopener noreferrer">{t('pd.link')} ↗</a>}
-          <Payload p={p} />
+          <DiscussionFields p={p} />
+          <Payload c={p.content} />
           {p.status === 'passed' && <PaymentLine id={p.event.id} />}
         </section>
 
@@ -254,11 +256,10 @@ function RecordRow({ e, nameOf }: { e: Event; nameOf: (k: string) => string }) {
   );
 }
 
-function Payload({ p }: { p: ProposalView }) {
+export function Payload({ c }: { c: ProposalContent }) {
   const app = useApp();
   const s = app.dao!;
   const nameOf = useNameOf();
-  const c = p.content;
   const pl = c.payload;
   switch (c.type) {
     case 'payout':
@@ -338,4 +339,17 @@ export function ruleLabel(key: string) {
     case 'feePolicy': return t('fee.label');
     default: return key;
   }
+}
+
+/** Where the proposal was discussed, and which version was submitted (protocol 4.5.4). */
+function DiscussionFields({ p }: { p: ProposalView }) {
+  const app = useApp();
+  const th = app.discussion?.byProposal.get(p.event.id);
+  if (!th) return null;
+  return (
+    <>
+      <div class="kv"><span>{t('pd.discussion')}</span><a href={`#/d/${th.id}`}>{t('pd.discussionLink', { posts: postCount(th.posts.length) })}</a></div>
+      {th.submittedVersion && <div class="kv"><span>{t('pd.version')}</span><span class="mono">v{th.submittedVersion}</span></div>}
+    </>
+  );
 }

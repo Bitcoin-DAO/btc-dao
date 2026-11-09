@@ -3,6 +3,7 @@ import { useEffect, useState } from 'preact/hooks';
 import { stageError, stageOf, usable, type SiteConfig } from './core/config';
 import { KIND, sign, template, type Event } from './core/events';
 import { rebuild, type DaoState, type Member } from './core/state';
+import { buildDiscussion, type Discussion } from './core/discussion';
 import { parseDescriptor } from './core/descriptor';
 import { broadcast, loadTreasury, txStatus, type Broadcast, type TreasuryView, type TxStatus } from './core/chain';
 import { finalizeRound } from './core/round';
@@ -22,6 +23,7 @@ export interface AppState {
   loading: boolean;
   events: Event[];
   dao?: DaoState;
+  discussion?: Discussion;
   daoId?: string;
   pending?: PendingFounder;
   identity?: LocalIdentity;
@@ -85,7 +87,8 @@ function derive(events: Event[], extra: Partial<AppState> = {}) {
   const pubkey = s.secret ? pubkeyOf(s.secret) : s.identity?.pubkey;
   const me = pubkey ? dao.members.find(m => m.person === dao.personOf(pubkey)) : undefined;
   const isCouncil = !!(me && pubkey && dao.isCouncilAt(pubkey, dao.now));
-  setState({ ...extra, events, dao, daoId, me, isCouncil, lastSync: Date.now() });
+  const discussion = buildDiscussion(dao, events);
+  setState({ ...extra, events, dao, discussion, daoId, me, isCouncil, lastSync: Date.now() });
 }
 
 const tallied = new Set<string>();

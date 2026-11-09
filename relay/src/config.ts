@@ -18,7 +18,7 @@ export const AUTH_TIMEOUT_MS = 600000; // 10 minutes - how long the challenge is
 // Relay info
 export const relayInfo: RelayInfo = {
   name: "btc-dao relay",
-  description: "Relay for btc-dao DAOs. Accepts only the DAO's own events, kinds 3570-3586 with its D tag, and keeps all of them.",
+  description: "Relay for btc-dao DAOs. Accepts only the DAO's own events, kinds 3570-3589 with its D tag, and keeps all of them.",
   pubkey: "",
   contact: "https://github.com/Bitcoin-DAO/btc-dao",
   supported_nips: [1, 11, 12, 16, 20],
@@ -106,9 +106,9 @@ export const blockedEventKinds = new Set<number>([]);
 
 // Allowed event kinds
 // Add comma-separated kinds Ex: 1, 2, 3
-// btc-dao: only the DAO's kinds, 3570-3586 (protocol.md section 7.3)
+// btc-dao: only the DAO's kinds, 3570-3589 (protocol.md section 7.3)
 export const allowedEventKinds = new Set<number>(
-  Array.from({ length: 3586 - 3570 + 1 }, (_, i) => 3570 + i)
+  Array.from({ length: 3589 - 3570 + 1 }, (_, i) => 3570 + i)
 );
 
 // btc-dao: every event must carry ["D", <dao_id>]. Leave the list empty until

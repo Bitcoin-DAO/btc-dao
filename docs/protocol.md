@@ -75,7 +75,7 @@ Restoring: the app scans the card, checks the `dao8` prefix matches this DAO, ch
 
 ## 2. Kinds
 
-All DAO events are **regular** events (kinds 1000–9999), so relays keep every one and the full history stays auditable. The numbers below are a provisional block (3570–3586) and must be checked against the Nostr kind registry before v1.
+All DAO events are **regular** events (kinds 1000–9999), so relays keep every one and the full history stays auditable. The numbers below are a provisional block (3570–3589) and must be checked against the Nostr kind registry before v1.
 
 | Kind | Name | Signed by | Section |
 | --- | --- | --- | --- |
@@ -96,6 +96,9 @@ All DAO events are **regular** events (kinds 1000–9999), so relays keep every 
 | 3584 | `dao.anchor` | Any member | 7.1 |
 | 3585 | `dao.listing` | Council member | 7.2 |
 | 3586 | `dao.keywrap` | Member | 5.4 |
+| 3587 | `dao.draft` | Member (the draft's author) | 4.5.1 |
+| 3588 | `dao.post` | Member | 4.5.2 |
+| 3589 | `dao.withdraw` | Member (the draft's author) | 4.5.3 |
 
 Compared with the spec v0.1 event table, this adds `dao.settings` (versions of the rules, council and descriptor get their own event, like rosters), `dao.confirm` (recipient address confirmation), `dao.tally` (requirement S3), the three onboarding events and `dao.keywrap` (passkey-protected identity keys).
 
@@ -194,7 +197,7 @@ A founder's key lost before the genesis is published is simply replaced by signi
 }
 ```
 
-Common fields: `type`, `title` (≤ 80 characters), `summary` (≤ 500 characters; the binding text), `link` (optional; its `sha256` is optional too, because a browser cannot fetch arbitrary pages to hash them, and the summary is what binds), `lang`. `payload` depends on `type`:
+Common fields: `type`, `title` (≤ 80 characters), `summary` (≤ 500 characters; the binding text), `link` (optional; its `sha256` is optional too, because a browser cannot fetch arbitrary pages to hash them, and the summary is what binds), `draft` (optional: `{"id": <draft id>, "version": <n>}`, the discussion draft and version the proposal was submitted from, section 4.5), `lang`. Clients from v0.3 no longer offer `link` when writing a proposal: the discussion thread takes its place. `payload` depends on `type`:
 
 | `type` | `payload` |
 | --- | --- |
@@ -282,6 +285,45 @@ Every council member's client publishes the tally automatically the first time i
 Nostr timestamps are chosen by the signer, so a vote could be backdated after the close. The tally settles which votes count: once published and anchored, clients use it instead of recounting. A client that holds a vote dated before `closed_at` that the tally neither counts nor excludes shows a warning on the proposal. A second, conflicting tally makes the proposal **disputed** until `threshold` council members endorse one tally (`dao.endorse`, object `tally`).
 
 Payouts, roster changes and rule changes act only on proposals with a valid, undisputed tally.
+
+### 4.5 Discussion
+
+Before a proposal, members can shape it in public: **idea → draft → discuss → proposal**. A draft opens a thread at once; its author posts numbered versions as the discussion goes; any member posts in the thread; the author submits one version as a normal `dao.proposal`, and the thread carries on through the vote. Discussion never changes how a proposal is validated, voted or tallied: a client reads it beside the DAO's state. There is no editing, deletion or moderation; a correction is a new post or a new version.
+
+#### 4.5.1 `dao.draft`
+
+```json
+{
+  "version": 2,
+  "title": "Un forno solare per la piazza",
+  "summary": "Comprare un forno solare da usare alle feste del quartiere.",
+  "lang": "it",
+  "type": "payout",
+  "payload": {"recipient": "Officina", "outputs": [{"address": "tb1q…", "amount_sat": 80000}]}
+}
+```
+
+A **version card**: a complete snapshot of the proposal fields, numbered from 1. Version 1 has no `e` tag and its id is the **draft id**; every later version carries `["e", <draft id>]`. An **idea** is a version with only `title` (≤ 80) and `summary` (≤ 500, may be short); `type` and `payload` are absent together or present together, with the same formats as section 4.1.
+
+Valid when: version 1 is signed by a member at its `created_at`; a later version is signed by the same person (a replaced key counts as the same person), its `version` is exactly one more than the last valid version, and it is dated before the draft's submission and before its withdrawal. The newest valid version is the current draft.
+
+#### 4.5.2 `dao.post`
+
+```json
+{ "text": "Dove lo mettiamo? In piazza o nel cortile della scuola?" }
+```
+
+Tags: `["e", <thread id>]`, where the thread id is a draft id, or the id of a proposal published without a draft (every proposal has a thread). `text` is plain text, 1 to 2,000 characters; links are written in the text. Valid when the signer is a member at its `created_at`: members and council post, anyone else's posts are ignored. Posts are flat and in time order; there are no replies, reactions or attachments. A post's place in the timeline shows which version it answers.
+
+#### 4.5.3 `dao.withdraw`
+
+Content `{}`, tags `["e", <draft id>]`. Signed by the draft's author while the draft is not submitted. The draft stays visible, marked withdrawn; later versions and submissions are ignored, posts are still accepted.
+
+#### 4.5.4 Submission and status
+
+The author submits a version by publishing a `dao.proposal` (section 4.1) whose `title`, `summary`, `type` and `payload` equal that version's, with `"draft": {"id": <draft id>, "version": <n>}`. The first such proposal, by the author, dated at or after the version and before any withdrawal, is the draft's submission: it **freezes** the draft, so the text that is voted is the text that was discussed. A proposal that names a draft but does not meet these conditions is still an ordinary proposal; it is shown with a thread of its own and no link to the draft.
+
+The draft's status is derived, never stored: **open**, **submitted** (a valid submission exists) or **withdrawn** (a valid withdrawal exists). Events are taken in time order per draft; within the same second, versions and withdrawals count before a proposal.
 
 ## 5. Membership
 
@@ -383,12 +425,12 @@ After a domain loss, members find the new address in two ways that do not depend
 
 Each DAO runs one relay of its own beside at least two public relays. Its policy:
 
-- accept only events of kinds 3570–3586 that carry the DAO's `["D", <dao_id>]` tag, and reject everything else;
-- accept them from any key, because candidates and payout recipients who are not members must be able to publish; clients validate every event anyway;
+- accept only events of kinds 3570–3589 that carry the DAO's `["D", <dao_id>]` tag, and reject everything else;
+- accept them from any key, because candidates and payout recipients who are not members must be able to publish; clients validate every event anyway, so a discussion post from a non-member is kept by the relay but never shown;
 - no payment for access, and rate limits per key and per connection to keep spam small;
 - keep every accepted event; never delete.
 
-The reference setup is Nosflare on Cloudflare Workers, configured in `relay/`: pay-to-relay and sign-in off, only kinds 3570–3586, a required `D` tag (pinned to the DAO id once it exists), and pruning off. For UNO's stages it runs at a `workers.dev` address under the Bitcoin-DAO organisation's Cloudflare account; a mainnet DAO runs its own on its own domain. Any relay with the same policy can replace it.
+The reference setup is Nosflare on Cloudflare Workers, configured in `relay/`: pay-to-relay and sign-in off, only kinds 3570–3589, a required `D` tag (pinned to the DAO id once it exists), and pruning off. For UNO's stages it runs at a `workers.dev` address under the Bitcoin-DAO organisation's Cloudflare account; a mainnet DAO runs its own on its own domain. Any relay with the same policy can replace it.
 
 ### 7.4 Discovery relays
 
@@ -406,7 +448,7 @@ A client rebuilds a DAO in this order, from events filtered by `#D` and from the
 
 1. Verify the genesis event and its endorsements; load relays and settings version 1 (rules, council, threshold, descriptor).
 2. Follow the roster and settings chains, accepting each version only with a valid basis and enough endorsements.
-3. Collect proposals, confirmations, votes and tallies; derive proposal numbers and statuses.
+3. Collect proposals, confirmations, votes and tallies; derive proposal numbers and statuses. Drafts, posts and withdrawals (section 4.5) are read beside this and never change it.
 4. Apply verify, rekey and leave events to membership as of each moment that matters.
 5. Collect rounds, signatures and receipts; check each against the chain.
 6. Compute the treasury balance and history from the descriptor and the chain API, linking each payout to its round and proposals.

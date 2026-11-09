@@ -69,7 +69,7 @@ It measures whether money arrives **regularly** compared with what the DAO regul
 
 The dashboard has two inputs and writes nothing back:
 
-- **Events:** the protocol's kinds 3570–3586, found from each listing (section 4) and fetched by the DAO's `D` tag from the relays named in it.
+- **Events:** the protocol's kinds 3570–3589, found from each listing (section 4) and fetched by the DAO's `D` tag from the relays named in it.
 - **The chain:** read through the dashboard's own node or Electrum server, never a third-party explorer.
 
 There is no database of record. The dashboard can be rebuilt from scratch at any time from relays and the chain, following protocol section 8.
@@ -156,7 +156,7 @@ flowchart LR
 - [ ] Add the *show on public dashboards* switch to the DAO app's settings page, setting `listed` in the listing.
 - [ ] Run reconciliation locally in the DAO app during the trial stages.
 - [ ] Pick the discovery relays shipped with the first release, and set up the btcdao.tech relay with the discovery policy.
-- [ ] Confirm kinds 3570–3586 are unused on large relays (`decisions.md`).
+- [ ] Confirm kinds 3570–3589 are unused on large relays (`decisions.md`).
 - [ ] Write the protocol up as a draft NIP, with the app (publisher) and the dashboard (reader) as its two implementations, and submit it to nostr-protocol/nips after the first mainnet DAO.
 
 ## 9. Open questions

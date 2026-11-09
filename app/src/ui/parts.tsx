@@ -8,6 +8,7 @@ import { isPracticeVotes, stageOf } from '../core/config';
 import { cardPayload } from '../core/identity';
 import { shortCode, formatShortCode } from '../core/shortcode';
 import { fmtDate } from '../i18n';
+import { useUnreadCount } from './Discussion';
 
 export const go = (path: string) => {
   location.hash = '#' + path;
@@ -62,10 +63,12 @@ export function Header(props: { sub?: string; tabs?: ComponentChildren }) {
 
 export function Footer() {
   const app = useApp();
+  const unread = useUnreadCount();
   if (!app.daoId) return null;
   return (
     <nav class="footer">
       <a href="#/">{t('nav.home')}</a>
+      <a href="#/discussion">{t('nav.discussion')}{unread > 0 && <> <span class="chip" style="background:var(--accent);color:var(--accent-ink)">{unread}</span></>}</a>
       <a href="#/proposals">{t('nav.proposals')}</a>
       <a href="#/members">{t('nav.members')}</a>
       <a href="#/rules">{t('nav.rules')}</a>

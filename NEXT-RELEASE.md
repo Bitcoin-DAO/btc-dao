@@ -1,10 +1,48 @@
-# Next release: v0.3.0
+# Next releases
 
-**Status (9 November 2026):** planned, not started. The latest release is v0.2.0 (8 November 2026, `CHANGELOG.md`). Before building, UNO DAO runs v0.2.0 end to end: 2 of 3, three phones with their own Google accounts, practice votes, no SeedSigner.
+**Status (9 November 2026):** the latest release is v0.2.0 (8 November 2026, `CHANGELOG.md`). UNO DAO runs v0.2.0 end to end first (2 of 3, three phones with their own Google accounts, practice votes, no SeedSigner); fixes from that run go out as v0.2.1, tested on their own. Discussion is built in parallel on the `discussion` branch and merged after.
+
+**Order (decided 9 November 2026):** v0.3.0 discussion, v0.4.0 hardware keys, then outward comms (it needs the Announcement flow and the gateway's key).
 
 **Rule:** an item is ticked when it is built and its tests pass. Passing in the wild is tracked separately in `MAINNET-READINESS.md`.
 
-## A. Hardware keys
+## v0.3.0 · Discussion
+
+Design: `docs/drafts/discussion-and-comms.md`, section 3. Protocol: `docs/protocol.md` section 4.5. Branch: `discussion`.
+
+**Decided:** only members and council post; non-members' posts are filtered in the app, not at the relay (the relay keeps accepting the DAO's kinds from any key, as for every other event).
+
+**Protocol**
+- [x] Three new kinds: draft version, thread post, draft withdraw. 3587 `dao.draft`, 3588 `dao.post`, 3589 `dao.withdraw` (still to check the registry and large relays, as for 3570–3586)
+- [x] Proposal event gains the draft id and the submitted version number
+- [x] Validation: version cards only from the draft's author; no version card after the proposal opens (freeze); posts only from members; withdraw only by the author
+- [x] Draft status (open, submitted, withdrawn) derived from events
+- [x] Relay: accept kinds 3570–3589 (`relay/src/config.ts`), keep all, no deletions
+- [x] `docs/protocol.md` updated (the NIP draft follows when it is written)
+
+**App**
+- [x] Discussion tab: drafts and proposals by last activity
+- [x] New idea: title and a line or two; thread opens at once
+- [x] Thread view: latest version card pinned, then the full timeline of version cards and posts
+- [x] Version cards: author posts v2, v3… with the proposal fields
+- [x] Posts: flat, plain text, links allowed
+- [x] Submit as proposal (author only), pre-filled from the chosen version
+- [x] Withdraw (author only); the draft stays visible, marked closed
+- [x] Share button: public read-only link to a draft or thread
+- [x] "New since your last visit", timestamp kept on the device
+- [x] Proposal page: the external link box replaced by **Discussion** (thread link) and **Version** (e.g. v3)
+
+**Tests**
+- [x] Unit: draft status, freeze, author-only version cards and withdraw, posts from non-members ignored
+- [x] End-to-end: idea → v1 → posts → v2 → submit → vote, with the thread continuing through the vote
+
+**In the wild (UNO DAO, after v0.2.1)**
+- [ ] An idea, two versions, posts from three phones, submit, vote, posts during the vote
+- [ ] A withdrawn draft
+- [ ] Share link opened on a phone that is not a member
+- [ ] Relay redeployed with kinds 3570–3589 before UNO DAO upgrades
+
+## v0.4.0 · Hardware keys
 
 Plan agreed 8 November 2026. Phase 2 of the build plan (`docs/spec.md`). Tested with one SeedSigner and one SD card, loading three SeedQR cards in turn.
 
@@ -25,35 +63,7 @@ Plan agreed 8 November 2026. Phase 2 of the build plan (`docs/spec.md`). Tested 
 - [ ] End-to-end: a software stand-in that behaves like a SeedSigner (xpub export, PSBT scan, signed PSBT back)
 - [ ] End-to-end: council change from phone keys to hardware keys, migration round confirmed
 
-## B. Discussion
-
-Design: `docs/drafts/discussion-and-comms.md`, section 3.
-
-**Protocol**
-- [ ] Three new kinds: draft version, thread post, draft withdraw. Proposed numbers 3587, 3588, 3589 (next free after 3586; check the registry and large relays as for 3570–3586)
-- [ ] Proposal event gains the draft id and the submitted version number
-- [ ] Validation: version cards only from the draft's author; no version card after the proposal opens (freeze); posts only from members; withdraw only by the author
-- [ ] Draft status (open, submitted, withdrawn) derived from events
-- [ ] Relay: accept kinds 3570–3589 (`relay/src/config.ts`), keep all, no deletions
-- [ ] `docs/protocol.md` and the NIP draft updated
-
-**App**
-- [ ] Discussion tab: drafts and proposals by last activity
-- [ ] New idea: title and a line or two; thread opens at once
-- [ ] Thread view: latest version card pinned, then the full timeline of version cards and posts
-- [ ] Version cards: author posts v2, v3… with the proposal fields
-- [ ] Posts: flat, plain text, links allowed
-- [ ] Submit as proposal (author only), pre-filled from the chosen version
-- [ ] Withdraw (author only); the draft stays visible, marked closed
-- [ ] Share button: public read-only link to a draft or thread
-- [ ] "New since your last visit", timestamp kept on the device
-- [ ] Proposal page: the external link box replaced by **Discussion** (thread link) and **Version** (e.g. v3)
-
-**Tests**
-- [ ] Unit: draft status, freeze, author-only version cards and withdraw, posts from non-members ignored
-- [ ] End-to-end: idea → v1 → posts → v2 → submit → vote, with the thread continuing through the vote
-
-## C. Outward comms
+## Later · Outward comms
 
 Design: `docs/drafts/discussion-and-comms.md`, section 4.
 
@@ -66,8 +76,7 @@ Design: `docs/drafts/discussion-and-comms.md`, section 4.
 
 ## Open items
 
-- [ ] **Relay write check.** The design assumes the relay accepts writes from member keys only. It does not: by design it accepts the DAO's kinds from any key, because candidates and payout recipients must publish, and clients validate every event (`docs/protocol.md` 7.3). Discussion fits that model (clients show only members' posts), but non-members could fill the relay with posts the app ignores. Decide: client-side filtering only, or a relay rule limiting kinds 3588 to keys on the latest roster
+- [x] **Relay write check.** Decided 9 November 2026: filtered in the app only. The relay accepts the DAO's kinds from any key, because candidates and payout recipients must publish, and clients validate every event (`docs/protocol.md` 7.3); a relay rule limiting posts to the roster can be added later without changing the event format
 - [ ] **Where the DAO npub's notes go.** The feed and announcements are ordinary notes (kind 1), and the DAO relay rejects every kind outside the DAO's range. Either they go to public relays only, or the relay also accepts kind 1 from the DAO npub alone
 - [ ] Testnet4 DAOs: feed to public relays, or only to their own relay? (ties in with the open question in `docs/decisions.md` on testnet publishing)
 - [ ] Default list of public relays for the DAO npub
-- [ ] Order of the three parts. Suggested: B (discussion) first, since it touches no keys and UNO can use it straight away; then A (hardware keys); C last, since it needs B's Announcement flow and the gateway's key

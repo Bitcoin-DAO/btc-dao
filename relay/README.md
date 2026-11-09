@@ -8,7 +8,7 @@ All in `src/config.ts` unless noted:
 
 | Setting | Nosflare default | Here |
 | --- | --- | --- |
-| Event kinds | all | only 3570–3586 |
+| Event kinds | all | only 3570–3589 |
 | `D` tag | not checked | required on every event (new `hasDaoTag`, checked in `src/durable-object.ts`); any 64-hex value until `ALLOWED_DAO_IDS` has entries, then only those DAO ids |
 | Pay to relay | on | off |
 | Sign-in to read or write (NIP-42) | required | not required: anyone can read, any key can publish |

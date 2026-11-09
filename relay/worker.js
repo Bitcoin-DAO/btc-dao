@@ -78,7 +78,7 @@ var AUTH_REQUIRED = false;
 var AUTH_TIMEOUT_MS = 6e5;
 var relayInfo = {
   name: "btc-dao relay",
-  description: "Relay for btc-dao DAOs. Accepts only the DAO's own events, kinds 3570-3586 with its D tag, and keeps all of them.",
+  description: "Relay for btc-dao DAOs. Accepts only the DAO's own events, kinds 3570-3589 with its D tag, and keeps all of them.",
   pubkey: "",
   contact: "https://github.com/Bitcoin-DAO/btc-dao",
   supported_nips: [1, 11, 12, 16, 20],
@@ -270,7 +270,7 @@ var allowedPubkeys = /* @__PURE__ */ new Set([
 ]);
 var blockedEventKinds = /* @__PURE__ */ new Set([]);
 var allowedEventKinds = new Set(
-  Array.from({ length: 3586 - 3570 + 1 }, (_, i) => 3570 + i)
+  Array.from({ length: 3589 - 3570 + 1 }, (_, i) => 3570 + i)
 );
 var ALLOWED_DAO_IDS = [];
 var blockedContent = /* @__PURE__ */ new Set([]);

@@ -20,6 +20,7 @@ import { Rules } from './ui/Rules';
 import { Header } from './ui/parts';
 import { ProposalDetail, Proposals } from './ui/Proposals';
 import { NewProposal } from './ui/NewProposal';
+import { DiscussionList, NewIdea, ThreadView } from './ui/Discussion';
 import { Confirm } from './ui/Confirm';
 import { Candidate } from './ui/Candidate';
 import { Sponsor } from './ui/Sponsor';
@@ -36,7 +37,9 @@ const routes: Record<string, () => preact.JSX.Element> = {
   '/members': Members,
   '/rules': Rules,
   '/proposals': Proposals,
-  '/new': NewProposal,
+  '/new': () => <NewProposal />,
+  '/discussion': DiscussionList,
+  '/idea': NewIdea,
   '/sponsor': Sponsor,
   '/council': Council,
   '/round/new': PrepareRound,
@@ -80,6 +83,8 @@ function App() {
       </div>
     );
   }
+  const thread = path.match(/^\/d\/([0-9a-f]{64})(\/edit)?$/);
+  if (thread) return <div class="app">{thread[2] ? <NewProposal draftId={thread[1]} key={thread[1]} /> : <ThreadView id={thread[1]} key={thread[1]} />}</div>;
   const param = path.match(/^\/(p|confirm|round)\/([0-9a-f]{64})$/);
   if (param) {
     const [, kind, id] = param;

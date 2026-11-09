@@ -191,10 +191,12 @@ Remote members are marked "verified remotely" until someone verifies them in per
 
 ### 6.2 Proposals
 
-1. Any member writes a proposal: type, title (up to 80 characters), summary (up to 500; the binding text), an optional link to the full text, and the language.
-2. For a payout, the recipient's address goes in its own box, scanned from the recipient's wallet. Payouts can pay several recipients.
-3. If the recipient is not the proposer, the recipient confirms the address on the proposal page. There is no deadline, but an unconfirmed payout cannot be paid and lapses under the usual rule.
-4. Discussion happens wherever the group already talks. The proposal links to it; the DAO records only the decision.
+1. **Start with an idea.** Any member opens **Discussion → New idea**: a title and a line or two. The thread opens at once, in public, on the DAO's own relay.
+2. **Shape it in the thread.** Members and council post (plain text, links allowed). The author posts new versions (v2, v3…) with the proposal fields: type, title (up to 80 characters), summary (up to 500; the binding text) and the details. Nothing is edited or deleted; a correction is a new post or a new version.
+3. **Submit a version.** When the discussion has settled, the author submits one version as the proposal and voting opens. The draft freezes, so the text voted is the text discussed; the thread carries on through the vote. An author can withdraw a draft instead; it stays visible.
+4. For a payout, the recipient's address goes in its own box, scanned from the recipient's wallet. Payouts can pay several recipients.
+5. If the recipient is not the proposer, the recipient confirms the address on the proposal page. There is no deadline, but an unconfirmed payout cannot be paid and lapses under the usual rule.
+6. A proposal can still be published directly (for urgent or routine ones); it gets a thread of its own. New members and council changes start from their own flows.
 
 ### 6.3 Voting and the final count
 
