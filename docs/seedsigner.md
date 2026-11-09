@@ -18,14 +18,17 @@ Checked 9 November 2026, card A.
 - Decoding libraries that work: `@ngraveio/bc-ur` (fragments) and `@keystonehq/bc-ur-registry` (`CryptoAccount`). The registry prints the key with mainnet version bytes (`xpub…`) whatever the network; the app must take the network from the key's use info and re-encode as `tpub` on testnet
 - The **Specter Desktop** export is also animated (not checked further: the app reads the Sparrow one)
 
-## 2. PSBT to the device (signing)
+## 2. Wallet descriptor (change check, S7)
 
-To check in step 1: a test round's PSBT as animated UR `crypto-psbt`.
+Checked 9 November 2026 with the QR test page (`#/qrtest`), cards A, B, C.
 
-## 3. Signed PSBT back from the device
+- A **static QR** of the plain-text descriptor, 2 of 3, three keys: read by the SeedSigner in the **`/0/*` form** (`wsh(sortedmulti(2,[fp/48h/1h/0h/2h]tpub…/0/*,…))#checksum`). The SeedSigner showed 2 of 3 and the three fingerprints.
+- The `/<0;1>/*` form: not confirmed; the app shows `/0/*` to the device.
 
-To check in step 1.
+## 3. PSBT to the device (signing)
 
-## 4. Wallet descriptor (change check, S7)
+Checked 9 November 2026: a test round's PSBT as **animated UR `crypto-psbt`**, 100-byte parts at 4 frames a second (the page's defaults), read by the SeedSigner first time.
 
-To check in step 1: the treasury's descriptor as a QR the SeedSigner scans before signing.
+## 4. Signed PSBT back from the device
+
+Checked 9 November 2026: the SeedSigner shows the signed PSBT as animated UR `crypto-psbt`, read by the phone. It is **trimmed**: the transaction and the signatures only, without `witness_utxo`, `witness_script` or key paths. The app puts the signatures back into the PSBT it sent (`mergeSignatures` in `src/core/hwkeys.ts`), after checking it is the same transaction, before checking or publishing them.
