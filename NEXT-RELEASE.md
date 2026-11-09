@@ -1,71 +1,64 @@
-# Next release: v0.3.0
+# Next release: v0.4.0
 
-**Status (9 November 2026):** carried-over issues and B. Discussion built and tested (v0.3.0). The latest release is v0.2.8 (`CHANGELOG.md`). UNO DAO's 2-of-3 run on three phones passed on 9 November (`docs/runs/2026-11-uno-dao.md`).
+**Status (9 November 2026):** planned, not started. The latest release is v0.3.1 (`CHANGELOG.md`). v0.3.0's Discussion passed in the wild on TEST DAO (9 November).
 
-**Scope, decided 9 November 2026:** v0.3.0 is the issues carried over from the two UNO runs, plus **B. Discussion**. **A. Hardware keys** moves to v0.4.0, **C. Outward comms** after it (it needs Discussion's Announcement flow and the gateway's key). Sections A and C below stay as the plan for those releases.
+**Direction, decided 9 November 2026:** the focus moves to mainnet. New DAOs that matter start on SeedSigners; phone keys stay only as a practice mode on testnet4. One codebase: the network and the founding choice decide which keys are allowed (mainnet: SeedSigners only). There is no move from phone keys to SeedSigners.
+
+**Order:**
+- **v0.4.0 — SeedSigner founding and signing**, in small steps, each tested before the next.
+- **v0.5.0 — Council change** (one key swapped or the threshold changed; the migration round that a lost, resigned or recalled key needs), before any mainnet launch. Tested on v0.4.0's SeedSigner DAO, with one SeedQR card playing the lost key.
+- **Later — Outward comms** (section C).
 
 **Rule:** an item is ticked when it is built and its tests pass. Passing in the wild is tracked separately in `MAINNET-READINESS.md`.
 
-## Carried over from the UNO runs
+**Equipment for the wild test:** one SeedSigner, one SD card with current firmware (a fresh card from the SD card ceremony, `docs/guide.md` 3.1), three SeedQR cards.
 
-- [x] Automatic second broadcast: about a minute after a broadcast, re-send once to the sources that do not know the transaction yet (UNO DAO finding 11; practice finding 24)
-- [x] Broadcast pages as their own config entry (practice finding 25)
-- [x] Council members write down the trial treasury key's 12 words as a required step, checked by typing some back (UNO DAO finding 7)
-- [x] A council member's phone can tell the council its treasury key is gone; the Council page shows the keys left and whether a spare remains (UNO DAO finding 8)
-- [x] End-to-end test that closes a DAO (UNO DAO finding 13)
+## v0.3.0 (done)
 
-## Carried over to v0.4.0
+Issues carried over from the UNO runs, and Discussion: see `CHANGELOG.md` v0.3.0 and v0.3.1.
 
-- [ ] Prepare page says "not enough funds" as soon as it opens, with the amount missing (payouts plus an estimated fee, less the balance); the Council page does not offer "Prepare the payout round" meanwhile (TEST DAO, 9 Nov 2026)
+## v0.4.0 — SeedSigner founding and signing
 
-## A. Hardware keys (v0.4.0)
+Formats: the ones Sparrow uses with SeedSigner, so any of the DAO's keys and descriptors also work in Sparrow for recovery. Animated QRs in UR (`crypto-psbt`) for PSBTs; the xpub export as the SeedSigner shows it for a multisig key (fingerprint, path `m/48'/coin'/0'/2'`, xpub); the descriptor as a wallet-registration QR the SeedSigner can scan. Each to be confirmed against the firmware on the test SD card in step 1.
 
-Plan agreed 8 November 2026. Phase 2 of the build plan (`docs/spec.md`). Tested with one SeedSigner and one SD card, loading three SeedQR cards in turn.
+**Step 1. QR building blocks**
+- [ ] Format check with the real device: export a multisig xpub, scan a test PSBT, show the signed PSBT, scan a descriptor; record the exact formats and firmware version in `docs/seedsigner.md`
+- [ ] Animated QR display (UR parts, steady frame rate, size suited to the SeedSigner's camera)
+- [ ] Animated QR scanning on the phone (multi-part decoding with progress, any order, duplicates ignored)
+- [ ] Unit tests: UR round trips for PSBTs of 1–3 inputs; decoding the formats recorded from the device
 
-**QR in and out**
-- [ ] Show a round's PSBT as an animated QR the SeedSigner can scan
-- [ ] Scan the signed PSBT back from the SeedSigner
-- [ ] Scan a SeedSigner's xpub export (founding with hardware keys and council change); today the setup page takes it as typed text only
-- [ ] Show the treasury descriptor as a QR to load on the device, so it verifies change (S7, hard gate)
+**Step 2. Founding with SeedSigner keys**
+- [ ] Founding choice on testnet4: **phone keys (practice)** or **SeedSigners**; mainnet: SeedSigners only, no choice shown
+- [ ] Council sign-up with a SeedSigner: scan its xpub export instead of creating a phone key and the 12 words; check network and path; the sign-up code carries fingerprint and xpub as today
+- [ ] The setup page's typed key-origin text stays as a fallback
+- [ ] No 12-word step and no phone treasury key for SeedSigner councils; the profile shows the key's fingerprint and where it lives (SeedQR card, steel plate)
 
-**Council change**
-- [ ] `change_council` proposal form (category, reason, keys; the rules are already in `docs/protocol.md`)
-- [ ] New descriptor confirmed by the council, like a rules version
-- [ ] Migration round: the whole balance from the old treasury to the new one, signed with the old keys
-- [ ] Treasury page follows both descriptors during the move
-- [ ] DAO history page opened from the DAO name (`docs/spec.md`, "DAO history"), including council changes
+**Step 3. Signing a round**
+- [ ] Round page, per council member: show the PSBT as an animated QR; scan the signed PSBT back; check it carries this member's valid signature (as the pasted-PSBT path does today) and publish it
+- [ ] Descriptor QR (S7, hard gate): shown before the PSBT, with the step "scan the wallet descriptor first, check change shows as verified"
+- [ ] Address check (S1): the payout addresses on the round page laid out as the SeedSigner shows them, to compare on the device
+- [ ] The preparer no longer signs automatically (only phone keys did)
+- [ ] "Not enough funds" shown as soon as the prepare page opens, with the amount missing; the Council page does not offer a round meanwhile (TEST DAO, 9 Nov 2026)
 
-**Tests**
-- [ ] End-to-end: a software stand-in that behaves like a SeedSigner (xpub export, PSBT scan, signed PSBT back)
-- [ ] End-to-end: council change from phone keys to hardware keys, migration round confirmed
+**Step 4. Tests**
+- [ ] A software stand-in for a SeedSigner in the end-to-end tests: shows an xpub QR, scans an animated PSBT QR, signs, shows the signed PSBT as animated QR (fed to the phone's camera as a fake video stream, as the camera test does today)
+- [ ] End-to-end: founding a 2-of-3 SeedSigner DAO, funding, a payout round signed by two stand-ins, broadcast, receipt; signatures checked independently with embit
 
-## B. Discussion
+**Step 5. In the wild**
+- [ ] A new testnet4 DAO founded on SeedSigners, 2 of 3, one SeedSigner and three SeedQR cards loaded in turn: founding, funding, a payout signed on the device, closing round
 
-Design: `docs/drafts/discussion-and-comms.md`, section 3.
+## v0.5.0 — Council change
 
-**Protocol**
-- [x] Three new kinds: draft version, thread post, draft withdraw. Proposed numbers 3587, 3588, 3589 (next free after 3586; check the registry and large relays as for 3570–3586)
-- [x] Proposal event gains the draft id and the submitted version number
-- [x] Validation: version cards only from the draft's author; no version card after the proposal opens (freeze); posts only from members; withdraw only by the author
-- [x] Draft status (open, submitted, withdrawn) derived from events
-- [x] Relay: accept kinds 3570–3590 (`relay/src/config.ts`), keep all, no deletions; discussion kinds limited per key (10 a minute)
-- [x] `docs/protocol.md` updated (section 4.5; kinds 3587–3590). There is no separate NIP draft yet: it will be written from `docs/protocol.md`
+The rules are already in `docs/protocol.md` (4.1.2, 6.1): every council change moves the whole treasury to a new descriptor, because keys cannot be removed from a multisig.
 
-**App**
-- [x] Discussion tab: drafts and proposals by last activity
-- [x] New idea: title and a line or two; thread opens at once
-- [x] Thread view: latest version card pinned, then the full timeline of version cards and posts
-- [x] Version cards: author posts v2, v3… with the proposal fields
-- [x] Posts: flat, plain text, links allowed
-- [x] Submit as proposal (author only), pre-filled from the chosen version
-- [x] Withdraw (author only); the draft stays visible, marked closed
-- [x] Share button: public read-only link to a draft or thread
-- [x] "New since your last visit", timestamp kept on the device
-- [x] Proposal page: **Discussion** (thread link) and **Version** (e.g. v3); a version's form has no external link box. A proposal written directly keeps its optional link and gets its own thread
-
-**Tests**
-- [x] Unit: draft status, freeze, author-only version cards and withdraw, posts from non-members ignored
-- [x] End-to-end: idea → v1 → posts → v2 → submit → vote, with the thread continuing through the vote
+- [ ] `change_council` proposal form: reason (`lost_key`, `resignation`, `recall`, `rotation`, `threshold`), outgoing key, incoming member's scanned SeedSigner xpub, new threshold; the new descriptor shown in full
+- [ ] Migration round: the whole balance to the new treasury's first address, signed with the old keys, checked as protocol 6.1 says
+- [ ] New settings version (council, threshold, descriptor) confirmed by the council after the migration's receipt
+- [ ] Treasury page follows both descriptors during the move, and keeps watching the old one for late payments
+- [ ] A reported lost key (`dao.keystatus`) links to "start a council change"
+- [ ] DAO history page opened from the DAO's name (`docs/spec.md`, "DAO history"): founding, rules and council versions, closing
+- [ ] End-to-end: a 2-of-3 SeedSigner DAO replaces a lost key; migration confirmed; the next payout spends from the new treasury
+- [ ] In the wild: on v0.4.0's SeedSigner DAO, one SeedQR card plays the lost key
 
 ## C. Outward comms (after v0.4.0)
 
