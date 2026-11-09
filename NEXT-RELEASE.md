@@ -74,6 +74,21 @@ Design: `docs/drafts/discussion-and-comms.md`, section 4.
 - [ ] Gateway: watch the DAO relay for record events, post once per event (no duplicates after a restart)
 - [ ] Tests: gateway unit tests for each feed note and the announcement; end-to-end announcement passed and published
 
+**Member notifications** (decided 9 November 2026): opt-in, for members and council
+- [ ] Opt-in from the profile: the member gives an npub (any Nostr app) to receive on, and can remove it
+- [ ] The link is **encrypted to the DAO npub** (NIP-44), so only the gateway can read which npub belongs to which member. The first DAO data that is not public, by decision: it is the member's own contact, not a DAO record. Anyone can see that a member opted in, not to which npub
+- [ ] The gateway sends gift-wrapped private messages (NIP-17) from the DAO npub; the member's Nostr app gives the phone notification
+- [ ] Council: a round to sign, a tally to count, a candidate to check, a key replacement
+- [ ] Members: a vote opening or closing within 24 hours, a payout to confirm as recipient, new posts in a thread they took part in, their proposal's result
+- [ ] Everyone opted in: passed Announcement proposals
+- [ ] Urgent items at once, the rest as one daily digest; the gateway works out each person's to-do list on a timer
+- [ ] Never received on the DAO identity key itself (that would mean pasting the voting key into a third-party app)
+
+**Sign in with Nostr** (option, separate from notifications)
+- [ ] Sign in with a Nostr signer (NIP-07 browser extension, NIP-46 remote signer such as Amber) as an alternative to the passkey; the passkey route stays the default
+- [ ] The app says plainly to use a key made for this DAO: an everyday npub would put every vote under the member's public Nostr identity, and the same key would appear in every DAO they join (against per-DAO keys)
+- [ ] Identity card and recovery: decide what the card holds for a signer-held key
+
 ## Open items
 
 - [x] **Relay write check.** Decided 9 November 2026: filtered in the app only. The relay accepts the DAO's kinds from any key, because candidates and payout recipients must publish, and clients validate every event (`docs/protocol.md` 7.3); a relay rule limiting posts to the roster can be added later without changing the event format
