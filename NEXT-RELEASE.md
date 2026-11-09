@@ -75,7 +75,9 @@ Design: `docs/drafts/discussion-and-comms.md`, section 4.
 - [ ] Tests: gateway unit tests for each feed note and the announcement; end-to-end announcement passed and published
 
 **Member notifications** (decided 9 November 2026): opt-in, for members and council
-- [ ] Opt-in from the profile: the member gives an npub (any Nostr app) to receive on, and can remove it
+- [ ] Opt-in from the profile: a **Nostr address** field taking a NIP-05 name (`name@domain`) or an npub; the member can change or remove it
+- [ ] A NIP-05 name is resolved in the member's browser (`/.well-known/nostr.json`), the npub shown for the member to confirm, and that npub stored, so a later change on the name's domain cannot redirect the DAO's messages
+- [ ] Test client: 0xchat on Android and iPhone (NIP-17 gift-wrapped messages). Check a message arrives with the phone locked, and that the DAO npub shows with its NIP-05 name
 - [ ] The link is **encrypted to the DAO npub** (NIP-44), so only the gateway can read which npub belongs to which member. The first DAO data that is not public, by decision: it is the member's own contact, not a DAO record. Anyone can see that a member opted in, not to which npub
 - [ ] The gateway sends gift-wrapped private messages (NIP-17) from the DAO npub; the member's Nostr app gives the phone notification
 - [ ] Council: a round to sign, a tally to count, a candidate to check, a key replacement
@@ -84,11 +86,7 @@ Design: `docs/drafts/discussion-and-comms.md`, section 4.
 - [ ] Urgent items at once, the rest as one daily digest; the gateway works out each person's to-do list on a timer
 - [ ] Never received on the DAO identity key itself (that would mean pasting the voting key into a third-party app)
 
-**Sign in with Nostr** (option, separate from notifications)
-- [ ] Sign in with a Nostr signer (NIP-07 browser extension, NIP-46 remote signer such as Amber) as an alternative to the passkey; the passkey route stays the default
-- [ ] The app says plainly to use a key made for this DAO: an everyday npub would put every vote under the member's public Nostr identity, and the same key would appear in every DAO they join (against per-DAO keys)
-- [ ] Identity card and recovery: decide what the card holds for a signer-held key
-- [ ] Test before the guide names any signer (decided 9 November 2026: recommend only tested sign-in methods). Android: Amber (NIP-46). iOS: NostrKey Web Extension first (Safari, NIP-07, several identities, NIP-44), Nostash second; Clave (NIP-46, TestFlight beta, no audit yet) only once released
+**Sign in with Nostr:** parked (9 November 2026). Notifications reach members without it, and the passkey stays the only sign-in. If it comes back: any NIP-07 or NIP-46 signer, a key made for the DAO, and only signers we have tested (Amber on Android; NostrKey, then Nostash, on iOS).
 
 ## Open items
 
