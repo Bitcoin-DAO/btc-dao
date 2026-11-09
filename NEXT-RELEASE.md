@@ -60,7 +60,7 @@ The rules are already in `docs/protocol.md` (4.1.2, 6.1): every council change m
 - [ ] End-to-end: a 2-of-3 SeedSigner DAO replaces a lost key; migration confirmed; the next payout spends from the new treasury
 - [ ] In the wild: on v0.4.0's SeedSigner DAO, one SeedQR card plays the lost key
 
-## C. Outward comms (after v0.4.0)
+## C. Outward comms (after v0.5.0)
 
 Design: `docs/drafts/discussion-and-comms.md`, section 4.
 
