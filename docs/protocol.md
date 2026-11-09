@@ -313,7 +313,7 @@ Tagged `["e", <thread id>]`: a draft id, or a proposal id (a submitted draft's p
 
 #### 4.5.3 `dao.withdraw`
 
-Empty content, tagged `["e", <draft id>]`, signed by the draft's author before it is submitted. The draft stays visible, closed: no new versions, no submission.
+Empty content, tagged `["e", <draft id>]`, signed by the draft's author before it is submitted. The draft stays visible, closed: no new versions, no submission, and no new posts (posts dated after the withdrawal are ignored).
 
 #### 4.5.4 From draft to proposal
 
