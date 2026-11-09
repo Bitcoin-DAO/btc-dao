@@ -23,9 +23,10 @@ Formats: the ones Sparrow uses with SeedSigner, so any of the DAO's keys and des
 
 **Step 1. QR building blocks**
 - [ ] Format check with the real device: export a multisig xpub, scan a test PSBT, show the signed PSBT, scan a descriptor; record the exact formats and firmware version in `docs/seedsigner.md`
-- [ ] Animated QR display (UR parts, steady frame rate, size suited to the SeedSigner's camera)
-- [ ] Animated QR scanning on the phone (multi-part decoding with progress, any order, duplicates ignored)
-- [ ] Unit tests: UR round trips for PSBTs of 1–3 inputs; decoding the formats recorded from the device
+- [x] Animated QR display (UR parts, steady frame rate, size suited to the SeedSigner's camera)
+- [x] Animated QR scanning on the phone (multi-part decoding with progress, any order, duplicates ignored)
+- [x] Unit tests: UR parts identical to the reference library's, decoding from mixed parts alone, the real device's key export (`src/core/ur.test.ts`)
+- [x] QR test page (`#/qrtest`): scan keys, show the test wallet's descriptor and a test PSBT, scan the signed PSBT back and check whose signature it carries; end-to-end test `e2e/hw.e2e.cjs`
 
 **Step 2. Founding with SeedSigner keys**
 - [ ] Founding choice on testnet4: **phone keys (practice)** or **SeedSigners**; mainnet: SeedSigners only, no choice shown
