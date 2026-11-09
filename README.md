@@ -28,6 +28,7 @@ All 19 screens are in [`design/`](design/README.md).
 | Path | What it holds |
 | --- | --- |
 | `CHANGELOG.md` | What each tagged release changed. A DAO's copy runs one tagged release |
+| `NEXT-RELEASE.md` | The build list for the next release (v0.3.0: hardware keys, discussion, outward comms) |
 | `docs/what-is-a-bitcoin-dao.md`, `docs/what-is-a-bitcoin-dao.it.md` | A plain-language introduction, in English and Italian: what a Bitcoin DAO is, how it works, what it can be used for |
 | `docs/wallet-guide.it.md`, `docs/wallet-guide.en.md` | "Your first bitcoin wallet in 5 minutes" for members, in Italian and English |
 | `docs/testnet-treasury.md` | The BTC DAO Testnet Treasury: the organisation's testnet4 wallet that funds every practice and testnet stage and gets the coins back when each one closes |
