@@ -14,6 +14,10 @@
 - [x] A council member's phone can tell the council its treasury key is gone; the Council page shows the keys left and whether a spare remains (UNO DAO finding 8)
 - [x] End-to-end test that closes a DAO (UNO DAO finding 13)
 
+## Carried over to v0.4.0
+
+- [ ] Prepare page says "not enough funds" as soon as it opens, with the amount missing (payouts plus an estimated fee, less the balance); the Council page does not offer "Prepare the payout round" meanwhile (TEST DAO, 9 Nov 2026)
+
 ## A. Hardware keys (v0.4.0)
 
 Plan agreed 8 November 2026. Phase 2 of the build plan (`docs/spec.md`). Tested with one SeedSigner and one SD card, loading three SeedQR cards in turn.
