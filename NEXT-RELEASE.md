@@ -88,6 +88,7 @@ Design: `docs/drafts/discussion-and-comms.md`, section 4.
 - [ ] Sign in with a Nostr signer (NIP-07 browser extension, NIP-46 remote signer such as Amber) as an alternative to the passkey; the passkey route stays the default
 - [ ] The app says plainly to use a key made for this DAO: an everyday npub would put every vote under the member's public Nostr identity, and the same key would appear in every DAO they join (against per-DAO keys)
 - [ ] Identity card and recovery: decide what the card holds for a signer-held key
+- [ ] Test before the guide names any signer (decided 9 November 2026: recommend only tested sign-in methods). Android: Amber (NIP-46). iOS: NostrKey Web Extension first (Safari, NIP-07, several identities, NIP-44), Nostash second; Clave (NIP-46, TestFlight beta, no audit yet) only once released
 
 ## Open items
 
