@@ -4,6 +4,8 @@ November 2026 (draft 0.3: ticker, DAO identity and announcements added 9 Novembe
 
 ## 1. Purpose and principles
 
+**One site for every DAO.** A DAO needs no domain of its own: its app runs at a free address, and the dashboard carries its public page, Nostr identity, announcements and place in the ticker. Each fork of the dashboard is a mirror that shows the same DAOs from the same public events. What the dashboard does not host is any DAO's app: members sign in and vote on their own DAO's site, so no single operator can serve the app for every DAO.
+
 The dashboard is a block explorer for governance: it shows that btc-dao DAOs run, decide and spend only as agreed, without showing who their members are.
 
 1. **Events and keys, never people.** It shows what happened, never who someone is.
@@ -100,7 +102,7 @@ Every listed DAO gets the same standard view. There are no per-item display choi
 **DAO page**, like an address page in a block explorer:
 
 - Name, site, stage, software version and build check (protocol section 7.2).
-- **Identity:** the DAO's npub and its NIP-05 name on the DAO's own domain (`dao@<domain>`), shown only when the domain confirms it, with a link to follow the DAO on Nostr.
+- **Identity:** the DAO's npub from its endorsed listing, with its NIP-05 name on the dashboard's domain (`<name>@btcdao.tech`, protocol section 7.2), or on the DAO's own domain if it has one and that domain confirms it; a link to follow the DAO on Nostr; and the DAO's app address (`site`).
 - **Announcements:** the text of each passed Announcement proposal, word for word, newest first, each linked to its proposal page. These are the DAO's only official words; nothing else a DAO posts is shown.
 - Funding model (`rules.fundingModel`): shown as a label with a colour, never colour alone. Grant, production, mutual, revolving, or "not stated" when unset or unknown.
 - **Steady I/O** beside the funding model, with the 12-month totals in and out and a monthly chart (section 2a).
@@ -159,6 +161,7 @@ flowchart LR
 - [ ] Add the *show on public dashboards* switch to the DAO app's settings page, setting `listed` in the listing.
 - [ ] Run reconciliation locally in the DAO app during the trial stages.
 - [ ] Pick the discovery relays shipped with the first release, and set up the btcdao.tech relay with the discovery policy.
+- [ ] Serve `/.well-known/nostr.json` for every listed DAO with an `npub` in its endorsed listing (CORS open, as NIP-05 requires), names as in protocol section 7.2.
 - [ ] Ticker on the front page, from the events the dashboard already reads (needs no new kind).
 - [ ] DAO page: identity (npub, verified NIP-05) and Announcements, once the Announcement category exists (`NEXT-RELEASE.md`, outward comms).
 - [ ] Confirm kinds 3570–3589 are unused on large relays (`decisions.md`).

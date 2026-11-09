@@ -417,6 +417,8 @@ Content: `{"name": "UNO", "site": "https://...", "relays": ["wss://..."], "descr
 
 **Dashboard switch** (optional): the content may carry `"listed": true`, set by the app's *show on public dashboards* switch. Dashboards show a DAO only when its latest endorsed listing has `"listed": true`. A listing without it, or with `"listed": false`, keeps working for its other purposes (the DAO's address, the build check) but is not shown on dashboards. Leaving dashboards is a new listing with `"listed": false`, endorsed like any other. The switch governs display only: every event stays public on the relays.
 
+**No domain needed** (decided 9 November 2026): `site` can be the free address the DAO's app is published at (for example its GitHub Pages address); an own domain is optional. The listing may also carry `"npub"`, the DAO's Nostr identity (outward comms). Dashboards then serve it as a NIP-05 name on their own domain, `<name>@btcdao.tech` on the reference instance, derived from the endorsed listing alone, so the council, not the dashboard operator, decides which npub is the DAO, and replacing a lost key is a new endorsed listing. The name is the DAO's name in lower case; if another listed DAO already holds it, the later one gets the first four characters of its DAO id appended. Mirrors serve the same npubs under their own domains.
+
 The `site` of the latest endorsed listing is the DAO's address. Moving the DAO to a new domain is done by publishing a new listing and collecting `threshold` endorsements; no member needs re-verifying. The card-restore screen shows the endorsed address and its endorsements, and clients warn when they are opened at any other address. Members should never scan an identity card on an address the council has not endorsed.
 
 After a domain loss, members find the new address in two ways that do not depend on the lost domain: the project dashboard (btcdao.tech), which shows the latest endorsed `site` of each DAO that is listed, and an announcement by the council in person or on a call. A DAO relay on the lost domain goes down with it. The public relays in the config still hold every event, so the new listing can be fetched there, and its `relays` field names the DAO's new relays.
@@ -430,7 +432,7 @@ Each DAO runs one relay of its own beside at least two public relays. Its policy
 - no payment for access, and rate limits per key and per connection to keep spam small;
 - keep every accepted event; never delete.
 
-The reference setup is Nosflare on Cloudflare Workers, configured in `relay/`: pay-to-relay and sign-in off, only kinds 3570–3589, a required `D` tag (pinned to the DAO id once it exists), and pruning off. For UNO's stages it runs at a `workers.dev` address under the Bitcoin-DAO organisation's Cloudflare account; a mainnet DAO runs its own on its own domain. Any relay with the same policy can replace it.
+The reference setup is Nosflare on Cloudflare Workers, configured in `relay/`: pay-to-relay and sign-in off, only kinds 3570–3589, a required `D` tag (pinned to the DAO id once it exists), and pruning off. For UNO's stages it runs at a `workers.dev` address under the Bitcoin-DAO organisation's Cloudflare account; a mainnet DAO runs its own, at a `workers.dev` address or on its own domain if it has one. Any relay with the same policy can replace it.
 
 ### 7.4 Discovery relays
 

@@ -68,7 +68,7 @@ Plan agreed 8 November 2026. Phase 2 of the build plan (`docs/spec.md`). Tested 
 Design: `docs/drafts/discussion-and-comms.md`, section 4.
 
 - [ ] DAO npub: one keypair per DAO, nsec held by the chain gateway (Worker secret), profile with name, picture, description, website
-- [ ] NIP-05 on the DAO's domain (`dao@<domain>`) as the trust anchor; key rotation steps in `docs/guide.md`
+- [ ] DAO npub in the endorsed listing (`npub`), served as NIP-05 by dashboards (`<name>@btcdao.tech`), or on the DAO's own domain if it has one; replacing a lost key is a new endorsed listing (protocol 7.2)
 - [ ] Automatic feed from the gateway: proposal opened, passed or failed with the result, payout sent with tx link, council change completed. Facts only
 - [ ] Announcement proposal category; once passed, the gateway publishes the submitted version's text word for word, linked to the proposal
 - [ ] Gateway: watch the DAO relay for record events, post once per event (no duplicates after a restart)
