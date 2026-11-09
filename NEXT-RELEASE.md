@@ -22,7 +22,7 @@ Issues carried over from the UNO runs, and Discussion: see `CHANGELOG.md` v0.3.0
 Formats: the ones Sparrow uses with SeedSigner, so any of the DAO's keys and descriptors also work in Sparrow for recovery. Animated QRs in UR (`crypto-psbt`) for PSBTs; the xpub export as the SeedSigner shows it for a multisig key (fingerprint, path `m/48'/coin'/0'/2'`, xpub); the descriptor as a wallet-registration QR the SeedSigner can scan. Each to be confirmed against the firmware on the test SD card in step 1.
 
 **Step 1. QR building blocks**
-- [ ] Format check with the real device: export a multisig xpub, scan a test PSBT, show the signed PSBT, scan a descriptor; record the exact formats and firmware version in `docs/seedsigner.md`
+- [x] Format check with the real device: export a multisig xpub, scan a test PSBT, show the signed PSBT, scan a descriptor; record the exact formats and firmware version in `docs/seedsigner.md` (9 Nov 2026, firmware 0.8.6, cards A, B, C: all four work; change verified on the device)
 - [x] Animated QR display (UR parts, steady frame rate, size suited to the SeedSigner's camera)
 - [x] Animated QR scanning on the phone (multi-part decoding with progress, any order, duplicates ignored)
 - [x] Unit tests: UR parts identical to the reference library's, decoding from mixed parts alone, the real device's key export (`src/core/ur.test.ts`)

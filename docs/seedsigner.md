@@ -32,3 +32,14 @@ Checked 9 November 2026: a test round's PSBT as **animated UR `crypto-psbt`**, 1
 ## 4. Signed PSBT back from the device
 
 Checked 9 November 2026: the SeedSigner shows the signed PSBT as animated UR `crypto-psbt`, read by the phone. It is **trimmed**: the transaction and the signatures only, without `witness_utxo`, `witness_script` or key paths. The app puts the signatures back into the PSBT it sent (`mergeSignatures` in `src/core/hwkeys.ts`), after checking it is the same transaction, before checking or publishing them.
+
+Result, 9 November 2026: the same test transaction signed on the device with card A, then with card B; each signed PSBT scanned back and recognised (**valid signature from A ✓**, **from B ✓**). With the descriptor loaded, the SeedSigner's **"Your change"** screen showed the change address as **verified** (S7).
+
+## Summary: all four exchanges work with SeedSigner 0.8.6
+
+| Exchange | Format | Result |
+| --- | --- | --- |
+| Key export (founding) | animated UR `crypto-account` (Sparrow) | read in about 2 s |
+| Wallet descriptor | static plain text, `/0/*` form | read; 2 of 3, three fingerprints |
+| PSBT to the device | animated UR `crypto-psbt`, 100-byte parts, 4 frames a second | read first time |
+| Signed PSBT back | animated UR `crypto-psbt`, trimmed | read; signatures merged and verified; change verified on the device |
