@@ -1,6 +1,6 @@
 # Next release: v0.3.0
 
-**Status (9 November 2026):** in progress. The latest release is v0.2.8 (`CHANGELOG.md`). UNO DAO's 2-of-3 run on three phones passed on 9 November (`docs/runs/2026-11-uno-dao.md`).
+**Status (9 November 2026):** carried-over issues and B. Discussion built and tested (v0.3.0). The latest release is v0.2.8 (`CHANGELOG.md`). UNO DAO's 2-of-3 run on three phones passed on 9 November (`docs/runs/2026-11-uno-dao.md`).
 
 **Scope, decided 9 November 2026:** v0.3.0 is the issues carried over from the two UNO runs, plus **B. Discussion**. **A. Hardware keys** moves to v0.4.0, **C. Outward comms** after it (it needs Discussion's Announcement flow and the gateway's key). Sections A and C below stay as the plan for those releases.
 
@@ -8,11 +8,11 @@
 
 ## Carried over from the UNO runs
 
-- [ ] Automatic second broadcast: about a minute after a broadcast, re-send once to the sources that do not know the transaction yet (UNO DAO finding 11; practice finding 24)
-- [ ] Broadcast pages as their own config entry (practice finding 25)
-- [ ] Council members write down the trial treasury key's 12 words as a required step, checked by typing some back (UNO DAO finding 7)
-- [ ] A council member's phone can tell the council its treasury key is gone; the Council page shows the keys left and whether a spare remains (UNO DAO finding 8)
-- [ ] End-to-end test that closes a DAO (UNO DAO finding 13)
+- [x] Automatic second broadcast: about a minute after a broadcast, re-send once to the sources that do not know the transaction yet (UNO DAO finding 11; practice finding 24)
+- [x] Broadcast pages as their own config entry (practice finding 25)
+- [x] Council members write down the trial treasury key's 12 words as a required step, checked by typing some back (UNO DAO finding 7)
+- [x] A council member's phone can tell the council its treasury key is gone; the Council page shows the keys left and whether a spare remains (UNO DAO finding 8)
+- [x] End-to-end test that closes a DAO (UNO DAO finding 13)
 
 ## A. Hardware keys (v0.4.0)
 
@@ -40,28 +40,28 @@ Plan agreed 8 November 2026. Phase 2 of the build plan (`docs/spec.md`). Tested 
 Design: `docs/drafts/discussion-and-comms.md`, section 3.
 
 **Protocol**
-- [ ] Three new kinds: draft version, thread post, draft withdraw. Proposed numbers 3587, 3588, 3589 (next free after 3586; check the registry and large relays as for 3570–3586)
-- [ ] Proposal event gains the draft id and the submitted version number
-- [ ] Validation: version cards only from the draft's author; no version card after the proposal opens (freeze); posts only from members; withdraw only by the author
-- [ ] Draft status (open, submitted, withdrawn) derived from events
-- [ ] Relay: accept kinds 3570–3589 (`relay/src/config.ts`), keep all, no deletions
-- [ ] `docs/protocol.md` and the NIP draft updated
+- [x] Three new kinds: draft version, thread post, draft withdraw. Proposed numbers 3587, 3588, 3589 (next free after 3586; check the registry and large relays as for 3570–3586)
+- [x] Proposal event gains the draft id and the submitted version number
+- [x] Validation: version cards only from the draft's author; no version card after the proposal opens (freeze); posts only from members; withdraw only by the author
+- [x] Draft status (open, submitted, withdrawn) derived from events
+- [x] Relay: accept kinds 3570–3590 (`relay/src/config.ts`), keep all, no deletions; discussion kinds limited per key (10 a minute)
+- [x] `docs/protocol.md` updated (section 4.5; kinds 3587–3590). There is no separate NIP draft yet: it will be written from `docs/protocol.md`
 
 **App**
-- [ ] Discussion tab: drafts and proposals by last activity
-- [ ] New idea: title and a line or two; thread opens at once
-- [ ] Thread view: latest version card pinned, then the full timeline of version cards and posts
-- [ ] Version cards: author posts v2, v3… with the proposal fields
-- [ ] Posts: flat, plain text, links allowed
-- [ ] Submit as proposal (author only), pre-filled from the chosen version
-- [ ] Withdraw (author only); the draft stays visible, marked closed
-- [ ] Share button: public read-only link to a draft or thread
-- [ ] "New since your last visit", timestamp kept on the device
-- [ ] Proposal page: the external link box replaced by **Discussion** (thread link) and **Version** (e.g. v3)
+- [x] Discussion tab: drafts and proposals by last activity
+- [x] New idea: title and a line or two; thread opens at once
+- [x] Thread view: latest version card pinned, then the full timeline of version cards and posts
+- [x] Version cards: author posts v2, v3… with the proposal fields
+- [x] Posts: flat, plain text, links allowed
+- [x] Submit as proposal (author only), pre-filled from the chosen version
+- [x] Withdraw (author only); the draft stays visible, marked closed
+- [x] Share button: public read-only link to a draft or thread
+- [x] "New since your last visit", timestamp kept on the device
+- [x] Proposal page: **Discussion** (thread link) and **Version** (e.g. v3); a version's form has no external link box. A proposal written directly keeps its optional link and gets its own thread
 
 **Tests**
-- [ ] Unit: draft status, freeze, author-only version cards and withdraw, posts from non-members ignored
-- [ ] End-to-end: idea → v1 → posts → v2 → submit → vote, with the thread continuing through the vote
+- [x] Unit: draft status, freeze, author-only version cards and withdraw, posts from non-members ignored
+- [x] End-to-end: idea → v1 → posts → v2 → submit → vote, with the thread continuing through the vote
 
 ## C. Outward comms (after v0.4.0)
 

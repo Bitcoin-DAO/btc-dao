@@ -1,6 +1,7 @@
 import { render, type ComponentChildren } from 'preact';
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { completeFounding, setLang, useApp } from '../app';
+import { newCount } from './Discussion';
 import { t } from '../i18n';
 import { qrMatrix, startScanner, type Scanner } from '../lib/qr';
 import { rpId } from '../lib/passkey';
@@ -66,10 +67,13 @@ export function Header(props: { sub?: string; tabs?: ComponentChildren }) {
 export function Footer() {
   const app = useApp();
   if (!app.daoId) return null;
+  const s = app.dao;
+  const unread = s ? s.discussion.threads.filter(th => newCount(th, app.daoId!, app.me?.person, s.personOf) > 0).length : 0;
   return (
     <nav class="footer">
       <a href="#/">{t('nav.home')}</a>
       <a href="#/proposals">{t('nav.proposals')}</a>
+      <a href="#/discussion">{t('nav.discussion')}{unread > 0 && <span class="dot" aria-label={t('ds.unread', { n: unread })} />}</a>
       <a href="#/members">{t('nav.members')}</a>
       <a href="#/rules">{t('nav.rules')}</a>
       {app.isCouncil && app.secret && <a href="#/council">{t('nav.council')}</a>}

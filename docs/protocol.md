@@ -96,9 +96,9 @@ All DAO events are **regular** events (kinds 1000–9999), so relays keep every 
 | 3584 | `dao.anchor` | Any member | 7.1 |
 | 3585 | `dao.listing` | Council member | 7.2 |
 | 3586 | `dao.keywrap` | Member | 5.4 |
-| 3587 | `dao.draft` | Member (the draft's author) | 8.1 |
-| 3588 | `dao.post` | Member | 8.2 |
-| 3589 | `dao.withdraw` | The draft's author | 8.3 |
+| 3587 | `dao.draft` | Member (the draft's author) | 4.5.1 |
+| 3588 | `dao.post` | Member | 4.5.2 |
+| 3589 | `dao.withdraw` | The draft's author | 4.5.3 |
 | 3590 | `dao.keystatus` | Council member | 5.5 |
 
 Compared with the spec v0.1 event table, this adds `dao.settings` (versions of the rules, council and descriptor get their own event, like rosters), `dao.confirm` (recipient address confirmation), `dao.tally` (requirement S3), the three onboarding events and `dao.keywrap` (passkey-protected identity keys).
@@ -286,6 +286,38 @@ Every council member's client publishes the tally automatically the first time i
 Nostr timestamps are chosen by the signer, so a vote could be backdated after the close. The tally settles which votes count: once published and anchored, clients use it instead of recounting. A client that holds a vote dated before `closed_at` that the tally neither counts nor excludes shows a warning on the proposal. A second, conflicting tally makes the proposal **disputed** until `threshold` council members endorse one tally (`dao.endorse`, object `tally`).
 
 Payouts, roster changes and rule changes act only on proposals with a valid, undisputed tally.
+
+### 4.5 Discussion
+
+Idea → draft → discuss → proposal, in the DAO's own record. One public thread per proposal, from the first idea to the result. No editing, no deletion, no moderation: corrections are new posts. The relay accepts these kinds from any key and limits how fast one key posts them; clients keep only what members wrote, under the rules below.
+
+#### 4.5.1 `dao.draft`
+
+```json
+{ "version": 1, "title": "Volantini per il meetup", "summary": "Stampiamo dei volantini?", "lang": "it" }
+```
+
+A version card: a snapshot of the proposal fields (`type`, `title`, `summary`, `payload`, `lang`, as in 4.1), complete or not; only `version` and `title` are required. Version 1 has no `e` tag and opens the draft: its event id is the **draft id**. An idea is a version 1 with a title and perhaps a line of text. Later versions carry `["e", <draft id>]` and are valid when:
+
+- the signer is the same person as version 1's (a replaced key counts as the same person) and a member at `created_at`;
+- `version` is the next number (versions are 1, 2, 3… with no gaps or repeats);
+- the draft is not withdrawn (4.5.3) and not submitted: a version dated after the proposal that submits the draft is ignored (**freeze**, so the voted text cannot move).
+
+#### 4.5.2 `dao.post`
+
+```json
+{ "text": "Sì, 500 in A5. Preventivo: https://…" }
+```
+
+Tagged `["e", <thread id>]`: a draft id, or a proposal id (a submitted draft's proposal id leads to the draft's thread; a proposal made without a draft has its own thread). Valid when the signer is a member at `created_at` and `text` is 1–2000 characters. Plain text; clients make web links clickable and interpret nothing else. Posts carry on through and after the vote.
+
+#### 4.5.3 `dao.withdraw`
+
+Empty content, tagged `["e", <draft id>]`, signed by the draft's author before it is submitted. The draft stays visible, closed: no new versions, no submission.
+
+#### 4.5.4 From draft to proposal
+
+A `dao.proposal` (4.1) may carry `"draft": { "id": <draft id>, "version": <n> }`. It **submits** the draft when it is the first proposal naming the draft and its signer is the draft's author; any other proposal naming the draft is an ordinary proposal with its own thread. Clients compare the proposal's `type`, `title`, `summary` and `payload` with the named version and say so if they differ. A draft's status is derived, never stored: **open**, **submitted** or **withdrawn**.
 
 ## 5. Membership
 

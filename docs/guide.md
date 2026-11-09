@@ -194,7 +194,15 @@ Remote members are marked "verified remotely" until someone verifies them in per
 1. Any member writes a proposal: type, title (up to 80 characters), summary (up to 500; the binding text), an optional link to the full text, and the language.
 2. For a payout, the recipient's address goes in its own box, scanned from the recipient's wallet. Payouts can pay several recipients.
 3. If the recipient is not the proposer, the recipient confirms the address on the proposal page. There is no deadline, but an unconfirmed payout cannot be paid and lapses under the usual rule.
-4. Discussion happens wherever the group already talks. The proposal links to it; the DAO records only the decision.
+4. Discussion happens in the app (since v0.3.0), so the reasoning behind every decision stays in the DAO's own record: see 6.2.1. A proposal can still be written directly, and still gets its own thread.
+
+#### 6.2.1 From idea to proposal
+
+1. **Idea:** any member opens one from the Discussion page with a title and a line or two. The thread opens at once, and everyone can read it from a shared link.
+2. **Draft:** the author posts new versions (v2, v3…) as the discussion shapes it, filling in the proposal's fields. Only the author adds versions.
+3. **Discuss:** members post in the thread: plain text, links allowed, no editing or deleting. Corrections are new posts. Each phone marks what is new since its last visit.
+4. **Proposal:** when a version is complete, the author submits it. Voting opens at once, the versions freeze, and the thread carries on through the vote. The proposal page shows its thread and the version it was made from.
+5. **Withdraw:** the author can withdraw a draft that has not been submitted. It stays visible as history.
 
 ### 6.3 Voting and the final count
 
@@ -237,6 +245,7 @@ Once a month, every approved payment goes out in one transaction.
 - **New phone:** a synced passkey brings the identity back with nothing to do. Otherwise, scan the identity card.
 - **Lost passkey and no card:** key replacement. A council member re-verifies the member (two council members if remote), and three council members approve. Past votes stay valid.
 - **Lost or exposed card:** print a new one and ask the council for a key replacement. A finder could vote as the member, but never move funds.
+- **A council member's trial treasury key lost** (phone data cleared and the 12 words not kept): the identity comes back with the card, the treasury key does not. The member taps "Tell the council my key is lost" on the profile, and the Council page shows how many keys are left and whether a spare remains. The fix is a council change (7.3). This is why council members write the 12 words down at sign-up: the app checks three of them before it shows the sign-up code.
 
 ## 7. Changing the DAO
 
