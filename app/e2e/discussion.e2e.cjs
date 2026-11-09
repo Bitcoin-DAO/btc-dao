@@ -115,6 +115,8 @@ async function councilAction(page, buttonName) {
   check(await seen(f.getByText('Bozza v1')), 'thread opens as draft v1');
   check(await seen(f.getByText(/Per ora solo un'idea/)), 'an idea cannot be submitted yet');
   await shot(f, '01-idea');
+  // Leave the thread: a post arriving while the thread is open on screen counts as seen.
+  await open(f, '#/proposals');
 
   log('A visitor reads, without a post box');
   const visitor = await phone(browser, 'visitor');
