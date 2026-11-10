@@ -424,6 +424,62 @@ describe('payout rounds (6.1-6.3)', () => {
     expect(s.closed).toBe(true);
     expect(s.rejected.some(x => x.event.id === late.id && x.reason === 'proposal: the DAO is closed')).toBe(true);
   });
+
+  it('council change (4.1.2, 6.1): a lost key replaced by the same member\'s new key, the treasury migrated, the new council in force', async () => {
+    const { councilAfter, descriptorFor } = await import('./council');
+    const d = dao();
+    let s = d.state(d.T);
+    const cur = s.settings[0].content.council;
+    const newKey = treasuryKeyFromMnemonic('process wrestle rigid evoke cash ancient adjust minor size meat puzzle glue', 'testnet4');
+    const base = { reason: 'lost_key' as const, out_key: pubkeyOf(d.c[4]), in_key: pubkeyOf(d.c[4]), in_xpub: newKey.xpub, in_fingerprint: newKey.fingerprint, in_device: 'seedsigner' as const, threshold: 3 };
+    const next4 = councilAfter(cur, { ...base, new_descriptor: '' }, '@c4', s.personOf);
+    const payload = { ...base, new_descriptor: descriptorFor(next4, 3, 'testnet4') };
+    // Refused: a descriptor not derived from the new council, an outsider coming in, a threshold too high.
+    const bad1 = d.propose(d.f[0], { type: 'change_council', payload: { ...payload, new_descriptor: cur.length ? s.settings[0].content.descriptor : '' } }, d.T);
+    const outsider = newSecret();
+    const bad2 = d.propose(d.f[0], { type: 'change_council', payload: { ...payload, in_key: pubkeyOf(outsider) } }, d.T);
+    const bad3 = d.propose(d.f[0], { type: 'change_council', payload: { ...payload, threshold: 6 } }, d.T);
+    const p = d.propose(d.f[0], { type: 'change_council', payload }, d.T + 1);
+    s = d.state(d.T + 2);
+    const why = (e: { id: string }) => s.rejected.find(x => x.event.id === e.id)?.reason;
+    expect(why(bad1)).toBe('proposal: new_descriptor is not the one derived from the new council');
+    expect(why(bad2)).toBe('proposal: incoming key is not a member');
+    expect(why(bad3)).toBe('proposal: threshold above the council size');
+    expect(s.proposals.some(x => x.event.id === p.id)).toBe(true);
+
+    for (const i of [0, 1, 2]) d.vote(d.f[i], p, 'yes', d.T + 2);
+    d.tally(d.c[0], d.state(d.T + 8 * DAY), p, d.T + 8 * DAY);
+    const t = d.T + 8 * DAY + 10;
+    s = d.state(t);
+    expect(s.payments.get(p.id)?.status).toBe('waiting'); // no recipient confirmation needed: the destination is derived
+    const dest = treasuryAddress(parseDescriptor(payload.new_descriptor, 'testnet4'), 'testnet4', 0, 0).address;
+    const wrong = round(d, [p.id], [], t, coins(d), { sweepTo: RECIPIENT });
+    s = d.state(t + 1);
+    expect(s.rounds.find(r => r.event.id === wrong.e.id)!.errors).toContain('a migration round has one output, to the new treasury');
+    const { e, r } = round(d, [p.id], [], t + 2, coins(d), { sweepTo: dest });
+    s = d.state(t + 3);
+    const mr = s.rounds.find(x => x.event.id === e.id)!;
+    expect(mr.errors).toEqual([]);
+    expect(mr.isMigration).toBe(true);
+    const fin = finalizeRound([0, 1, 2].map(i => signWithMnemonicKey(r.psbt, masters[i]))); // the old council signs
+    const rc = d.ev(KIND.receipt, { txid: fin.txid, block_height: 101 }, d.c[0], t + 4, [['e', e.id]]);
+    s = d.state(t + 5);
+    expect(s.pendingSettings).toEqual([p.id]);
+    const next = nextSettings(s)!;
+    expect(next.basis).toEqual([p.id, rc.id]);
+    expect(next.descriptor).toBe(payload.new_descriptor);
+    expect(next.council.map(x => x.fingerprint)).toEqual([...cur.slice(0, 4).map(x => x.fingerprint), newKey.fingerprint]);
+    expect(next.council[4]).toMatchObject({ label: '@c4', device: 'seedsigner' });
+    const se = d.ev(KIND.settings, next, d.c[0], t + 6);
+    for (const i of [0, 1, 2]) d.endorse(d.c[i], se, 'settings', t + 7);
+    s = d.state(t + 8);
+    expect(s.settings.length).toBe(2);
+    expect(s.settings[1].content.descriptor).toBe(payload.new_descriptor);
+    expect(s.pendingSettings).toEqual([]);
+    // The new treasury is the DAO's own: nobody can propose paying to it.
+    const self = d.propose(d.f[1], { type: 'payout', payload: { recipient: 'x', outputs: [{ address: dest, amount_sat: 10_000 }] } }, t + 9);
+    expect(d.state(t + 10).rejected.find(x => x.event.id === self.id)?.reason).toBe('proposal: pays the treasury');
+  });
 });
 
 describe('weekly rounds and standing payout addresses (4.2, 6.1)', () => {

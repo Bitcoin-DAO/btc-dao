@@ -9,6 +9,7 @@ import { hashJson, nowSec, parseJson } from './util';
 import { inspectRound, memberSignatures, type RoundContent, type RoundInspection } from './round';
 import { cadenceOf, roundDatesAfter } from './time';
 import { buildDiscussion, type Discussion } from './discussion';
+import { councilAfter, councilChangeError, councilChangeSchemaError, type CouncilChange } from './council';
 
 // ---------- types ----------
 
@@ -178,6 +179,8 @@ export interface RoundView {
   inspection?: RoundInspection;
   errors: string[];
   isClose: boolean;
+  /** A council change's migration: the whole treasury to the new descriptor (6.1). */
+  isMigration: boolean;
   status: 'open' | 'paid' | 'void' | 'invalid';
   /** Valid partial signatures: person → input index → pubkey. */
   signatures: Map<string, Map<number, string>>;
@@ -313,8 +316,7 @@ export function proposalSchemaError(c: ProposalContent, network: DaoConfig['netw
       for (const ch of p.changes) if (!(typeof ch?.path === 'string' && /^rules\.[A-Za-z]+$/.test(ch.path) && 'from' in ch && 'to' in ch)) return 'change';
       return;
     case 'change_council':
-      if (!isKey(p.out_key) || !isKey(p.in_key)) return 'keys';
-      return;
+      return councilChangeSchemaError(p as Partial<CouncilChange>);
     case 'close':
       if (!validAddress(p.destination, network)) return 'destination';
       return;
@@ -487,10 +489,13 @@ export function rebuild(site: SiteConfig, events: Event[], prefer?: string, now 
     return rosterAt(t).content.members.some(m => personOf(m.key) === p);
   };
 
+  // Every descriptor so far (a council change adds one), counted again when the settings chain grows.
   let treasury: Set<string> | undefined;
+  let treasuryFor = 0;
   const isTreasuryAddress = (addr: string) => {
-    if (!treasury) {
+    if (!treasury || treasuryFor !== settings.length) {
       treasury = new Set();
+      treasuryFor = settings.length;
       for (const s of settings) {
         try {
           const d = parseDescriptor(s.content.descriptor, network);
@@ -560,6 +565,13 @@ export function rebuild(site: SiteConfig, events: Event[], prefer?: string, now 
       if (settingsAt(e.created_at).content.closed) { proposalRejected.push({ event: e, reason: 'proposal: the DAO is closed' }); continue; }
       if (c!.type === 'payout' && (c!.payload.outputs as Output[]).some(o => isTreasuryAddress(o.address))) { proposalRejected.push({ event: e, reason: 'proposal: pays the treasury' }); continue; }
       if (c!.type === 'close' && isTreasuryAddress(c!.payload.destination)) { proposalRejected.push({ event: e, reason: 'proposal: pays the treasury' }); continue; }
+      if (c!.type === 'change_council') {
+        const r = councilChangeError(c!.payload as CouncilChange, settingsAt(e.created_at).content.council, {
+          network, personOf,
+          memberName: k => rosterAt(e.created_at).content.members.find(m => personOf(m.key) === personOf(k) && memberAt(k, e.created_at))?.name,
+        });
+        if ('error' in r) { proposalRejected.push({ event: e, reason: `proposal: ${r.error}` }); continue; }
+      }
       if (c!.type === 'add_member') {
         const vs = (c!.payload.verify as string[]).map(verifyOf);
         const ok = vs.every(v => v && parseJson<any>(v.content).candidate_key === c!.payload.candidate_key);
@@ -714,9 +726,10 @@ export function rebuild(site: SiteConfig, events: Event[], prefer?: string, now 
       }
       const props = c.proposals.map(id => proposals.find(p => p.event.id === id));
       const isClose = props.some(p => p?.content.type === 'close');
+      const migration = props.find(p => p?.content.type === 'change_council');
       for (const [i, p] of props.entries()) {
         if (!p) { errors.push(`unknown proposal ${c.proposals[i].slice(0, 8)}`); continue; }
-        if (p.status !== 'passed' || !['payout', 'close'].includes(p.content.type)) errors.push(`proposal ${p.number} is not a passed payout`);
+        if (p.status !== 'passed' || !['payout', 'close', 'change_council'].includes(p.content.type)) errors.push(`proposal ${p.number} is not a passed payout`);
         if (!p.confirmedAt(e.created_at)) errors.push(`proposal ${p.number} is not confirmed by its recipient`);
         const paid = paidAt.get(p.event.id);
         if (paid !== undefined && paid <= e.created_at) errors.push(`proposal ${p.number} is already paid`);
@@ -729,6 +742,12 @@ export function rebuild(site: SiteConfig, events: Event[], prefer?: string, now 
           const dest = props.find(p => p?.content.type === 'close')?.content.payload.destination;
           if (props.length !== 1) errors.push('a closing round pays only the close proposal');
           if (ins.outputs.length !== 1 || ins.outputs[0].address !== dest) errors.push('a closing round has one output, to the destination');
+        } else if (migration) {
+          // 6.1: the whole balance, minus the fee, to the first receive address of the new descriptor.
+          let dest: string | undefined;
+          try { dest = treasuryAddress(parseDescriptor(migration.content.payload.new_descriptor, network), network, 0, 0).address; } catch { /* reported below */ }
+          if (props.length !== 1) errors.push('a migration round pays only the council change');
+          if (!dest || ins.outputs.length !== 1 || ins.outputs[0].address !== dest) errors.push('a migration round has one output, to the new treasury');
         } else {
           const want = props.flatMap(p => (p?.content.type === 'payout' ? (p.content.payload.outputs as Output[]) : [])).map(o => `${o.address}:${o.amount_sat}`).sort();
           const got = nonChange.map(o => `${o.address}:${o.value}`).sort();
@@ -770,7 +789,7 @@ export function rebuild(site: SiteConfig, events: Event[], prefer?: string, now 
         return tagValue(r, 'e') === e.id && b?.txid === ins!.txid && Number.isInteger(b.block_height) && isCouncilAt(r.pubkey, r.created_at);
       });
       const view: RoundView = {
-        event: e, content: c, inspection: ins, errors, isClose, signatures, signEvents, declines, ready, threshold, receipt,
+        event: e, content: c, inspection: ins, errors, isClose, isMigration: !!migration, signatures, signEvents, declines, ready, threshold, receipt,
         status: errors.length ? 'invalid' : receipt ? 'paid' : 'open',
       };
       if (view.status === 'paid') for (const id of c.proposals) if (!paidAt.has(id)) paidAt.set(id, receipt!.created_at);
@@ -784,7 +803,7 @@ export function rebuild(site: SiteConfig, events: Event[], prefer?: string, now 
     }
     const pay = new Map<string, Payment>();
     for (const p of proposals) {
-      if (p.status !== 'passed' || !['payout', 'close'].includes(p.content.type)) continue;
+      if (p.status !== 'passed' || !['payout', 'close', 'change_council'].includes(p.content.type)) continue;
       const paidRound = out.find(r => r.status === 'paid' && r.content.proposals.includes(p.event.id));
       const openRound = out.find(r => r.status === 'open' && r.content.proposals.includes(p.event.id));
       const l = lapseAt(p);
@@ -814,7 +833,7 @@ export function rebuild(site: SiteConfig, events: Event[], prefer?: string, now 
       } else if (p?.content.type === 'remove_member') {
         const k = p.content.payload.member_key as string;
         const m = members.find(m => personOf(m.key) === personOf(k));
-        if (!m || m.council) return `cannot remove: ${id}`;
+        if (!m || m.council || councilPersonsAt(now).has(personOf(m.key))) return `cannot remove: ${id}`;
         members = members.filter(x => x !== m);
       } else if (leave) {
         const m = members.find(m => personOf(m.key) === personOf(leave.pubkey));
@@ -888,6 +907,7 @@ export function rebuild(site: SiteConfig, events: Event[], prefer?: string, now 
   function expectedSettings(prev: SettingsContent, basis: string[]): Omit<SettingsContent, 'version' | 'prev' | 'basis'> | string {
     const rules = JSON.parse(JSON.stringify(prev.rules)) as Rules;
     let closed = prev.closed;
+    let { council, threshold, descriptor } = prev;
     for (const id of basis) {
       const p = passed(id);
       if (p?.content.type === 'close') {
@@ -895,6 +915,19 @@ export function rebuild(site: SiteConfig, events: Event[], prefer?: string, now 
         closed = true;
         continue;
       }
+      if (p?.content.type === 'change_council') {
+        if (payments.get(id)?.status !== 'paid') return `migration round not paid yet: ${id}`;
+        const r = councilChangeError(p.content.payload as CouncilChange, council, {
+          network, personOf, memberName: k => rosters[rosters.length - 1].content.members.find(m => personOf(m.key) === personOf(k))?.name,
+        });
+        if ('error' in r) return `council change no longer applies: ${r.error}`;
+        council = r.council;
+        threshold = p.content.payload.threshold;
+        descriptor = p.content.payload.new_descriptor;
+        continue;
+      }
+      // The migration's receipt is named in the basis too (protocol 4.5 of settings): accepted, checked above.
+      if (ofKind(KIND.receipt).some(r => r.id === id)) continue;
       if (p?.content.type !== 'change_rules') return `basis not a passed rules change: ${id}`;
       for (const ch of p.content.payload.changes as { path: string; from: unknown; to: unknown }[]) {
         const key = ch.path.slice('rules.'.length);
@@ -902,7 +935,7 @@ export function rebuild(site: SiteConfig, events: Event[], prefer?: string, now 
         rules[key] = ch.to;
       }
     }
-    return { rules, closed, council: prev.council, threshold: prev.threshold, descriptor: prev.descriptor };
+    return { rules, closed, council, threshold, descriptor };
   }
 
   function extendSettings(): boolean {
@@ -950,11 +983,12 @@ export function rebuild(site: SiteConfig, events: Event[], prefer?: string, now 
   const appliedSettings = new Set(settings.flatMap(s => s.content.basis ?? []));
   const closedNow = settings[settings.length - 1].content.closed;
   const pendingSettings = proposals
-    .filter(p => p.status === 'passed' && !appliedSettings.has(p.event.id) && (p.content.type === 'change_rules' || (p.content.type === 'close' && !closedNow && payments.get(p.event.id)?.status === 'paid')))
+    .filter(p => p.status === 'passed' && !appliedSettings.has(p.event.id) && (p.content.type === 'change_rules'
+      || ((p.content.type === 'close' || p.content.type === 'change_council') && !closedNow && payments.get(p.event.id)?.status === 'paid')))
     .map(p => p.event.id);
 
   const members: Member[] = current.members.map(m => ({
-    key: m.key, person: personOf(m.key), name: m.name, council: m.council, verified: m.verified, since: dateToUnix(m.since),
+    key: m.key, person: personOf(m.key), name: m.name, council: councilPersonsAt(now).has(personOf(m.key)), verified: m.verified, since: dateToUnix(m.since),
   }));
 
   // Keywraps: signed by a key that is or was on a roster, or a verified candidate.
@@ -1039,12 +1073,20 @@ export function nextSettings(s: DaoState): SettingsContent | undefined {
   if (!s.pendingSettings.length) return;
   const last = s.settings[s.settings.length - 1];
   const rules = JSON.parse(JSON.stringify(last.content.rules)) as Rules;
-  let { closed } = last.content;
+  let { closed, council, threshold, descriptor } = last.content;
+  const basis = [...s.pendingSettings];
   for (const id of s.pendingSettings) {
     const p = s.proposals.find(x => x.event.id === id)!;
     if (p.content.type === 'close') closed = true;
-    else for (const ch of p.content.payload.changes as { path: string; to: unknown }[]) rules[ch.path.slice('rules.'.length)] = ch.to;
+    else if (p.content.type === 'change_council') {
+      const c = p.content.payload as CouncilChange;
+      const name = s.members.find(m => m.person === s.personOf(c.in_key ?? ''))?.name ?? '';
+      council = councilAfter(council, c, name, s.personOf);
+      threshold = c.threshold;
+      descriptor = c.new_descriptor;
+      const receipt = s.payments.get(id)?.round?.receipt;
+      if (receipt) basis.push(receipt.id);
+    } else for (const ch of p.content.payload.changes as { path: string; to: unknown }[]) rules[ch.path.slice('rules.'.length)] = ch.to;
   }
-  const { council, threshold, descriptor } = last.content;
-  return { version: last.content.version + 1, prev: last.hash, basis: s.pendingSettings, rules, closed, council, threshold, descriptor };
+  return { version: last.content.version + 1, prev: last.hash, basis, rules, closed, council, threshold, descriptor };
 }
