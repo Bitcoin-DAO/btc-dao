@@ -1,6 +1,6 @@
-# Next release: v0.4.0
+# Next release: v0.5.0
 
-**Status (9 November 2026):** planned, not started. The latest release is v0.3.1 (`CHANGELOG.md`). v0.3.0's Discussion passed in the wild on TEST DAO (9 November).
+**Status (10 November 2026):** v0.4.0 released (SeedSigner founding and signing), passed in the wild on SEEDSIGNER DAO. Next: v0.5.0, council change.
 
 **Direction, decided 9 November 2026:** the focus moves to mainnet. New DAOs that matter start on SeedSigners; phone keys stay only as a practice mode on testnet4. One codebase: the network and the founding choice decide which keys are allowed (mainnet: SeedSigners only). There is no move from phone keys to SeedSigners.
 

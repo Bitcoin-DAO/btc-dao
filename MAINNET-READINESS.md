@@ -9,7 +9,7 @@
 | Stage | Network | What it proves |
 | --- | --- | --- |
 | UNO practice | testnet4, 2 of 2, two phones, short votes | The whole life of a DAO, quickly, with the developer at hand |
-| UNO testnet | testnet4, hardware signing | SeedSigner, recovery without the website, real vote lengths |
+| UNO testnet | testnet4, hardware signing | SeedSigner, recovery without the website, real vote lengths. Hardware signing passed on SEEDSIGNER DAO (10 Nov 2026) |
 | Sandbox DAO | testnet4, 3 of 5, all remote | Strangers, many devices, signatures spread over days |
 | First mainnet DAO | mainnet, treasury capped (S9) | Three monthly rounds without developer help (release condition in FORK-TASKS.md) |
 
@@ -39,9 +39,9 @@
 - [x] Payout proposal with recipient confirmation, voted and passed (UNO practice, 6 Nov 2026)
 - [x] Rejected proposal (fails on votes): UNO-0002, 0 yes, 2 no (UNO practice, v0.1.6, 6 Nov 2026)
 - [ ] Proposal without quorum
-- [ ] Vote changed before the close
+- [x] Vote changed before the close: only the latest vote counts; the record marks replaced votes (SEEDSIGNER DAO, 10 Nov 2026)
 - [x] Rule change, confirmed by the council: UNO-0003, payouts monthly to weekly, rules version 2 (UNO practice, v0.1.6, 6 Nov 2026)
-- [ ] Rule change of the fee setting, once released
+- [x] Rule change of the fee setting: round fees fast → economical, rules version 2, next round at 1 sat/vB (UNO DAO, v0.2.5, 9 Nov 2026)
 - [ ] Statement proposal
 - [ ] Votes of the real length (days), with members voting on different days (Sandbox DAO)
 
@@ -57,20 +57,21 @@
 ## 5. Payout rounds
 
 - [x] First payout confirmed on chain, receipt published, proposal shows paid (UNO practice, round 2026-11, v0.1.6, 6 Nov 2026: 5,000 sats, fee 181, block 159459, tx `610238de…a3b`. Reached the network on the second attempt, through Blockbook; one reorg on the way)
-- [ ] A broadcast reaches the network first time, and the round confirms within a few blocks (fee setting released)
+- [x] A broadcast reaches the network first time, and the round confirms within a few blocks: UNO DAO's payout (block 160142) and closing (160156), SEEDSIGNER DAO's payout and closing (160349, 160355). A second broadcast is often needed to reach every source; since v0.3.0 the app sends it by itself (seen working 10 Nov 2026)
 - [ ] Round with several payouts
 - [ ] Signatures collected over days (Sandbox DAO, 3 of 5)
 - [ ] A council member declines a round, with the reason shown
 - [ ] Payment that lapses after two rounds
 - [ ] Fee above the charter cap: the round waits (S5)
-- [ ] A confirmation removed by a reorg does not produce a receipt; the round waits again (seen on testnet4, 6 Nov 2026: round 2026-11 was mined, then its block dropped)
+- [ ] A confirmation removed by a reorg does not produce a receipt; the round waits again (seen on testnet4, 6 Nov 2026: round 2026-11 was mined, then its block dropped). v0.2.0: 3 confirmations; v0.4.0: the depth is taken per source from its own tip, the shallowest counts, and sources must agree on the block, after SEEDSIGNER DAO's payout got a receipt from mixed sources (10 Nov 2026). To prove on a real reorg
 - [x] Closing: the whole balance returns to the BTC DAO Testnet Treasury: UNO-0005, two-thirds vote, round 2026-W45, 4,541 sats back, block 159889 (UNO practice, v0.1.10, 8 Nov 2026). Reached a miner only after a manual push to Blockbook (finding 27)
 
 ## 6. Hardware signing and recovery (UNO testnet)
 
-- [ ] SeedSigner signs a round from the copied PSBT, the signed PSBT is pasted back
-- [ ] Descriptor loaded on the SeedSigner, change shown as verified (S7, hard gate)
-- [ ] Every address shown in full and compared on the device (S1)
+- [x] SeedSigner signs a round: animated QR out, signed PSBT scanned back, signatures merged and checked (SEEDSIGNER DAO, v0.4.0, 10 Nov 2026: payout block 160349, closing block 160355; firmware 0.8.6, `docs/seedsigner.md`)
+- [x] Descriptor loaded on the SeedSigner, change shown as verified (S7, hard gate): "Your change" verified, cards A and B (9 and 10 Nov 2026)
+- [x] Every address shown in full and compared on the device (S1): the round page shows each address in full, grouped as on the device; checked by eye on both rounds
+- [x] Council founded on SeedSigner keys, scanned at sign-up; no key on any phone (SEEDSIGNER DAO, 10 Nov 2026)
 - [ ] UNO restores and spends its treasury in Sparrow without the website
 
 ## 7. Infrastructure and security
