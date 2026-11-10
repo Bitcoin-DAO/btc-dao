@@ -15,7 +15,7 @@
 | Payout round signed on the SeedSigner with cards A and B | Passed | descriptor, animated PSBT and signed PSBT all read quickly on device and phone |
 | Broadcast | Passed | "Broadcast again" was needed to reach 3 of 3 sources, as in UNO's runs |
 | Receipt | Issued too early | published for block 160347 at "3 confirmations" while Blockbook had the payment in block 160349, 1 deep: finding 4 |
-| Closing round | To do | |
+| Closing round, signed on the SeedSigner | Passed | SEEDSIGNER-0002, 14,328 sats back to the BTC DAO Testnet Treasury, fee 294 sats, block 160355; signed by @Founder1 and @Founder2; receipt under the new rule (every source, same block) |
 
 ## Findings
 

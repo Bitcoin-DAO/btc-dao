@@ -48,7 +48,7 @@ Formats: the ones Sparrow uses with SeedSigner, so any of the DAO's keys and des
 - [x] End-to-end (`e2e/seedsigner.e2e.cjs`): founding a 2-of-3 SeedSigner DAO, a payout waiting for funds, funding, a round signed with cards A and B (a wrong card refused), broadcast; signatures checked independently with embit
 
 **Step 5. In the wild**
-- [ ] A new testnet4 DAO founded on SeedSigners, 2 of 3, one SeedSigner and three SeedQR cards loaded in turn: founding, funding, a payout signed on the device, closing round
+- [x] A new testnet4 DAO founded on SeedSigners, 2 of 3, one SeedSigner and three SeedQR cards loaded in turn: founding, funding, a payout signed on the device, closing round (SEEDSIGNER DAO, 10 Nov 2026, `docs/runs/2026-11-seedsigner-dao.md`)
 
 ## v0.5.0 — Council change
 
