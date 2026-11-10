@@ -34,8 +34,7 @@ export function Header(props: { sub?: string; tabs?: ComponentChildren }) {
   return (
     <>
       <header class="top">
-        {/* The DAO name opens its history (spec "DAO history"), as a member's name opens their profile. */}
-        <a href={app.dao?.founded ? '#/history' : '#/'} style="display:flex;flex-direction:column" aria-label={app.dao?.founded ? t('hist.open') : undefined}>
+        <a href="#/" style="display:flex;flex-direction:column">
           <span class="name">{site?.name ?? 'btc-dao'}</span>
           <span class="sub">{props.sub ?? t('tagline')}</span>
         </a>
@@ -78,6 +77,7 @@ export function Footer() {
       <a href="#/discussion">{t('nav.discussion')}{unread > 0 && <span class="dot" aria-label={t('ds.unread', { n: unread })} />}</a>
       <a href="#/members">{t('nav.members')}</a>
       <a href="#/rules">{t('nav.rules')}</a>
+      {s?.founded && <a href="#/history">{t('nav.history')}</a>}
       {app.isCouncil && app.secret && <a href="#/council">{t('nav.council')}</a>}
     </nav>
   );

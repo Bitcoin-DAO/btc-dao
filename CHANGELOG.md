@@ -19,7 +19,7 @@ Each release is a git tag (`v0.1.1`). A DAO's copy runs one tagged release and r
 - Payout rounds after the change spend from the new treasury; the prepare page waits for a reading of the treasury in force.
 
 **DAO history**
-- The DAO's name in the header opens its **history**: founding, council changes (who left and joined, reason, threshold, the migration's transaction), rules and funding-model changes, closing, and any disputed version, each with its date, its proposal and the member and council counts at that date. Entries from DAO listings (address, software, listed) come later.
+- **History** in the footer opens the DAO's history: founding, council changes (who left and joined, reason, threshold, the migration's transaction), rules and funding-model changes, closing, and any disputed version, each with its date, its proposal and the member and council counts at that date. Entries from DAO listings (address, software, listed) come later.
 
 **Fixed**
 - A vote changed within the same second as the previous one could lose to it (equal timestamps are ordered by event id). The app now dates each new event after the same key's previous one on the same subject.

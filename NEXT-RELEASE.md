@@ -60,7 +60,7 @@ The rules are already in `docs/protocol.md` (4.1.2, 6.1): every council change m
 - [x] Treasury page follows both descriptors during the move, and keeps watching the old one for late payments (shown as "earlier treasury" when anything arrives); the move shows as one movement
 - [x] Warning before signing when the continuing keys could not sweep the old treasury (protocol 6.1, "unsweepable")
 - [x] A reported lost key (`dao.keystatus`) links to "start a council change"
-- [x] DAO history page opened from the DAO's name (`docs/spec.md`, "DAO history"): founding, rules and council versions, funding model, closing, disputed versions. Listing entries wait for `dao.listing`
+- [x] DAO history page, linked from the footer (`docs/spec.md`, "DAO history"): founding, rules and council versions, funding model, closing, disputed versions. Listing entries wait for `dao.listing`
 - [x] End-to-end (`e2e/council.e2e.cjs`): a 2-of-3 SeedSigner DAO replaces a lost key (card C → card D); migration confirmed; the next payout spends from the new treasury; history checked
 - [ ] In the wild: a new testnet4 SeedSigner DAO, 2 of 3 on cards A, B, C; card C plays the lost key and card D (printed for this) replaces it
 - [ ] Later: the sweep round for late arrivals at an earlier treasury (protocol 6.1); v0.5.0 shows them but does not move them

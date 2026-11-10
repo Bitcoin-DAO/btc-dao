@@ -324,7 +324,7 @@ The public pages:
 
 ### DAO history
 
-The DAO name in the header opens the history page, as a member's name opens their profile. It lists the changes that shape what the DAO is, newest at the top, each with its date and a link to the proposal and tally that caused it. It needs no new events: every entry is derived from signed, endorsed records the app already rebuilds.
+The history page is linked from the footer, next to Rules. (The DAO name in the header stays the way home.) It lists the changes that shape what the DAO is, newest at the top, each with its date and a link to the proposal and tally that caused it. It needs no new events: every entry is derived from signed, endorsed records the app already rebuilds.
 
 | Entry | Derived from | Shows |
 | --- | --- | --- |

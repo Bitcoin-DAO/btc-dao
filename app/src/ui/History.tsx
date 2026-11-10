@@ -1,5 +1,5 @@
 // DAO history (spec "DAO history"): the changes that shape what the DAO is, newest first, each derived from
-// signed, endorsed records the app already rebuilds. Opened from the DAO name in the header.
+// signed, endorsed records the app already rebuilds. Opened from the footer.
 // Listing entries (address moved, software upgraded, listed) wait for dao.listing, which is not read yet.
 import type { ComponentChildren } from 'preact';
 import { chainApis, useApp } from '../app';

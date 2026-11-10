@@ -289,8 +289,7 @@ async function signRound(a, mb) {
 
   log('History');
   await open(f, '#/');
-  await f.getByText('Servono 2 firme su 3').waitFor({ timeout: 30000 }); // the DAO is loaded: the name links to its history
-  await f.locator('header .name').click();
+  await f.locator('nav.footer').getByRole('link', { name: 'Storia' }).click({ timeout: 30000 });
   await f.waitForURL(/#\/history$/);
   check(await seen(f.getByRole('heading', { name: 'Consiglio cambiato' })), 'history: council changed');
   check(await seen(f.getByText('Nuova chiave della tesoreria per @luca: ec03225a → 6b7fa6f3.')), 'history: the new key for @luca');
