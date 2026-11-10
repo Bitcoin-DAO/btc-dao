@@ -8,6 +8,7 @@ import { explorerOf, feePolicyOf, pushPageOf, sourceLabel, suggestFee, txDepth, 
 import { parseDescriptor, treasuryAddress } from '../core/descriptor';
 import type { Network } from '../core/config';
 import { mergeSignatures } from '../core/hwkeys';
+import { newTreasuryAddress } from '../core/council';
 import { SeedSignerSign } from './Hw';
 import { buildRound, estimateVsize, finalizeRound, masterFromSeed, memberSignatures, signWithMnemonicKey, type BuiltRound } from '../core/round';
 import { cadenceOf, roundLabel } from '../core/time';
@@ -49,16 +50,21 @@ export function PrepareRound() {
   if (!app.isCouncil || !app.secret) return <CouncilOnly />;
 
   const waiting = s.proposals.filter(p => s.payments.get(p.event.id)?.status === 'waiting');
+  // A close or a council change moves the whole balance, alone in its round (6.1); a close comes first.
+  const migration = waiting.find(p => p.content.type === 'change_council');
   const close = waiting.find(p => p.content.type === 'close');
-  const list = close ? [close] : waiting.filter(p => p.content.type === 'payout');
-  const outputs: Output[] = close ? [] : list.flatMap(p => p.content.payload.outputs as Output[]);
+  const sweep = close ?? migration;
+  const sweepTo = close ? (close.content.payload.destination as string) : migration ? newTreasuryAddress(migration.content.payload.new_descriptor, cfg.network) : undefined;
+  const list = sweep ? [sweep] : waiting.filter(p => p.content.type === 'payout');
+  const outputs: Output[] = sweep ? [] : list.flatMap(p => p.content.payload.outputs as Output[]);
   const open = s.rounds.find(r => r.status === 'open');
   const r = Number(rate);
   const rateOk = Number.isFinite(r) && r >= 1 && r <= max;
   const aboveCap = suggested !== undefined && suggested > max;
-  const live = !!app.treasury && !app.treasuryLoading && (app.treasuryAt ?? 0) >= opened;
+  // A reading of the treasury in force: after a council change, an older reading is of the earlier descriptor.
+  const live = !!app.treasury && !app.treasuryLoading && (app.treasuryAt ?? 0) >= opened && app.treasury.descriptor === settings.descriptor;
   // Known at once from the live reading: is there enough for the payouts and a fee? (TEST DAO, 9 Nov 2026)
-  const shortBy = live && !close && rateOk ? missingFunds(app.treasury!.utxos.reduce((a, u) => a + u.value, 0), outputs, parseDescriptor(settings.descriptor, cfg.network), app.treasury!.utxos.length, r, cfg.network) : 0;
+  const shortBy = live && !sweep && rateOk ? missingFunds(app.treasury!.utxos.reduce((a, u) => a + u.value, 0), outputs, parseDescriptor(settings.descriptor, cfg.network), app.treasury!.utxos.length, r, cfg.network) : 0;
 
   const build = () => {
     setMsg(undefined);
@@ -67,7 +73,7 @@ export function PrepareRound() {
       const tr = app.treasury!;
       setBuilt(buildRound({
         d: parseDescriptor(settings.descriptor, cfg.network), network: cfg.network, utxos: tr.utxos, outputs, feeRate: r,
-        changeIndex: Math.max(0, tr.changeIndex), sweepTo: close?.content.payload.destination,
+        changeIndex: Math.max(0, tr.changeIndex), sweepTo,
       }));
     } catch (e) {
       setMsg((e as Error).message === 'insufficient' ? t('rd.insufficient') : errText(e));
@@ -106,9 +112,15 @@ export function PrepareRound() {
               {list.map(p => (
                 <div class="kv">
                   <a href={`#/p/${p.event.id}`}>{proposalLabel(app.site!.name, p.number)} · {p.content.title}</a>
-                  <span class="mono">{p.content.type === 'close' ? '—' : fmtSats((p.content.payload.outputs as Output[]).reduce((a, o) => a + o.amount_sat, 0))}</span>
+                  <span class="mono">{p.content.type !== 'payout' ? '—' : fmtSats((p.content.payload.outputs as Output[]).reduce((a, o) => a + o.amount_sat, 0))}</span>
                 </div>
               ))}
+              {migration && sweep === migration && (
+                <>
+                  <p class="small">{t('rd.migrationText')}</p>
+                  <Address value={sweepTo!} />
+                </>
+              )}
             </div>
             <label class="field">
               {t('rd.feeRate', { max })}
@@ -128,10 +140,10 @@ export function PrepareRound() {
           <div class="card">
             <h3>{t('rd.summary')}</h3>
             <div class="kv"><span>{t('rd.inputs')}</span><span class="mono">{built.inputs.length} · {fmtSats(built.inputs.reduce((a, u) => a + u.value, 0))}</span></div>
-            <div class="kv"><span>{t('rd.total')}</span><span class="mono">{fmtSats(close ? built.inputs.reduce((a, u) => a + u.value, 0) - built.fee : outputs.reduce((a, o) => a + o.amount_sat, 0))}</span></div>
+            <div class="kv"><span>{t('rd.total')}</span><span class="mono">{fmtSats(sweep ? built.inputs.reduce((a, u) => a + u.value, 0) - built.fee : outputs.reduce((a, o) => a + o.amount_sat, 0))}</span></div>
             {built.change && <div class="kv"><span>{t('rd.change')}</span><span class="mono">{fmtSats(built.change.value)}</span></div>}
             <div class="kv"><span>{t('rd.fee')}</span><span class="mono">{fmtSats(built.fee)} · {r} sat/vB</span></div>
-            <p class="small">{feeLine(built.fee, close ? built.inputs.reduce((a, u) => a + u.value, 0) - built.fee : outputs.reduce((a, o) => a + o.amount_sat, 0), policy)}</p>
+            <p class="small">{feeLine(built.fee, sweep ? built.inputs.reduce((a, u) => a + u.value, 0) - built.fee : outputs.reduce((a, o) => a + o.amount_sat, 0), policy)}</p>
             <button type="button" class="btn primary" disabled={busy} onClick={publish}>{t('rd.publish')}</button>
           </div>
         )}
@@ -260,6 +272,7 @@ export function RoundDetail({ id }: { id: string }) {
             {ins.outputs.map(o => (
               <div class="stack" style="gap:4px">
                 {o.change !== undefined && <span class="chip teal" style="align-self:flex-start">{t('rd.change')}</span>}
+                {r.isMigration && <span class="chip teal" style="align-self:flex-start">{t('rd.newTreasury')}</span>}
                 <Address value={o.address} />
                 <span class="mono">{fmtSats(o.value)} sats</span>
               </div>

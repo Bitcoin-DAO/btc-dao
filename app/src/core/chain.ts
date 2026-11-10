@@ -45,6 +45,13 @@ export interface TreasuryView {
   utxos: Utxo[];
   /** Which source answered, for "Read from the blockchain … via …". */
   source?: string;
+  /** The descriptor this reading is of (the one in force when read). */
+  descriptor?: string;
+  /**
+   * The other treasuries a council change leaves (protocol 6.1): earlier descriptors, watched for late
+   * arrivals, and the incoming one while a migration is under way.
+   */
+  others?: { descriptor: string; role: 'earlier' | 'next'; view?: TreasuryView; error?: string }[];
 }
 
 export type Fetcher = (url: string) => Promise<unknown>;

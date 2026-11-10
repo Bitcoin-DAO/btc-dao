@@ -2,6 +2,32 @@
 
 Each release is a git tag (`v0.1.1`). A DAO's copy runs one tagged release and records it in its README; a release moves to a DAO's next stage only after passing the one before ([guide, section 8](docs/guide.md#8-the-three-stages-practice-testnet-mainnet)).
 
+## v0.5.0 · 10 November 2026
+
+**Council change**: replacing a lost, resigned or recalled treasury key, adding or removing a council member, or changing the threshold. A multisig cannot drop a key, so every change moves the whole treasury to a new one (protocol 4.1.2, 6.1).
+
+**The proposal**
+- New proposal type **Council change**: the reason, who leaves, who joins (another member, or the same member with a new key after a lost card) and their SeedSigner key, scanned, and the signatures needed. The form shows the new council, the new treasury's first address and the full descriptor, and explains what is missing until it is complete.
+- A lost-key report on the Council page offers **Start a council change**, prefilled for that member.
+- If the keys that stay could not sign from the old treasury, the form and the proposal warn that anything sent there after the move could be lost (or recovered only with the outgoing key).
+- Protocol 4.1.2: the incoming member may be the outgoing one with a new key; the optional `in_device` is copied to the new council entry.
+
+**The move**
+- Once the proposal passes, **Prepare the round** builds the migration: one output, the whole balance less the fee, to the new treasury. The old council signs it on their SeedSigners as for any round; the round page marks the output as the new treasury.
+- After the receipt, the council endorses the new settings version; the Council page shows the council before and after.
+- The home page follows the new treasury while the move is under way, then keeps watching earlier treasuries and shows one if anything arrives there. The move appears once in the movements, as "Treasury moved".
+- Payout rounds after the change spend from the new treasury; the prepare page waits for a reading of the treasury in force.
+
+**DAO history**
+- The DAO's name in the header opens its **history**: founding, council changes (who left and joined, reason, threshold, the migration's transaction), rules and funding-model changes, closing, and any disputed version, each with its date, its proposal and the member and council counts at that date. Entries from DAO listings (address, software, listed) come later.
+
+**Fixed**
+- A vote changed within the same second as the previous one could lose to it (equal timestamps are ordered by event id). The app now dates each new event after the same key's previous one on the same subject.
+
+**Tests**
+- Unit: council-change checks (bad descriptor, outsider, threshold, migration to the wrong address, payout to the new treasury before its settings version).
+- End-to-end (`e2e/council.e2e.cjs`): a 2-of-3 SeedSigner DAO, card C reported lost and replaced by card D; the migration signed with cards A and B and checked with embit; the next payout spends the migration's output; the history page.
+
 ## v0.4.0 · 10 November 2026
 
 **SeedSigner founding and signing**: the mainnet flow, with every treasury key on a SeedSigner and none on a phone. Tested on a real SeedSigner (firmware 0.8.6) and passed in the wild on SEEDSIGNER DAO, from founding to closing (`docs/runs/2026-11-seedsigner-dao.md`). Formats recorded in `docs/seedsigner.md`.

@@ -239,7 +239,7 @@ export async function sync() {
     const sinceTry = Date.now() - lastTreasuryTry;
     const failedRecently = !!state.treasuryError && sinceTry < TREASURY_RETRY_MS; // after a failure, wait before trying again by itself
     // A round seen broadcast or confirmed since the last reading changes the treasury: read again whatever its age.
-    const marker = (state.dao?.rounds ?? []).map(r => `${r.event.id}:${r.receipt ? 'c' : r.ready ? 'r' : 'o'}`).join(',');
+    const marker = `${state.dao?.settings.length ?? 0}|` + (state.dao?.rounds ?? []).map(r => `${r.event.id}:${r.receipt ? 'c' : r.ready ? 'r' : 'o'}`).join(',');
     const moved = marker !== lastRoundMarker;
     lastRoundMarker = marker;
     if ((moved || age > TREASURY_FRESH_MS) && !failedRecently) void refreshTreasury();
@@ -258,6 +258,22 @@ export const manualRetryIn = () => Math.max(0, lastTreasuryTry + MANUAL_RETRY_MS
 let lastRoundMarker: string | undefined;
 
 /**
+ * The treasury in force (the latest settings version) and the others a council change leaves: every earlier
+ * descriptor (late arrivals, protocol 6.1), and a passed change's new descriptor until it is in force.
+ */
+export function treasuryDescriptors(s: DaoState): { current: string; others: { descriptor: string; role: 'earlier' | 'next' }[] } {
+  const current = s.settings[s.settings.length - 1].content.descriptor;
+  const known = new Set(s.settings.map(v => v.content.descriptor));
+  const earlier = [...known].filter(d => d !== current).map(descriptor => ({ descriptor, role: 'earlier' as const }));
+  const next = s.proposals
+    .filter(p => p.content.type === 'change_council' && ['waiting', 'in_round', 'paid'].includes(s.payments.get(p.event.id)?.status ?? ''))
+    .map(p => p.content.payload.new_descriptor as string)
+    .filter(d => !known.has(d))
+    .map(descriptor => ({ descriptor, role: 'next' as const }));
+  return { current, others: [...next, ...earlier] };
+}
+
+/**
  * Read the treasury from the chain. Only one read runs at a time. A call made while a read is running
  * queues one more read after it, so a caller (after a broadcast, say) always gets a read that started later.
  */
@@ -273,8 +289,17 @@ export function refreshTreasury(): Promise<void> {
   setState({ treasuryLoading: true });
   treasuryRead = (async () => {
     try {
-      const d = parseDescriptor(cfg.descriptor, cfg.network);
-      const view = await loadTreasury(d, cfg.network, chainApis());
+      const { current, others } = treasuryDescriptors(state.dao!);
+      const view: TreasuryView = { ...(await loadTreasury(parseDescriptor(current, cfg.network), cfg.network, chainApis())), descriptor: current };
+      // The others one after another, after the treasury in force: public APIs throttle bursts.
+      if (others.length) view.others = [];
+      for (const o of others) {
+        try {
+          view.others!.push({ ...o, view: await loadTreasury(parseDescriptor(o.descriptor, cfg.network), cfg.network, chainApis()) });
+        } catch (e) {
+          view.others!.push({ ...o, error: String((e as Error).message ?? e) });
+        }
+      }
       treasuryCache.set(daoId, view);
       setState({ treasury: view, treasuryAt: Date.now(), treasuryError: undefined });
     } catch (e) {
@@ -294,7 +319,12 @@ export function refreshTreasury(): Promise<void> {
 /** Sign with the unlocked key, publish to every relay, and fold the event into local state. */
 export async function signAndPublish(kind: number, content: unknown, tags: string[][] = [], secret = state.secret, daoId = state.daoId): Promise<{ event: Event; result: PublishResult }> {
   if (!secret || !daoId || !state.site) throw new Error('not-signed-in');
-  const event = sign(template(kind, daoId, content, tags), secret);
+  // Later than this key's previous event of the same kind on the same subject: a vote changed within one
+  // second would otherwise tie on created_at and be ordered by id, so the earlier choice could win (4.3).
+  const me = pubkeyOf(secret);
+  const subject = tags.find(x => x[0] === 'e')?.[1];
+  const last = Math.max(0, ...state.events.filter(e => e.pubkey === me && e.kind === kind && e.tags.find(x => x[0] === 'e')?.[1] === subject).map(e => e.created_at));
+  const event = sign(template(kind, daoId, content, tags, Math.max(Math.floor(Date.now() / 1000), last + 1)), secret);
   const result = await publish(relaysOf(state.site), event);
   if (!result.ok.length) throw new Error('publish-failed: ' + result.failed.map(f => f.reason).join('; '));
   derive([...state.events, event]);

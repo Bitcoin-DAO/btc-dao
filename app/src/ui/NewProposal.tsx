@@ -5,13 +5,37 @@ import { fmtSats, t } from '../i18n';
 import { KIND } from '../core/events';
 import { DUST, proposalSchemaError, validAddress, type Output, type ProposalContent, type ProposalType } from '../core/state';
 import type { DraftContent } from '../core/discussion';
+import { COUNCIL_REASONS, sweepable, councilAfter, councilChangeError, descriptorFor, type CouncilChange, type CouncilReason } from '../core/council';
+import { parseDescriptor, treasuryAddress } from '../core/descriptor';
+import { readKeyExport } from '../core/hwkeys';
+import { UrScanModal } from './Hw';
 import { cadenceOf } from '../core/time';
-import { Footer, Header, errText, go } from './parts';
+import { Address, Footer, Header, errText, go } from './parts';
 import { EDITABLE_RULES, periodText, ruleLabel, ruleValue, typeLabel } from './Proposals';
 import { PRACTICE_VOTE_DAYS } from '../core/config';
 import { feePolicyOf } from '../core/chain';
 
-const TYPES: ProposalType[] = ['payout', 'statement', 'remove_member', 'change_rules', 'close'];
+const TYPES: ProposalType[] = ['payout', 'statement', 'remove_member', 'change_rules', 'change_council', 'close'];
+
+/** councilChangeError's reasons, in the reader's language. */
+const CC_WHY: Record<string, string> = {
+  'outgoing key is not on the council': 'cc.e.out',
+  'incoming key is not a member': 'cc.e.notMember',
+  'incoming member is already on the council': 'cc.e.onCouncil',
+  'incoming xpub is not valid for this network': 'cc.e.xpub',
+  'incoming treasury key is already on the council': 'cc.e.dup',
+  'the council would be empty': 'cc.e.empty',
+  'threshold above the council size': 'cc.e.threshold',
+  'new_descriptor is not the one derived from the new council': 'cc.e.nothing',
+};
+const ccWhy = (e: string) => (CC_WHY[e] ? t(CC_WHY[e] as 'cc.e.out') : e);
+
+/** Set by "start a council change" (a reported lost key): the form opens on it, prefilled. */
+let councilPreset: { reason: CouncilReason; out: string; in: string } | undefined;
+export function startCouncilChange(preset: { reason: CouncilReason; out: string; in: string }) {
+  councilPreset = preset;
+  go('/new');
+}
 
 /** The form's fields from a draft version (protocol 4.5.1), so a new version starts from the latest one. */
 function fieldsOf(c?: DraftContent) {
@@ -41,7 +65,20 @@ export function NewProposal({ draftId }: { draftId?: string } = {}) {
   const thread = draftId ? s.discussion.byId.get(draftId) : undefined;
   const latest = thread?.versions[thread.versions.length - 1];
   const [init] = useState(() => fieldsOf(latest?.content));
-  const [type, setType] = useState<ProposalType>(init.type);
+  const [preset] = useState(() => {
+    const x = councilPreset;
+    councilPreset = undefined;
+    return x;
+  });
+  const [type, setType] = useState<ProposalType>(preset ? 'change_council' : init.type);
+  // Council change (protocol 4.1.2)
+  const cur = s.settings[s.settings.length - 1].content;
+  const [ccReason, setCcReason] = useState<CouncilReason>(preset?.reason ?? 'lost_key');
+  const [ccOut, setCcOut] = useState(preset?.out ?? '');
+  const [ccIn, setCcIn] = useState(preset?.in ?? '');
+  const [ccKey, setCcKey] = useState<{ fingerprint: string; xpub: string; device?: 'seedsigner' }>();
+  const [ccThreshold, setCcThreshold] = useState<number>(cur.threshold);
+  const [ccScan, setCcScan] = useState(false);
   const returnTo = s.founded!.config.testnetTreasury ?? app.site!.testnetTreasury;
   const returnOk = !!returnTo && validAddress(returnTo.address, network);
   const [title, setTitle] = useState(init.title);
@@ -109,6 +146,26 @@ export function NewProposal({ draftId }: { draftId?: string } = {}) {
   if (type === 'remove_member') payload = { member_key: member, reason: reason.trim() };
   if (type === 'change_rules') payload = { changes: [{ path: `rules.${rule}`, from: stored ?? null, to: parsedValue }] };
   if (type === 'close') payload = { destination: addr };
+  let cc: ReturnType<typeof councilChangeError> | undefined;
+  if (type === 'change_council') {
+    const change: CouncilChange = {
+      reason: ccReason, out_key: ccOut || null, in_key: ccIn || null,
+      in_xpub: ccIn ? ccKey?.xpub ?? '' : null, in_fingerprint: ccIn ? ccKey?.fingerprint ?? '' : null,
+      ...(ccIn && ccKey?.device ? { in_device: ccKey.device } : {}),
+      threshold: ccThreshold, new_descriptor: '',
+    };
+    const named = s.members.find(m => m.person === s.personOf(ccIn))?.name ?? '';
+    const next = councilAfter(cur.council, change, named, s.personOf);
+    try {
+      change.new_descriptor = descriptorFor(next, Math.min(ccThreshold, Math.max(1, next.length)), network);
+    } catch {
+      /* incomplete: the incoming key is not scanned yet */
+    }
+    payload = change as unknown as Record<string, unknown>;
+    cc = ccIn && !ccKey ? { error: t('cc.needKey') } : councilChangeError(change, cur.council, {
+      network, personOf: s.personOf, memberName: k => s.members.find(m => m.person === s.personOf(k))?.name,
+    });
+  }
   const content: ProposalContent = {
     type, title: title.trim(), summary: summary.trim(), lang: app.lang, payload,
     ...(link.trim() ? { link: { url: link.trim() } } : {}),
@@ -122,7 +179,7 @@ export function NewProposal({ draftId }: { draftId?: string } = {}) {
   const missing = schemaErr
     ? (FIELD[schemaErr] ? t(FIELD[schemaErr]) : schemaErr)
     : type === 'change_rules' && parsedValue === undefined ? t('np.newValue') : undefined;
-  const ok = !schemaErr && !addrError && !amtError && !(type === 'change_rules' && (parsedValue === undefined || parsedValue === current || (rule === 'payoutRound' && parsedValue === cadenceOf(current))));
+  const ok = !schemaErr && !addrError && !amtError && !(cc && 'error' in cc) && !(type === 'change_rules' && (parsedValue === undefined || parsedValue === current || (rule === 'payoutRound' && parsedValue === cadenceOf(current))));
 
   // A draft version may be partial: only the title is required, and wrong values are still flagged.
   const draftOk = !!title.trim() && !addrError && !amtError;
@@ -267,6 +324,60 @@ export function NewProposal({ draftId }: { draftId?: string } = {}) {
           </div>
         )}
 
+        {type === 'change_council' && (
+          <div class="card">
+            <p class="small">{t('cc.intro')}</p>
+            <label class="field">
+              {t('cc.reason')}
+              <select value={ccReason} onChange={e => setCcReason((e.target as HTMLSelectElement).value as CouncilReason)}>
+                {COUNCIL_REASONS.map(r => <option value={r}>{t(`cc.r.${r}` as 'cc.r.lost_key')}</option>)}
+              </select>
+            </label>
+            <label class="field">
+              {t('cc.out')}
+              <select value={ccOut} onChange={e => setCcOut((e.target as HTMLSelectElement).value)}>
+                <option value="">{t('cc.none')}</option>
+                {cur.council.map(c => <option value={c.identityKey}>{c.label} · {c.fingerprint}</option>)}
+              </select>
+            </label>
+            <label class="field">
+              {t('cc.in')}
+              <select value={ccIn} onChange={e => (setCcIn((e.target as HTMLSelectElement).value), setCcKey(undefined))}>
+                <option value="">{t('cc.none')}</option>
+                {s.members.filter(m => !m.council || (ccOut && m.person === s.personOf(ccOut))).map(m => (
+                  <option value={m.key}>{m.name}{m.council ? ` · ${t('cc.newKey')}` : ''}</option>
+                ))}
+              </select>
+            </label>
+            {ccIn && (
+              <>
+                <p class="small">{t('cc.keyText')}</p>
+                {ccKey && <div class="kv"><span>{t('cc.inKey')}</span><span class="mono ok">{ccKey.fingerprint} ✓</span></div>}
+                <button type="button" class={ccKey ? 'btn link' : 'btn secondary'} onClick={() => setCcScan(true)}>{ccKey ? t('fs.deviceRescan') : t('cc.scan')}</button>
+              </>
+            )}
+            <div class="row" style="align-items:center">
+              <span>{t('cc.threshold')}</span>
+              <span class="row" style="gap:8px;align-items:center">
+                <button type="button" class="btn secondary" style="width:44px" disabled={ccThreshold <= 1} onClick={() => setCcThreshold(ccThreshold - 1)}>−</button>
+                <strong>{t('setup.of', { m: ccThreshold, n: cc && 'council' in cc ? cc.council.length : '?' })}</strong>
+                <button type="button" class="btn secondary" style="width:44px" onClick={() => setCcThreshold(ccThreshold + 1)}>+</button>
+              </span>
+            </div>
+            {cc && 'council' in cc && (
+              <div class="stack" style="gap:4px">
+                <span class="small">{t('cc.newCouncil')}</span>
+                {cc.council.map(c => <span class="small mono">{c.label} · {c.fingerprint}</span>)}
+                <span class="small">{t('cc.newTreasury')}</span>
+                <Address value={treasuryAddress(parseDescriptor(payload.new_descriptor as string, network), network, 0, 0).address} />
+                <p class="note">{t('cc.migration')}</p>
+                {!sweepable(cur.council, cur.threshold, cc.council) && <p class="warnbox">{t(ccReason === 'lost_key' || ccReason === 'recall' ? 'cc.unsweepableLost' : 'cc.unsweepable')}</p>}
+              </div>
+            )}
+            {cc && 'error' in cc && <p class="error">{t('cc.notYet', { why: ccWhy(cc.error) })}</p>}
+          </div>
+        )}
+
         {type === 'close' && (
           <div class="card">
             <p class="warn">{t('np.closeWarn')}</p>
@@ -277,6 +388,15 @@ export function NewProposal({ draftId }: { draftId?: string } = {}) {
           </div>
         )}
 
+        {ccScan && <UrScanModal title={t('cc.scan')} plainOk onCancel={() => setCcScan(false)} onResult={v => {
+          setCcScan(false);
+          try {
+            const k = readKeyExport('text' in v ? v.text : v, network);
+            setCcKey({ fingerprint: k.fingerprint, xpub: k.xpub, device: 'seedsigner' }); // as at founding: the key a SeedSigner exports, scanned or typed
+          } catch (e) {
+            setMsg(errText(e));
+          }
+        }} />}
         {draftId ? (
           <>
             <button type="button" class="btn primary" disabled={!draftOk || busy} onClick={publish}>{t('ds.publishVersion', { n: nextVersion })}</button>

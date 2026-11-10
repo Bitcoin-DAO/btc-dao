@@ -104,7 +104,8 @@ const TEST_CARDS: HwKey[] = [
   { fingerprint: '49c2d730', xpub: 'tpubDFUxuLmA93bTzumuAt8nqakLsDcNXk5ZB2mwZv1SxwX7u6THfmvdqBRrrBdkmCeLfQPcs8Rx3kEYsAZFYvQjSeJ6V1Q6dMn7Z7TzJHswBXU', path: '48h/1h/0h/2h', network: 'testnet4' },
   { fingerprint: 'ec03225a', xpub: 'tpubDFCfvs2SLPX7J8JKkpaRQ6XKH2EksYsLNPAsucb9KDunGYemVrAm8VL4kNJ5Gm6icC3mBUinvirVXF5ZMatoCHuqmpAYKcmKUTLT7pMyXxE', path: '48h/1h/0h/2h', network: 'testnet4' },
 ];
-const cardName = (fp: string) => ({ d3bdd580: 'A', '49c2d730': 'B', ec03225a: 'C' } as Record<string, string>)[fp];
+// Card D (v0.5.0): the replacement key in the council-change test. Not among the cards "use the test cards" adds.
+const cardName = (fp: string) => ({ d3bdd580: 'A', '49c2d730': 'B', ec03225a: 'C', '6b7fa6f3': 'D' } as Record<string, string>)[fp];
 
 /**
  * QR test page (#/qrtest): checks every exchange with a real SeedSigner before the app relies on it.

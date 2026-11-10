@@ -2,7 +2,7 @@
 // from a multisig, so every change moves the whole treasury to a new descriptor, which every client derives
 // from the current council and the proposal, and so can check before anything is signed.
 import type { CouncilEntry, Network } from './config';
-import { buildDescriptor, checkXpub } from './descriptor';
+import { buildDescriptor, checkXpub, parseDescriptor, treasuryAddress } from './descriptor';
 
 export const COUNCIL_REASONS = ['resignation', 'recall', 'lost_key', 'rotation', 'threshold'] as const;
 export type CouncilReason = (typeof COUNCIL_REASONS)[number];
@@ -85,3 +85,13 @@ export function councilChangeError(
   if (c.new_descriptor !== descriptorFor(next, c.threshold, ctx.network)) return { error: 'new_descriptor is not the one derived from the new council' };
   return { council: next };
 }
+
+/** Where a migration pays (6.1): the first receive address of the new descriptor. */
+export const newTreasuryAddress = (descriptor: string, network: Network) => treasuryAddress(parseDescriptor(descriptor, network), network, 0, 0).address;
+
+/**
+ * Whether the keys continuing into the new council can still meet the old descriptor's threshold, so a sweep
+ * round can move late arrivals (protocol 6.1). When not, the old treasury is unsweepable after the migration.
+ */
+export const sweepable = (council: CouncilEntry[], threshold: number, next: CouncilEntry[]) =>
+  council.filter(x => next.some(y => y.xpub === x.xpub)).length >= threshold;

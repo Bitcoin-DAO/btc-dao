@@ -1,4 +1,5 @@
 // Proposals: list, detail with voting, confirmation status, final count and record (protocol 4).
+import { councilChangeError, newTreasuryAddress, sweepable, type CouncilChange } from '../core/council';
 import { useState } from 'preact/hooks';
 import { signAndPublish, useApp } from '../app';
 import { fmtDate, fmtDateTime, fmtLeft, fmtSats, t } from '../i18n';
@@ -300,6 +301,35 @@ function Payload({ p }: { p: ProposalView }) {
           ))}
         </>
       );
+    case 'change_council': {
+      let addr = '';
+      try { addr = newTreasuryAddress(pl.new_descriptor, app.site!.network); } catch { /* the proposal was rejected */ }
+      return (
+        <>
+          <div class="kv"><span>{t('cc.reason')}</span><span>{t(`cc.r.${pl.reason}` as 'cc.r.lost_key')}</span></div>
+          <div class="kv"><span>{t('cc.out')}</span><span>{pl.out_key ? nameOf(pl.out_key) : t('cc.none')}</span></div>
+          <div class="kv"><span>{t('cc.in')}</span><span>{pl.in_key ? `${nameOf(pl.in_key)} · ${pl.in_fingerprint}${pl.in_device === 'seedsigner' ? ' · SeedSigner' : ''}` : t('cc.none')}</span></div>
+          <div class="kv"><span>{t('cc.threshold')}</span><span>{pl.threshold}</span></div>
+          {addr && (
+            <>
+              <span class="small">{t('cc.newTreasury')}</span>
+              <Address value={addr} />
+            </>
+          )}
+          <details>
+            <summary class="small">{t('pd.descriptor')}</summary>
+            <p class="small mono" style="overflow-wrap:anywhere">{pl.new_descriptor}</p>
+          </details>
+          <p class="small">{t('cc.migration')}</p>
+          {(() => {
+            const before = s.settingsAt(p.event.created_at).content;
+            const r = councilChangeError(pl as CouncilChange, before.council, { network: app.site!.network, personOf: s.personOf, memberName: k => s.members.find(m => m.person === s.personOf(k))?.name ?? '' });
+            return 'council' in r && !sweepable(before.council, before.threshold, r.council)
+              ? <p class="warnbox">{t(pl.reason === 'lost_key' || pl.reason === 'recall' ? 'cc.unsweepableLost' : 'cc.unsweepable')}</p> : null;
+          })()}
+        </>
+      );
+    }
     case 'close':
       return <p class="warn">{t('pd.destination')}</p>;
     default:

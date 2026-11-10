@@ -1,6 +1,6 @@
 # Next release: v0.5.0
 
-**Status (10 November 2026):** v0.4.0 released (SeedSigner founding and signing), passed in the wild on SEEDSIGNER DAO. Next: v0.5.0, council change.
+**Status (10 November 2026):** v0.5.0 (council change) built and tested; next, the wild test on a new SeedSigner DAO.
 
 **Direction, decided 9 November 2026:** the focus moves to mainnet. New DAOs that matter start on SeedSigners; phone keys stay only as a practice mode on testnet4. One codebase: the network and the founding choice decide which keys are allowed (mainnet: SeedSigners only). There is no move from phone keys to SeedSigners.
 
@@ -11,7 +11,7 @@
 
 **Rule:** an item is ticked when it is built and its tests pass. Passing in the wild is tracked separately in `MAINNET-READINESS.md`.
 
-**Equipment for the wild test:** one SeedSigner, one SD card with current firmware (a fresh card from the SD card ceremony, `docs/guide.md` 3.1), three SeedQR cards.
+**Equipment for the wild test:** one SeedSigner, one SD card with current firmware (a fresh card from the SD card ceremony, `docs/guide.md` 3.1), SeedQR test cards A, B, C and, for v0.5.0, D (testnet only).
 
 ## v0.3.0 (done)
 
@@ -54,14 +54,16 @@ Formats: the ones Sparrow uses with SeedSigner, so any of the DAO's keys and des
 
 The rules are already in `docs/protocol.md` (4.1.2, 6.1): every council change moves the whole treasury to a new descriptor, because keys cannot be removed from a multisig.
 
-- [ ] `change_council` proposal form: reason (`lost_key`, `resignation`, `recall`, `rotation`, `threshold`), outgoing key, incoming member's scanned SeedSigner xpub, new threshold; the new descriptor shown in full
-- [ ] Migration round: the whole balance to the new treasury's first address, signed with the old keys, checked as protocol 6.1 says
-- [ ] New settings version (council, threshold, descriptor) confirmed by the council after the migration's receipt
-- [ ] Treasury page follows both descriptors during the move, and keeps watching the old one for late payments
-- [ ] A reported lost key (`dao.keystatus`) links to "start a council change"
-- [ ] DAO history page opened from the DAO's name (`docs/spec.md`, "DAO history"): founding, rules and council versions, closing
-- [ ] End-to-end: a 2-of-3 SeedSigner DAO replaces a lost key; migration confirmed; the next payout spends from the new treasury
-- [ ] In the wild: on v0.4.0's SeedSigner DAO, one SeedQR card plays the lost key
+- [x] `change_council` proposal form: reason (`lost_key`, `resignation`, `recall`, `rotation`, `threshold`), outgoing key, incoming member (another member, or the same member with a new key) and their scanned SeedSigner key, new threshold; the new council, the new treasury's first address and the descriptor shown
+- [x] Migration round: the whole balance to the new treasury's first address, signed with the old keys, checked as protocol 6.1 says
+- [x] New settings version (council, threshold, descriptor) confirmed by the council after the migration's receipt; the Council page shows the council before and after
+- [x] Treasury page follows both descriptors during the move, and keeps watching the old one for late payments (shown as "earlier treasury" when anything arrives); the move shows as one movement
+- [x] Warning before signing when the continuing keys could not sweep the old treasury (protocol 6.1, "unsweepable")
+- [x] A reported lost key (`dao.keystatus`) links to "start a council change"
+- [x] DAO history page opened from the DAO's name (`docs/spec.md`, "DAO history"): founding, rules and council versions, funding model, closing, disputed versions. Listing entries wait for `dao.listing`
+- [x] End-to-end (`e2e/council.e2e.cjs`): a 2-of-3 SeedSigner DAO replaces a lost key (card C → card D); migration confirmed; the next payout spends from the new treasury; history checked
+- [ ] In the wild: a new testnet4 SeedSigner DAO, 2 of 3 on cards A, B, C; card C plays the lost key and card D (printed for this) replaces it
+- [ ] Later: the sweep round for late arrivals at an earlier treasury (protocol 6.1); v0.5.0 shows them but does not move them
 
 ## C. Outward comms (after v0.5.0)
 

@@ -34,7 +34,8 @@ export function Header(props: { sub?: string; tabs?: ComponentChildren }) {
   return (
     <>
       <header class="top">
-        <a href="#/" style="display:flex;flex-direction:column">
+        {/* The DAO name opens its history (spec "DAO history"), as a member's name opens their profile. */}
+        <a href={app.dao?.founded ? '#/history' : '#/'} style="display:flex;flex-direction:column" aria-label={app.dao?.founded ? t('hist.open') : undefined}>
           <span class="name">{site?.name ?? 'btc-dao'}</span>
           <span class="sub">{props.sub ?? t('tagline')}</span>
         </a>

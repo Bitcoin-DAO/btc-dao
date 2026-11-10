@@ -8,14 +8,14 @@ import { councilTodo } from './Council';
 import { cadenceOf, roundDatesAfter } from '../core/time';
 import { proposalLabel, type RoundView } from '../core/state';
 import { parseDescriptor, treasuryAddress } from '../core/descriptor';
-import { explorerOf } from '../core/chain';
+import { explorerOf, type Movement, type TreasuryView } from '../core/chain';
 
 export function Home() {
   const app = useApp();
   if (!app.daoId) return <Join />;
   const cfg = app.dao!.founded!.config;
   const current = app.dao!.settings[app.dao!.settings.length - 1].content;
-  const tr = app.treasury;
+  const tr = inForce(app.treasury, current.descriptor);
   const n = current.council.length;
   const m = current.threshold;
   const cap = current.rules.treasuryCapSats;
@@ -27,6 +27,7 @@ export function Home() {
   const waitingSats = waiting.reduce((s, p) => s + (p.content.payload.outputs as { amount_sat: number }[]).reduce((a, o) => a + o.amount_sat, 0), 0);
   const nextRoundDate = new Intl.DateTimeFormat(app.lang === 'en' ? 'en-GB' : 'it-IT', { day: 'numeric', month: 'long', timeZone: current.rules.timezone })
     .format(new Date(roundDatesAfter(app.dao!.now, current.rules.timezone, 1, cadenceOf(current.rules.payoutRound))[0] * 1000));
+  const moves = movementsOf(tr);
   const paidRounds = new Map(app.dao!.rounds.filter(r => r.status === 'paid' && r.inspection).map(r => [r.inspection!.txid, r]));
   return (
     <>
@@ -66,7 +67,9 @@ export function Home() {
           </div>
         </section>
 
-        {!app.dao!.closed && !tr && <Donate address={firstAddress(cfg.descriptor, cfg.network)} />}
+        {tr?.others?.map(o => <OtherTreasury o={o} explorer={explorer} />)}
+
+        {!app.dao!.closed && !tr && <Donate address={firstAddress(current.descriptor, cfg.network)} />}
 
         {!app.dao!.closed && tr && (atCap ? (
           <section class="card">
@@ -111,14 +114,14 @@ export function Home() {
         {tr && (
           <section class="card">
             <h2>{t('home.movements')}</h2>
-            {tr.movements.length === 0 ? (
+            {moves.length === 0 ? (
               <p class="small">{t('home.noMovements')}</p>
             ) : (
               <div class="list">
-                {tr.movements.map(mv => (
+                {moves.map(mv => (
                   <div class="row" style="align-items:flex-start">
                     <div class="stack" style="gap:2px">
-                      <strong>{mv.net >= 0 ? t('home.in') : paidRounds.has(mv.txid) ? roundTitle(paidRounds.get(mv.txid)!) : t('home.out')}</strong>
+                      <strong>{mv.moved ? t('home.moved') : mv.net >= 0 ? t('home.in') : paidRounds.has(mv.txid) ? roundTitle(paidRounds.get(mv.txid)!) : t('home.out')}{mv.earlier && !mv.moved ? ` · ${t('home.earlierShort')}` : ''}</strong>
                       <span class="small">
                         {mv.time ? fmtDate(mv.time, false) : t('home.pending')}
                         {mv.net < 0 ? ` · ${t('home.feeIncl')}` : ''} ·{' '}
@@ -138,13 +141,60 @@ export function Home() {
           <p class="small">{t('home.verifyText', { m })}</p>
           <details>
             <summary class="small" style="cursor:pointer">{t('home.descriptor')}</summary>
-            <p class="mono" style="font-size:12px;overflow-wrap:anywhere;margin-top:8px">{cfg.descriptor}</p>
+            <p class="mono" style="font-size:12px;overflow-wrap:anywhere;margin-top:8px">{current.descriptor}</p>
           </details>
           <a href="#/rules" onClick={e => (e.preventDefault(), go('/rules'))}>{t('nav.rules')} →</a>
         </section>
       </main>
       <Footer />
     </>
+  );
+}
+
+/**
+ * A reading taken before the latest settings version, seen from the descriptor now in force: the treasury it
+ * called "next" is the treasury, and the one it read as the treasury is an earlier one (until the next read).
+ */
+function inForce(tr: TreasuryView | undefined, descriptor: string): TreasuryView | undefined {
+  if (!tr?.descriptor || tr.descriptor === descriptor) return tr;
+  const o = tr.others?.find(x => x.descriptor === descriptor && x.view);
+  if (!o) return tr;
+  const { others: _o, ...was } = tr;
+  return {
+    ...o.view!, descriptor, source: tr.source,
+    others: [{ descriptor: tr.descriptor, role: 'earlier', view: was }, ...(tr.others ?? []).filter(x => x !== o)],
+  };
+}
+
+/**
+ * The treasury's movements across council changes: the one in force and the earlier ones, newest first. A
+ * migration shows once (the move costs only its fee), not as an out of one treasury and an in of the next.
+ */
+function movementsOf(tr: TreasuryView | undefined): (Movement & { moved?: boolean; earlier?: boolean })[] {
+  if (!tr) return [];
+  const all = new Map<string, Movement & { moved?: boolean; earlier?: boolean }>();
+  const add = (m: Movement, earlier: boolean) => {
+    const had = all.get(m.txid);
+    if (had) all.set(m.txid, { ...had, net: had.net + m.net, moved: true, earlier: false });
+    else all.set(m.txid, { ...m, earlier });
+  };
+  for (const m of tr.movements) add(m, false);
+  for (const o of tr.others ?? []) for (const m of o.view?.movements ?? []) add(m, o.role === 'earlier');
+  return [...all.values()].sort((a, b) => (b.time ?? Infinity) - (a.time ?? Infinity));
+}
+
+/** An earlier treasury (late arrivals) or the incoming one while the council change is under way. */
+function OtherTreasury({ o, explorer }: { o: NonNullable<TreasuryView['others']>[number]; explorer: string }) {
+  const network = useApp().site!.network;
+  const v = o.view;
+  if (o.role === 'earlier' && v && v.balance === 0) return null; // nothing left behind: nothing to say
+  return (
+    <section class="card">
+      <span class="small" style="font-size:15px">{o.role === 'next' ? t('home.nextTreasury') : t('home.earlierTreasury')}</span>
+      {v ? <div class="balance" style="font-size:28px">{fmtSats(v.balance)} <small>sats</small></div> : <p class="small">{t('home.chainError', { msg: o.error ?? '' })}</p>}
+      <p class="small">{o.role === 'next' ? t('home.nextTreasuryText') : t('home.earlierTreasuryText')}</p>
+      {v && <a class="small" href={`${explorer}/address/${firstAddress(o.descriptor, network)}`} target="_blank" rel="noopener">{t('home.onExplorer')}</a>}
+    </section>
   );
 }
 

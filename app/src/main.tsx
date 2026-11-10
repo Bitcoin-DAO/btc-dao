@@ -20,6 +20,7 @@ import { Rules } from './ui/Rules';
 import { Header } from './ui/parts';
 import { ProposalDetail, Proposals } from './ui/Proposals';
 import { NewProposal } from './ui/NewProposal';
+import { History } from './ui/History';
 import { Confirm } from './ui/Confirm';
 import { Candidate } from './ui/Candidate';
 import { Sponsor } from './ui/Sponsor';
@@ -37,6 +38,7 @@ const routes: Record<string, () => preact.JSX.Element> = {
   '/profile': Profile,
   '/members': Members,
   '/rules': Rules,
+  '/history': History,
   '/proposals': Proposals,
   '/new': NewProposal,
   '/sponsor': Sponsor,

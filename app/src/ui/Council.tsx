@@ -7,7 +7,8 @@ import { missingFunds } from './Round';
 import { KIND, type Event } from '../core/events';
 import { parseFounderCode, type FounderCode } from '../core/identity';
 import { formatShortCode, shortCode } from '../core/shortcode';
-import { nextRoster, nextSettings, type Candidate, type DaoState, type Output, type RekeyView, type Verified } from '../core/state';
+import { startCouncilChange } from './NewProposal';
+import { nextRoster, nextSettings, type SettingsContent, type Candidate, type DaoState, type Output, type RekeyView, type Verified } from '../core/state';
 import { hashJson, parseJson } from '../core/util';
 import { CouncilOnly, Footer, Header, ScanModal, ShortCode, errText } from './parts';
 import { useNameOf } from './Proposals';
@@ -103,7 +104,7 @@ export function Council() {
   const lastRoster = s.rosters[s.rosters.length - 1].content.version;
   const lastSettings = s.settings[s.settings.length - 1].content.version;
 
-  const versionBlock = <T,>(title: string, text: string, cands: Candidate<T>[], pending: string[], v: number, publishLabel: string, endorseLabel: string, build: () => unknown, kind: number, object: string) => {
+  const versionBlock = <T,>(title: string, text: string, cands: Candidate<T>[], pending: string[], v: number, publishLabel: string, endorseLabel: string, build: () => unknown, kind: number, object: string, extra?: unknown) => {
     const valid = cands.filter(c => !c.error && c.effectiveAt === undefined);
     const invalid = cands.filter(c => c.error);
     if (!valid.length && !pending.length && !invalid.length) return null;
@@ -111,6 +112,7 @@ export function Council() {
       <section class="card">
         <h3>{title}</h3>
         {pending.length > 0 && <p class="small">{text}</p>}
+        {extra}
         {valid.map(c => (
           <div class="stack" style="gap:6px">
             <span class="small">{t('cn.approvals', { n: c.endorsers.length, m })}</span>
@@ -182,7 +184,7 @@ export function Council() {
         {versionBlock(t('cn.roster'), t('cn.rosterText', { n: s.pendingRoster.length, v: lastRoster }), s.rosterCandidates, s.pendingRoster, lastRoster + 1,
           t('cn.rosterPublish', { v: lastRoster + 1 }), t('cn.rosterEndorse', { v: lastRoster + 1 }), () => nextRoster(s), KIND.roster, 'roster')}
         {versionBlock(t('cn.settings'), t('cn.settingsText', { n: s.pendingSettings.length, v: lastSettings }), s.settingsCandidates, s.pendingSettings, lastSettings + 1,
-          t('cn.settingsPublish', { v: lastSettings + 1 }), t('cn.settingsEndorse', { v: lastSettings + 1 }), () => nextSettings(s), KIND.settings, 'settings')}
+          t('cn.settingsPublish', { v: lastSettings + 1 }), t('cn.settingsEndorse', { v: lastSettings + 1 }), () => nextSettings(s), KIND.settings, 'settings', <CouncilDiff />)}
 
         {liveRekeys(s).length > 0 && (
           <section class="card">
@@ -267,6 +269,26 @@ export function Council() {
   );
 }
 
+/** The council before and after the next settings version, when it carries a council change. */
+function CouncilDiff() {
+  const s = useApp().dao!;
+  if (!s.pendingSettings.some(id => s.proposals.find(p => p.event.id === id)?.content.type === 'change_council')) return null;
+  let next: SettingsContent;
+  try {
+    next = nextSettings(s) as SettingsContent;
+  } catch {
+    return null;
+  }
+  const cur = s.settings[s.settings.length - 1].content;
+  const line = (c: SettingsContent) => `${c.council.map(x => `${x.label} (${x.fingerprint})`).join(', ')} · ${t('setup.of', { m: c.threshold, n: c.council.length })}`;
+  return (
+    <div class="stack" style="gap:4px">
+      <span class="small">{t('cn.councilNow', { list: line(cur) })}</span>
+      <span class="small"><strong>{t('cn.councilNext', { list: line(next) })}</strong></span>
+    </div>
+  );
+}
+
 /** Treasury keys their holders reported lost: how many are left, and whether a spare remains. */
 export function LostKeys() {
   const s = useApp().dao!;
@@ -276,5 +298,17 @@ export function LostKeys() {
   const left = set.council.length - s.lostKeys.length;
   const names = s.lostKeys.map(k => nameOf(s.keyOf(k.person))).join(', ');
   const key = left > set.threshold ? 'cn.lostSpare' : left === set.threshold ? 'cn.lostNoSpare' : 'cn.lostStuck';
-  return <p class="warnbox">{t(key, { names, left, n: set.council.length, m: set.threshold })}</p>;
+  const app = useApp();
+  // Anyone on the roster can propose the fix: the same member, with a new key (protocol 4.1.2).
+  const open = s.proposals.some(p => p.content.type === 'change_council' && ['open', 'awaiting_tally', 'passed'].includes(p.status) && s.payments.get(p.event.id)?.status !== 'paid');
+  return (
+    <div class="warnbox stack" style="gap:8px">
+      <span>{t(key, { names, left, n: set.council.length, m: set.threshold })}</span>
+      {app.me && !open && key !== 'cn.lostStuck' && s.lostKeys.map(k => (
+        <button type="button" class="btn secondary" onClick={() => startCouncilChange({ reason: 'lost_key', out: s.keyOf(k.person), in: s.keyOf(k.person) })}>
+          {t('cn.startChange', { name: nameOf(s.keyOf(k.person)) })}
+        </button>
+      ))}
+    </div>
+  );
 }
