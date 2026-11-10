@@ -18,6 +18,8 @@ Checked 9 November 2026, card A.
 - Decoding libraries that work: `@ngraveio/bc-ur` (fragments) and `@keystonehq/bc-ur-registry` (`CryptoAccount`). The registry prints the key with mainnet version bytes (`xpub…`) whatever the network; the app must take the network from the key's use info and re-encode as `tpub` on testnet
 - The **Specter Desktop** export is also animated (not checked further: the app reads the Sparrow one)
 
+- **Network after a restart:** the SeedSigner starts on **Mainnet** unless its settings are saved (Persistent settings). Exported on Mainnet, the key has path `48'/0'/0'/2'` and the export does not state the network; the app reads the network from the path and says to switch the device to Testnet (10 November 2026, SEEDSIGNER DAO sign-up).
+
 ## 2. Wallet descriptor (change check, S7)
 
 Checked 9 November 2026 with the QR test page (`#/qrtest`), cards A, B, C.
