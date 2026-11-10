@@ -14,7 +14,7 @@
 | Payout proposal and vote | Passed | a repeated "Yes" published a second, identical vote; only the latest counts, but it confused the record (fixed 9c9ed0f) |
 | Payout round signed on the SeedSigner with cards A and B | Passed | descriptor, animated PSBT and signed PSBT all read quickly on device and phone |
 | Broadcast | Passed | "Broadcast again" was needed to reach 3 of 3 sources, as in UNO's runs |
-| Receipt | Waiting | |
+| Receipt | Issued too early | published for block 160347 at "3 confirmations" while Blockbook had the payment in block 160349, 1 deep: finding 4 |
 | Closing round | To do | |
 
 ## Findings
@@ -22,3 +22,4 @@
 1. **SeedSigner on the wrong network:** the export does not say "mainnet", only its path does (fixed: the app reads the path and says how to switch).
 2. **Repeated vote:** tapping the current choice published it again (fixed: no new event; replaced votes marked in the record).
 3. **Broadcast reached 2 of 3 sources at first:** "Broadcast again" brought it to 3 of 3. v0.3.0 re-sends by itself a minute after a broadcast if the page stays open; to check whether it ran here.
+4. **A receipt from mixed sources.** The depth was computed from one source's block height (160347) and another source's chain tip (160349): "3 confirmations" that no chain had. Blockbook, on the winning chain, had the payment in block 160349, 1 deep. The payment itself is real; the receipt names the wrong block and came too early. Fixed: each source's depth comes from its own tip, and the receipt waits until **every** source that knows the payment sees it deep enough and in the same block; the round page says when sources disagree (a fork settling).
