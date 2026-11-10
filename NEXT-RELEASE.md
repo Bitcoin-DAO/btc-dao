@@ -37,15 +37,15 @@ Formats: the ones Sparrow uses with SeedSigner, so any of the DAO's keys and des
 - [x] End-to-end `e2e/seedsigner.e2e.cjs`: three council members sign up from SeedSigner exports (card A from the device's recorded frames), founding, treasury address checked against embit
 
 **Step 3. Signing a round**
-- [ ] Round page, per council member: show the PSBT as an animated QR; scan the signed PSBT back; check it carries this member's valid signature (as the pasted-PSBT path does today) and publish it
-- [ ] Descriptor QR (S7, hard gate): shown before the PSBT, with the step "scan the wallet descriptor first, check change shows as verified"
-- [ ] Address check (S1): the payout addresses on the round page laid out as the SeedSigner shows them, to compare on the device
-- [ ] The preparer no longer signs automatically (only phone keys did)
-- [ ] "Not enough funds" shown as soon as the prepare page opens, with the amount missing; the Council page does not offer a round meanwhile (TEST DAO, 9 Nov 2026)
+- [x] Round page, per council member: show the PSBT as an animated QR; scan the signed PSBT back; check it carries this member's valid signature (as the pasted-PSBT path does today) and publish it
+- [x] Descriptor QR (S7, hard gate): shown before the PSBT, with the step "scan the wallet descriptor first, check change shows as verified"
+- [x] Address check (S1): the payout addresses on the round page laid out as the SeedSigner shows them, to compare on the device
+- [x] The preparer no longer signs automatically (only phone keys did)
+- [x] "Not enough funds" shown as soon as the prepare page opens, with the amount missing; the Council page does not offer a round meanwhile (TEST DAO, 9 Nov 2026)
 
 **Step 4. Tests**
-- [ ] A software stand-in for a SeedSigner in the end-to-end tests: shows an xpub QR, scans an animated PSBT QR, signs, shows the signed PSBT as animated QR (fed to the phone's camera as a fake video stream, as the camera test does today)
-- [ ] End-to-end: founding a 2-of-3 SeedSigner DAO, funding, a payout round signed by two stand-ins, broadcast, receipt; signatures checked independently with embit
+- [x] A software stand-in for a SeedSigner in the end-to-end tests: key export (the real device's recorded frames, or key-origin text), signing with the card's words, the signed PSBT trimmed as the device trims it and sent back as UR parts (pasted, the scanner's no-camera path; the camera path itself is covered by the camera test)
+- [x] End-to-end (`e2e/seedsigner.e2e.cjs`): founding a 2-of-3 SeedSigner DAO, a payout waiting for funds, funding, a round signed with cards A and B (a wrong card refused), broadcast; signatures checked independently with embit
 
 **Step 5. In the wild**
 - [ ] A new testnet4 DAO founded on SeedSigners, 2 of 3, one SeedSigner and three SeedQR cards loaded in turn: founding, funding, a payout signed on the device, closing round
