@@ -168,7 +168,7 @@ Settings hold everything about the DAO that can change by vote: the rules, the c
 
 The first members cannot join the normal way, because no sponsor, council or vote exists yet. They are listed in the genesis config instead, and the council's endorsement of the genesis stands in for verifying each of them.
 
-The genesis config holds `council` (label, identity key, fingerprint, xpub for each) and `founders`: the founding members who are not on the council, each with `name`, `identityKey` and `verified` (`in_person` or `remote`).
+The genesis config holds `council` (label, identity key, fingerprint, xpub for each, and optionally `"device": "seedsigner"` when the treasury key lives on a SeedSigner; absent means a trial key on a phone) and `founders`: the founding members who are not on the council, each with `name`, `identityKey` and `verified` (`in_person` or `remote`).
 
 1. The site runs in setup mode at its address before any genesis exists.
 2. Each founder, council members included, creates a passkey and a random identity key in Founder sign-up. The secret stays in that browser only. The setup device scans each founder's key and both read the short code aloud; remote founders do this on a video call.

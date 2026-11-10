@@ -29,10 +29,12 @@ Formats: the ones Sparrow uses with SeedSigner, so any of the DAO's keys and des
 - [x] QR test page (`#/qrtest`): scan keys, show the test wallet's descriptor and a test PSBT, scan the signed PSBT back and check whose signature it carries; end-to-end test `e2e/hw.e2e.cjs`
 
 **Step 2. Founding with SeedSigner keys**
-- [ ] Founding choice on testnet4: **phone keys (practice)** or **SeedSigners**; mainnet: SeedSigners only, no choice shown
-- [ ] Council sign-up with a SeedSigner: scan its xpub export instead of creating a phone key and the 12 words; check network and path; the sign-up code carries fingerprint and xpub as today
-- [ ] The setup page's typed key-origin text stays as a fallback
-- [ ] No 12-word step and no phone treasury key for SeedSigner councils; the profile shows the key's fingerprint and where it lives (SeedQR card, steel plate)
+- [x] Founding choice on testnet4: **phone keys (practice)** or **SeedSigners**; mainnet: SeedSigners only, no choice shown
+- [x] Council sign-up with a SeedSigner: scan its xpub export instead of creating a phone key and the 12 words; check network and path; the sign-up code carries fingerprint and xpub as today
+- [x] The setup page's typed key-origin text stays as a fallback
+- [x] No 12-word step and no phone treasury key for SeedSigner councils; the profile shows the key's fingerprint and where it lives (SeedQR card, steel plate)
+- [x] The choice is made per council member at sign-up (SeedSigner by default); the founding code and the genesis council entry carry `"device": "seedsigner"`; the setup page shows where each key lives, warns about a mixed council, refuses a treasury key already on the council (one SeedSigner, several cards) and, on mainnet, any phone key
+- [x] End-to-end `e2e/seedsigner.e2e.cjs`: three council members sign up from SeedSigner exports (card A from the device's recorded frames), founding, treasury address checked against embit
 
 **Step 3. Signing a round**
 - [ ] Round page, per council member: show the PSBT as an animated QR; scan the signed PSBT back; check it carries this member's valid signature (as the pasted-PSBT path does today) and publish it
