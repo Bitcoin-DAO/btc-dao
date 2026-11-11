@@ -80,10 +80,10 @@ Design: `docs/drafts/discussion-and-comms.md`, section 4.
 ## Open items
 
 - [ ] **Restoring a member in another browser** (COUNCIL DAO finding 14): add to the guide how one good phone can stand in for a member whose phone cannot use its camera
-- [ ] **Replace an open round** (COUNCIL DAO finding 9): the protocol allows a replacement round spending one of the open round's coins; the app has no button for it, so an unsignable or declined round blocks every later payout. Add "Replace this round" for the council, carrying the open round's payouts plus newly approved ones
-- [ ] **Donate address during a council change** (COUNCIL DAO finding 7): show the new treasury once the migration is broadcast
-- [ ] **Signing steps fold away** once a round has enough signatures (COUNCIL DAO finding 6)
-- [ ] **Not-listed founder after founding** (COUNCIL DAO finding 1): say the DAO is founded and link to the member sign-up
+- [x] **Replace an open round** (COUNCIL DAO finding 9): the protocol allows a replacement round spending one of the open round's coins; the app has no button for it, so an unsignable or declined round blocks every later payout. Add "Replace this round" for the council, carrying the open round's payouts plus newly approved ones
+- [x] **Donate address during a council change** (COUNCIL DAO finding 7): show the new treasury once the migration is broadcast
+- [x] **Signing steps fold away** once a round has enough signatures (COUNCIL DAO finding 6)
+- [x] **Not-listed founder after founding** (COUNCIL DAO finding 1): say the DAO is founded and link to the member sign-up
 - [ ] **Clock skew** (COUNCIL DAO finding 2): the relay refuses events dated more than ~2 minutes ahead; the app warns when the phone's clock is off
 - [ ] **Onboarding process for the council** (from COUNCIL DAO, 11 November 2026). Joining works, but the council needs one clear, step-by-step procedure it can follow. Rework `docs/guide.md` 6.1 into an onboarding section written for the council and the sponsor: who does what and in which order (check first, then the sponsor's proposal), one in-person check is enough (two council members for remote), the vote, then publishing and approving the member list (as many approvals as the threshold, not "three"), and what the candidate sees at each step. Cover the founding case too: someone left off the founders joins this way. Consider a short in-app version on the Council page next to **Check a candidate**
 - [x] **Relay write check.** Decided 9 November 2026: phones show only members' posts (as for every other kind, `docs/protocol.md` 7.3), and the relay limits how fast one key can post discussion events. A relay rule limited to the current member list waits until spam is actually seen
