@@ -386,5 +386,6 @@ A DAO is closed by a final proposal of type **Close the DAO**, decided by vote. 
 | G-18 | Council | Death or long incapacity of a council member | Charter | Resolved in the council handbook module |
 | G-19 | Governance | Winding up a DAO | Charter | Resolved |
 | G-20 | Software | Parts of the design not in the app yet: OpenTimestamps anchoring, the event-history export, the DAO listing (moving address), council changes with migration and sweep rounds, SeedSigner signing by animated QR, signed reproducible releases | Phase 2, and mainnet for releases | Open |
+| G-21 | Operations | A clear onboarding procedure for the council and sponsors (6.1 is a sketch; COUNCIL DAO found the order and the number of checks unclear in practice) | Next release | Open |
 
 Still open from the design and listed in [decisions.md](decisions.md): who sits on UNO's council and who the founders are; the mainnet DAO's name; the event kind numbers; and the phase 1 checks: passkey support on every member's phone (confirmed on the first Android phone tested), printing a card without a saved file, SeedSigner change verification, and OpenTimestamps from the browser. Votes are public by name (decided).

@@ -79,6 +79,7 @@ Design: `docs/drafts/discussion-and-comms.md`, section 4.
 
 ## Open items
 
+- [ ] **Onboarding process for the council** (from COUNCIL DAO, 11 November 2026). Joining works, but the council needs one clear, step-by-step procedure it can follow. Rework `docs/guide.md` 6.1 into an onboarding section written for the council and the sponsor: who does what and in which order (check first, then the sponsor's proposal), one in-person check is enough (two council members for remote), the vote, then publishing and approving the member list (as many approvals as the threshold, not "three"), and what the candidate sees at each step. Cover the founding case too: someone left off the founders joins this way. Consider a short in-app version on the Council page next to **Check a candidate**
 - [x] **Relay write check.** Decided 9 November 2026: phones show only members' posts (as for every other kind, `docs/protocol.md` 7.3), and the relay limits how fast one key can post discussion events. A relay rule limited to the current member list waits until spam is actually seen
 - [ ] **Where the DAO npub's notes go.** The feed and announcements are ordinary notes (kind 1), and the DAO relay rejects every kind outside the DAO's range. Either they go to public relays only, or the relay also accepts kind 1 from the DAO npub alone
 - [ ] Testnet4 DAOs: feed to public relays, or only to their own relay? (ties in with the open question in `docs/decisions.md` on testnet publishing)
