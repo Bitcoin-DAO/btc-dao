@@ -62,7 +62,8 @@ The rules are already in `docs/protocol.md` (4.1.2, 6.1): every council change m
 - [x] A reported lost key (`dao.keystatus`) links to "start a council change"
 - [x] DAO history page, linked from the footer (`docs/spec.md`, "DAO history"): founding, rules and council versions, funding model, closing, disputed versions. Listing entries wait for `dao.listing`
 - [x] End-to-end (`e2e/council.e2e.cjs`): a 2-of-3 SeedSigner DAO replaces a lost key (card C → card D); migration confirmed; the next payout spends from the new treasury; history checked
-- [ ] In the wild: a new testnet4 SeedSigner DAO, 2 of 3 on cards A, B, C; card C plays the lost key and card D (printed for this) replaces it
+- [x] v0.5.1: `expansion` reason, a council seat added (2 of 3 → 3 of 4), in the end-to-end test
+- [ ] In the wild: a new testnet4 SeedSigner DAO, 2 of 3 on cards A, B, C; card C plays the lost key and card D (printed for this) replaces it; then the plain member joins with card C, 2 of 3 → 3 of 4
 - [ ] Later: the sweep round for late arrivals at an earlier treasury (protocol 6.1); v0.5.0 shows them but does not move them
 
 ## C. Outward comms (after v0.5.0)
