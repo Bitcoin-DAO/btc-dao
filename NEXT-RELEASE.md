@@ -89,6 +89,37 @@ Design: `docs/drafts/discussion-and-comms.md`, section 4.
 
 **Sign in with Nostr:** parked (9 November 2026). Notifications reach members without it, and the passkey stays the only sign-in. If it comes back: any NIP-07 or NIP-46 signer, a key made for the DAO, and only signers we have tested (Amber on Android; NostrKey, then Nostash, on iOS).
 
+## Public beta · Help and onboarding
+
+Decided 11 November 2026. The site is built from the repo's own files, so keeping it current is part of every build; nothing is edited on the site directly.
+
+**Docs site** (btcdao.tech, English and Italian)
+- [ ] Static site built from `docs/` and published by a GitHub workflow on every push to `main`; every fork gets the same site
+- [ ] Four sections by reader: **Joining a DAO** (what it is, passkey and card, voting, discussion); **Starting or forking one**; **On the council** (signing rounds, tallies, council changes, lost keys); **Builders** (protocol, spec, decisions)
+- [ ] Pages pull in sections of the existing files (guide, wallet guides, protocol) rather than copying them; only short linking pages are new ("start here", "fork in ten steps")
+- [ ] Screenshots taken from the end-to-end test runs, refreshed each release
+- [ ] Each page shows the version it was last checked against; the build fails on broken links
+- [ ] English is the source. Each Italian page records the English version it was translated from, and the build flags Italian pages whose source has changed
+- [ ] A native Italian speaker reviews every page about money or keys (passkey, card, signing, recovery) before public beta
+- [ ] "Docs updated" on every release checklist, done in the same commit as the feature
+
+**Fork and run a DAO** (for a non-technical person)
+- [ ] btc-dao as a GitHub template repository: forking is one "Use this template" button
+- [ ] One-click Cloudflare deploy buttons for the relay and the chain gateway
+- [ ] A setup checklist page, one step per screen with screenshots and a tick box, ending at "your DAO is live, now found it"
+- [ ] Starts from the blockers listed in `FORK-TASKS.md`
+
+**Help in the app**
+- [ ] "?" links beside hard steps (passkey, identity card, signing a round, council change), each opening the exact docs section, in the member's language
+
+**AI help, without an AI in the app**
+- [ ] `llms.txt` at btcdao.tech: the docs in a form AI tools can read
+- [ ] "Ask your AI about btc-dao" button opening the user's own assistant pointed at it; no API key, no chat box in the app (the app's one rule is never to type the 12 words anywhere)
+- [ ] The docs say plainly that no person or AI will ever ask for your words
+
+**Human help**
+- [ ] A help thread in the Sandbox DAO (or a project DAO), using the discussion feature: public questions and answers
+
 ## Open items
 
 - [x] **Relay write check.** Decided 9 November 2026: filtered in the app only. The relay accepts the DAO's kinds from any key, because candidates and payout recipients must publish, and clients validate every event (`docs/protocol.md` 7.3); a relay rule limiting posts to the roster can be added later without changing the event format
