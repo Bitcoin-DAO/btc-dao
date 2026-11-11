@@ -1,6 +1,6 @@
 # Next release: v0.5.0
 
-**Status (10 November 2026):** v0.5.0 (council change) built and tested; next, the wild test on a new SeedSigner DAO.
+**Status (11 November 2026):** v0.5.x passed in the wild on COUNCIL DAO (lost key replaced; council grown to 3 of 4). Open items below are the run's findings.
 
 **Direction, decided 9 November 2026:** the focus moves to mainnet. New DAOs that matter start on SeedSigners; phone keys stay only as a practice mode on testnet4. One codebase: the network and the founding choice decide which keys are allowed (mainnet: SeedSigners only). There is no move from phone keys to SeedSigners.
 
@@ -63,7 +63,7 @@ The rules are already in `docs/protocol.md` (4.1.2, 6.1): every council change m
 - [x] DAO history page, linked from the footer (`docs/spec.md`, "DAO history"): founding, rules and council versions, funding model, closing, disputed versions. Listing entries wait for `dao.listing`
 - [x] End-to-end (`e2e/council.e2e.cjs`): a 2-of-3 SeedSigner DAO replaces a lost key (card C → card D); migration confirmed; the next payout spends from the new treasury; history checked
 - [x] v0.5.1: `expansion` reason, a council seat added (2 of 3 → 3 of 4), in the end-to-end test
-- [ ] In the wild: a new testnet4 SeedSigner DAO, 2 of 3 on cards A, B, C; card C plays the lost key and card D (printed for this) replaces it; then the plain member joins with card C, 2 of 3 → 3 of 4
+- [x] In the wild: a new testnet4 SeedSigner DAO, 2 of 3 on cards A, B, C; card C plays the lost key and card D (printed for this) replaces it; then the plain member joins with card C, 2 of 3 → 3 of 4
 - [ ] Later: the sweep round for late arrivals at an earlier treasury (protocol 6.1); v0.5.0 shows them but does not move them
 
 ## C. Outward comms (after v0.5.0)
@@ -79,6 +79,7 @@ Design: `docs/drafts/discussion-and-comms.md`, section 4.
 
 ## Open items
 
+- [ ] **Restoring a member in another browser** (COUNCIL DAO finding 14): add to the guide how one good phone can stand in for a member whose phone cannot use its camera
 - [ ] **Replace an open round** (COUNCIL DAO finding 9): the protocol allows a replacement round spending one of the open round's coins; the app has no button for it, so an unsignable or declined round blocks every later payout. Add "Replace this round" for the council, carrying the open round's payouts plus newly approved ones
 - [ ] **Donate address during a council change** (COUNCIL DAO finding 7): show the new treasury once the migration is broadcast
 - [ ] **Signing steps fold away** once a round has enough signatures (COUNCIL DAO finding 6)
