@@ -38,3 +38,13 @@
 14. **Old phones:** two older devices could not run the camera reliably. Workaround that worked: @Member's identity restored from the identity card into Firefox on a good phone (#/restore), which then signed as @Member. One good phone with several browsers can stand in for several members. Worth a line in the guide.
 
 **Result:** v0.5.1/v0.5.2 council change passed in the wild: lost key replaced (2 of 3 kept), council grown (2 of 3 → 3 of 4), both migrations confirmed, payouts signed by the new keys. Balance left: 5,180 sats, to be returned by closing the DAO (3 of 4 signatures).
+
+## v0.6.0 plan (same DAO, 3 of 4 on cards A, B, C, D)
+
+1. After the update, the Council page offers a new member-list version: it moves the "Council" mark for @Member (the expansion). Publish and approve it.
+2. **Replace a round:** two payouts. Approve the first, prepare its round, and have one council member **decline** it. Approve the second. On the round page, "Is the round stuck, or a payout missing?" → **Replace this round**; both payouts are listed (the second marked "approved since"). Sign 3 of 4, broadcast. The declined round says it was replaced.
+3. **Signing kept:** on the old phone, sign at step 3 and, if the tab reloads, sign in again: the round offers to publish the kept signature without signing on the SeedSigner again.
+4. **Recall and removal:** recall one council member (Council change, reason Recall, who joins: nobody, threshold 3 of 3 or 2 of 3); migration signed by the others; settings version 4. Then a Remove member proposal for them; after the vote, the member-list version removes them (it can be the same version that clears their Council mark).
+5. History shows the recall; Members shows the new council.
+
+Coins: about 5,180 sats left; a top-up of ~10,000 sats makes steps 2 and 4 comfortable.
