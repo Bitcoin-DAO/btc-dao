@@ -79,7 +79,7 @@ Design: `docs/drafts/discussion-and-comms.md`, section 4.
 
 ## Open items
 
-- [ ] **Paid on delivery** (protocol 4.6, drafted 12 November 2026): staged payouts and bounties. Step 1 done (protocol text, relay kinds 3591-3592). Next: staged payouts (schedule in the form, reports as thread cards, a tranche joins a round only after its report, lapse, the committed line on the treasury page), then bounties (claims; the council's round picks the claimant). Reports are read in Discussion (a chip on the thread and a Reports filter) and on the proposal page (the schedule with each tranche's status); not on Home or in the footer
+- [x] **Paid on delivery** (protocol 4.6): staged payouts and bounties, v0.8.0. Built: staged payouts (schedule in the form, reports as thread cards, a tranche joins a round only after its report, lapse, the committed line on the treasury page), then bounties (claims; the council's round picks the claimant). Reports are read in Discussion (a chip on the thread and a Reports filter) and on the proposal page (the schedule with each tranche's status); not on Home or in the footer
 - [x] Same wallet in another key order is one treasury (v0.6.4, COUNCIL DAO finding 17)
 - [x] **Migration to the first unused address** of the new treasury (protocol 6.1 says "first receive address"; after a return to an earlier key set that address is already used). Protocol change: discuss first
 - [ ] **Guide: one key per DAO.** The same SeedSigner key with the same co-signers in two DAOs makes the same wallet (COUNCIL DAO and SEEDSIGNER DAO shared one with the test cards)
