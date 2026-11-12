@@ -79,6 +79,10 @@ Design: `docs/drafts/discussion-and-comms.md`, section 4.
 
 ## Open items
 
+- [x] Same wallet in another key order is one treasury (v0.6.4, COUNCIL DAO finding 17)
+- [ ] **Migration to the first unused address** of the new treasury (protocol 6.1 says "first receive address"; after a return to an earlier key set that address is already used). Protocol change: discuss first
+- [ ] **Guide: one key per DAO.** The same SeedSigner key with the same co-signers in two DAOs makes the same wallet (COUNCIL DAO and SEEDSIGNER DAO shared one with the test cards)
+- [ ] **Transaction box before broadcast** (COUNCIL DAO finding 19): a source answered "known" for a round not yet sent; not reproduced
 - [ ] **Restoring a member in another browser** (COUNCIL DAO finding 14): add to the guide how one good phone can stand in for a member whose phone cannot use its camera
 - [x] **Replace an open round** (COUNCIL DAO finding 9): the protocol allows a replacement round spending one of the open round's coins; the app has no button for it, so an unsignable or declined round blocks every later payout. Add "Replace this round" for the council, carrying the open round's payouts plus newly approved ones
 - [x] **Donate address during a council change** (COUNCIL DAO finding 7): show the new treasury once the migration is broadcast
