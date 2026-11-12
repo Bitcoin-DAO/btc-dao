@@ -75,7 +75,7 @@ Restoring: the app scans the card, checks the `dao8` prefix matches this DAO, ch
 
 ## 2. Kinds
 
-All DAO events are **regular** events (kinds 1000–9999), so relays keep every one and the full history stays auditable. The numbers below are a provisional block (3570–3590) and must be checked against the Nostr kind registry before v1.
+All DAO events are **regular** events (kinds 1000–9999), so relays keep every one and the full history stays auditable. The numbers below are a provisional block (3570–3592) and must be checked against the Nostr kind registry before v1.
 
 | Kind | Name | Signed by | Section |
 | --- | --- | --- | --- |
@@ -100,6 +100,8 @@ All DAO events are **regular** events (kinds 1000–9999), so relays keep every 
 | 3588 | `dao.post` | Member | 4.5.2 |
 | 3589 | `dao.withdraw` | The draft's author | 4.5.3 |
 | 3590 | `dao.keystatus` | Council member | 5.5 |
+| 3591 | `dao.report` | Member: the proposer, the member a payout pays, or a bounty's claimant | 4.6.3 |
+| 3592 | `dao.claim` | Member | 4.6.4 |
 
 Compared with the spec v0.1 event table, this adds `dao.settings` (versions of the rules, council and descriptor get their own event, like rosters), `dao.confirm` (recipient address confirmation), `dao.tally` (requirement S3), the three onboarding events and `dao.keywrap` (passkey-protected identity keys).
 
@@ -154,7 +156,7 @@ If two different versions with the same number each reach `threshold` endorsemen
   "version": 2,
   "prev": "<sha256 of settings version 1 content>",
   "basis": ["<id of the passed change_rules or change_council proposal>", "<id of the migration's dao.receipt, for a council change>"],
-  "rules": { "votingPeriodDays": 7, "quorum": "1/3", "timezone": "Europe/Rome", "payoutRound": "monthly", "lapseAfterRounds": 2, "maxFeeRateSatVb": 20, "fundingModel": "production", "charterLanguage": "it", "charterSha256": "<sha256 of the binding charter text>", "treasuryCapSats": 5000000, "...": "..." },
+  "rules": { "votingPeriodDays": 7, "quorum": "1/3", "timezone": "Europe/Rome", "payoutRound": "monthly", "lapseAfterRounds": 2, "maxFeeRateSatVb": 20, "fundingModel": "production", "charterLanguage": "it", "charterSha256": "<sha256 of the binding charter text>", "treasuryCapSats": 5000000, "maxTranches": 4, "maxScheduleDays": 90, "...": "..." },
   "closed": false,
   "council": [{"label": "Council 1", "identityKey": "<hex>", "fingerprint": "<8 hex>", "xpub": "<xpub>"}],
   "threshold": 3,
@@ -202,7 +204,7 @@ Common fields: `type`, `title` (≤ 80 characters), `summary` (≤ 500 character
 
 | `type` | `payload` |
 | --- | --- |
-| `payout` | `recipient` (display name), `outputs`: 1 to 10 `{address, amount_sat, member?}`, each address once; `member`, optional, is the identity key of the member an output pays (section 4.2); `category`, optional: `general` (the default when absent), `operations` or `distribution` (section 4.1.1) |
+| `payout` | `recipient` (display name), `outputs`: 1 to 10 `{address, amount_sat, member?}`, each address once; `member`, optional, is the identity key of the member an output pays (section 4.2); `category`, optional: `general` (the default when absent), `operations` or `distribution` (section 4.1.1); `report`, optional: `"requested"` (section 4.6.5); `schedule`, optional: tranches paid on delivery, and `bounty`, optional: `true` for a payout whose recipient is open (section 4.6) |
 | `statement` | `{}` |
 | `add_member` | `candidate_key`, `name`, `verify`: ids of the `dao.verify` events |
 | `remove_member` | `member_key`, `reason` |
@@ -319,6 +321,62 @@ Empty content, tagged `["e", <draft id>]`, signed by the draft's author before i
 
 A `dao.proposal` (4.1) may carry `"draft": { "id": <draft id>, "version": <n> }`. It **submits** the draft when it is the first proposal naming the draft and its signer is the draft's author; any other proposal naming the draft is an ordinary proposal with its own thread. Clients compare the proposal's `type`, `title`, `summary` and `payload` with the named version and say so if they differ. A draft's status is derived, never stored: **open**, **submitted** or **withdrawn**.
 
+### 4.6 Paid on delivery: staged payouts and bounties
+
+A payout can be paid in **tranches**, each after its work is reported. The vote approves the whole schedule once, with every amount fixed in sats. Two forms:
+
+- a **staged payout**: the recipient is known at the vote;
+- a **bounty**: the recipient is open at the vote; a member claims it, delivers and is paid. The app offers it as its own choice in the proposal form; in the protocol it is a payout with `"bounty": true`.
+
+The thread of the proposal (4.5) carries on through the tranches: idea → draft → discuss → proposal → vote → (bounty: claim) → report → paid → next tranche … → closed.
+
+#### 4.6.1 The schedule
+
+```json
+"payload": {
+  "recipient": "Tipografia locale",
+  "outputs": [{"address": "tb1q…", "amount_sat": 300000}],
+  "schedule": [{"amount_sat": 100000, "due_days": 14}, {"amount_sat": 200000, "due_days": 45}]
+}
+```
+
+- `schedule`: 1 to `rules.maxTranches` (default 4) tranches `{amount_sat, due_days}`, each amount above the dust limit; `due_days` are whole days after **approval** (the `created_at` of the proposal's first valid tally), strictly increasing, the last at most `rules.maxScheduleDays` (default 90).
+- A staged payout has exactly one output, and its `amount_sat` is the sum of the tranches.
+- A **bounty** has `"bounty": true`, `"recipient": ""` and `"outputs": []`; its amounts are in `schedule` (usually one tranche). The address comes from the claim (4.6.4).
+- **Practice mode:** in a DAO whose voting period is under one day, a schedule day lasts `votingPeriodDays / 7` days (with 10-minute votes, about 86 seconds), so a schedule can be tried out in an afternoon.
+
+#### 4.6.2 Tranches and rounds
+
+A round pays one tranche of a scheduled payout at a time and names it: `"tranches": {"<proposal id>": <n>}` (tranches count from 1), beside the proposal id in `proposals`. For that proposal the round's outputs must be exactly one output of the tranche's amount, to the payout's address (staged) or the chosen claimant's address (bounty). A tranche can join a round only when:
+- the tranches before it are paid;
+- a `dao.report` for it exists, published before the round;
+- it has not lapsed.
+
+**Approval is execution.** The council signing the round accepts the delivery; no other approval event exists. A council member who declines the round gives a public reason (6.2), and the council may replace the round without that tranche (6). The reporter may then publish a new report for the same tranche; the latest one counts.
+
+**Lapse:** a tranche lapses when it has no report by the first round date after its due date (in practice mode: by its due date plus one voting period); a reported tranche lapses like an ordinary payout, if it is not paid by the second round date after its report. When a tranche lapses, the remaining tranches lapse with it, and the sats stay in the treasury. The payout is **closed** when its last tranche is paid or lapsed.
+
+#### 4.6.3 `dao.report`
+
+```json
+{ "tranche": 1, "text": "Stampati e consegnati i 500 volantini.", "link": "https://…" }
+```
+
+Tagged `["e", <proposal id>]`. `text` 1 to 2000 characters, `link` optional. Signed by a member at `created_at` who is the proposer, the member the payout's output pays (`member`), or, for a bounty, a member with a live claim. A report for a tranche that is paid or lapsed, or that does not exist, is rejected. Clients show reports as cards in the proposal's thread.
+
+#### 4.6.4 `dao.claim` (bounties)
+
+```json
+{ "address": "tb1q…" }
+```
+
+Tagged `["e", <proposal id>]`. Signed by a member at `created_at`, for a bounty that is passed and not closed. The address passes the same checks as a payout address (4.1) and stands in for `dao.confirm`. Several members may claim the same bounty, and each may report; **the council's round decides**: the claimant whose report a paid round pays is chosen, and from then on only that claimant's reports count for later tranches and every later tranche pays that claimant's address. Other claims end when the bounty's first tranche is paid. A claimant's later claim replaces their earlier one (a new address).
+
+#### 4.6.5 Reports on other payouts and the committed amount
+
+- An ordinary payout may carry `"report": "requested"`. It does not block payment; a `dao.report` (tranche 1) by the proposer or the paid member may follow, and dashboards show the share of payouts with a report.
+- **Committed:** the sum of the tranches of passed scheduled payouts that are neither paid nor lapsed. The treasury page shows it beside the balance; the proposal form warns when a new schedule would take the committed amount above the balance. Approving a schedule reserves no coins.
+
 ## 5. Membership
 
 ### 5.1 `dao.verify`
@@ -366,7 +424,7 @@ A council member tells the DAO that their own treasury key, the one with this fi
 ```
 
 Every client that shows the round rebuilds the expected outputs and refuses to offer signing unless all of these hold:
-- the outputs are exactly the payout outputs of the listed proposals, with nothing added;
+- the outputs are exactly the payout outputs of the listed proposals, with nothing added; for a scheduled payout (4.6), exactly the named tranche's output;
 - each listed proposal is passed, tallied, confirmed where needed (by a confirmation for the proposal, or by a standing address in force when the round is published, section 4.2), not yet paid, and not lapsed;
 - any other output is change to the treasury's change branch (`/1/*`) at an unused index;
 - inputs are unspent treasury outputs;
@@ -427,12 +485,12 @@ After a domain loss, members find the new address in two ways that do not depend
 
 Each DAO runs one relay of its own beside at least two public relays. Its policy:
 
-- accept only events of kinds 3570–3590 that carry the DAO's `["D", <dao_id>]` tag, and reject everything else;
+- accept only events of kinds 3570–3592 that carry the DAO's `["D", <dao_id>]` tag, and reject everything else;
 - accept them from any key, because candidates and payout recipients who are not members must be able to publish; clients validate every event anyway;
 - no payment for access, and rate limits per key and per connection to keep spam small;
 - keep every accepted event; never delete.
 
-The reference setup is Nosflare on Cloudflare Workers, configured in `relay/`: pay-to-relay and sign-in off, only kinds 3570–3590, a required `D` tag (pinned to the DAO id once it exists), and pruning off. For UNO's stages it runs at a `workers.dev` address under the Bitcoin-DAO organisation's Cloudflare account; a mainnet DAO runs its own on its own domain. Any relay with the same policy can replace it.
+The reference setup is Nosflare on Cloudflare Workers, configured in `relay/`: pay-to-relay and sign-in off, only kinds 3570–3592, a required `D` tag (pinned to the DAO id once it exists), and pruning off. For UNO's stages it runs at a `workers.dev` address under the Bitcoin-DAO organisation's Cloudflare account; a mainnet DAO runs its own on its own domain. Any relay with the same policy can replace it.
 
 ### 7.4 Discovery relays
 
