@@ -64,7 +64,7 @@ The rules are already in `docs/protocol.md` (4.1.2, 6.1): every council change m
 - [x] End-to-end (`e2e/council.e2e.cjs`): a 2-of-3 SeedSigner DAO replaces a lost key (card C → card D); migration confirmed; the next payout spends from the new treasury; history checked
 - [x] v0.5.1: `expansion` reason, a council seat added (2 of 3 → 3 of 4), in the end-to-end test
 - [x] In the wild: a new testnet4 SeedSigner DAO, 2 of 3 on cards A, B, C; card C plays the lost key and card D (printed for this) replaces it; then the plain member joins with card C, 2 of 3 → 3 of 4
-- [ ] Later: the sweep round for late arrivals at an earlier treasury (protocol 6.1); v0.5.0 shows them but does not move them
+- [x] The sweep round for late arrivals at an earlier treasury (protocol 6.1): v0.7.0
 
 ## C. Outward comms (after v0.5.0)
 
@@ -80,7 +80,7 @@ Design: `docs/drafts/discussion-and-comms.md`, section 4.
 ## Open items
 
 - [x] Same wallet in another key order is one treasury (v0.6.4, COUNCIL DAO finding 17)
-- [ ] **Migration to the first unused address** of the new treasury (protocol 6.1 says "first receive address"; after a return to an earlier key set that address is already used). Protocol change: discuss first
+- [x] **Migration to the first unused address** of the new treasury (protocol 6.1 says "first receive address"; after a return to an earlier key set that address is already used). Protocol change: discuss first
 - [ ] **Guide: one key per DAO.** The same SeedSigner key with the same co-signers in two DAOs makes the same wallet (COUNCIL DAO and SEEDSIGNER DAO shared one with the test cards)
 - [ ] **Transaction box before broadcast** (COUNCIL DAO finding 19): a source answered "known" for a round not yet sent; not reproduced
 - [ ] **Restoring a member in another browser** (COUNCIL DAO finding 14): add to the guide how one good phone can stand in for a member whose phone cannot use its camera
