@@ -296,7 +296,7 @@ Cases for the floor check (requirement S10) and the descriptor chain, in the app
 | B-11 | Council change 3 of 4 → 3 of 3 (recall, no replacement) | Red "weakens the treasury" notice naming the spare line, on the proposal, the vote and every signing screen of the migration; usual majority | 4.1.2, 6.5 |
 | B-12 | Council change from a descriptor already below the floor to one that meets it | Green; the floor history shows the period below it ending | 6.5, 6.6 |
 | B-13 | Descriptor 2 of 4 | Below the floor: majority | 6.5 |
-| B-14 | Council change 3 of 5 → 3 of 7 (two seats added, threshold unchanged) | Meets the floor; red notice: threshold a smaller share (3 of 5 → 3 of 7) | 4.1.2, 6.5 |
+| B-14 | Council change 3 of 5 → 3 of 7 (two seats added, threshold unchanged) | Below the floor: majority (3 of 7 is a minority). Red notice: majority line broken, threshold a smaller share (3 of 5 → 3 of 7) | 4.1.2, 6.5 |
 | B-15 | Council change 3 of 5 → 3 of 6 | Below the floor: majority; red notice: majority line broken, smaller share | 4.1.2, 6.5 |
 | B-16 | Council change 3 of 5 → 4 of 6 | Green: share 0.6 → 0.67, floor met | 4.1.2, 6.5 |
 | B-17 | Council change 3 of 4 → 2 of 3 (recall) | Meets the floor; red notice: threshold lower | 4.1.2, 6.5 |
