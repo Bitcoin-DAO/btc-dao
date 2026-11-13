@@ -128,8 +128,15 @@ describe('proposals and votes (4.1, 4.3)', () => {
     d.tally(d.c[1], s, p, d.T + 8 * DAY + 2); // identical: one tally
     expect(view(d.state(d.T + 8 * DAY + 3), p).status).toBe('passed');
     d.tally(d.c[3], s, p, d.T + 8 * DAY + 3, { result: { yes: 0, no: 3, abstain: 0, quorum_met: true, passed: false } });
-    expect(view(d.state(d.T + 8 * DAY + 4), p).status).toBe('disputed');
-    for (const i of [0, 1, 2]) d.endorse(d.c[i], good, 'tally', d.T + 9 * DAY);
+    const dv = view(d.state(d.T + 8 * DAY + 4), p);
+    expect(dv.status).toBe('disputed');
+    expect(dv.tallies.length).toBe(2);
+    expect(dv.tallies.filter(g => g.matches).length).toBe(1);
+    d.endorse(d.c[0], good, 'tally', d.T + 9 * DAY);
+    const half = view(d.state(d.T + 9 * DAY + 1), p);
+    expect(half.status).toBe('disputed');
+    expect(half.tallies.find(g => g.matches)!.approvedBy.length).toBe(1);
+    for (const i of [1, 2]) d.endorse(d.c[i], good, 'tally', d.T + 9 * DAY);
     expect(view(d.state(d.T + 9 * DAY + 1), p).status).toBe('passed');
   });
 

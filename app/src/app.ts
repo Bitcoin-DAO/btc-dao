@@ -89,6 +89,8 @@ function derive(events: Event[], extra: Partial<AppState> = {}) {
 }
 
 const tallied = new Set<string>();
+/** Seconds after a vote's close before a council phone publishes the count. */
+const TALLY_GRACE = 90;
 /** When this phone last broadcast each round's transaction. */
 const broadcasted = new Map<string, number>();
 /** A broadcast that no source has seen after this long is sent again. */
@@ -186,6 +188,9 @@ async function autoTally() {
   if (!dao || !secret || !isCouncil) return;
   for (const p of dao.proposals) {
     if (p.status !== 'awaiting_tally' || tallied.has(p.event.id)) continue;
+    // Votes sent just before the close may still be on their way to the relays: count a little after it, so two
+    // council phones do not publish different counts (a dispute, 4.4).
+    if (dao.now < p.closeAt + TALLY_GRACE) continue;
     tallied.add(p.event.id);
     try {
       await signAndPublish(KIND.tally, p.recount, [['e', p.event.id]]);

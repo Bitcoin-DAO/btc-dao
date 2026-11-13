@@ -127,6 +127,8 @@ export interface ProposalView {
   twoThirds: boolean;
   recount: TallyContent;
   tally?: { events: Event[]; content: TallyContent };
+  /** Every distinct count published (more than one: disputed), with the council members who approved it (4.4). */
+  tallies: { events: Event[]; content: TallyContent; matches: boolean; approvedBy: string[] }[];
   disputed: boolean;
   tallyMismatch: boolean;
   untallied: string[]; // votes dated before close that the tally neither counts nor excludes
@@ -692,6 +694,11 @@ export function rebuild(site: SiteConfig, events: Event[], prefer?: string, now 
         if (winner) tally = winner;
         else disputed = true;
       }
+      const tallies = [...groups.values()].map(g => ({
+        ...g,
+        matches: tallyKey(g.content) === tallyKey(recount),
+        approvedBy: endorsedBy(g.events[0], 'tally', hashJson(parseJson(g.events[0].content))).persons,
+      }));
       const tallyMismatch = !!tally && tallyKey(tally.content) !== tallyKey(recount);
       const untallied = tally
         ? votes.filter(v => tagValue(v, 'e') === e.id && v.created_at <= closeAt && !tally!.content.counted.includes(v.id) && !tally!.content.excluded.some(x => x.id === v.id)).map(v => v.id)
@@ -717,7 +724,7 @@ export function rebuild(site: SiteConfig, events: Event[], prefer?: string, now 
         && standingList.some(x => x.address === a && personOf(x.event.pubkey) === personOf(memberOf.get(a)!) && x.event.created_at <= now));
       return {
         event: e, content: c, number, closeAt, rules, rosterVersion: rv.content.version, settingsVersion: sv.content.version,
-        eligible, votes: latest, counts, quorumNeeded, twoThirds, recount, tally, disputed, tallyMismatch, untallied, status,
+        eligible, votes: latest, counts, quorumNeeded, twoThirds, recount, tally, tallies, disputed, tallyMismatch, untallied, status,
         addresses, confirmations, byStanding, standingMoved, confirmed: confirmedAt(now), confirmedAt,
       };
     });
