@@ -71,7 +71,7 @@ It measures whether money arrives **regularly** compared with what the DAO regul
 
 The second thing an outsider wants to know is how the treasury is held. The dashboard answers from the descriptor chain (protocol 6.6), which it already reads for reconciliation.
 
-- **Structural grade:** the current descriptor's floor result (protocol 6.5), line by line: keys, threshold, spare key, distinct keys, script type. Shown as "meets the floor" or "below the floor" with the lines broken, plus the shape in words ("3 of 5, 2 spare keys").
+- **Structural grade:** the current descriptor's floor result (protocol 6.5), line by line: keys, threshold, majority, spare key, distinct keys, script type. Shown as "meets the floor" or "below the floor" with the lines broken, plus the shape in words ("3 of 5, 2 spare keys").
 - **Floor history:** "never below the floor" or the periods below it, with a link to each council change that weakened or restored the structure.
 - **What it measures, and what it doesn't.** The grade is a structural check of the public descriptor. Five distinct keys prove five seeds, not five people. It says nothing about who holds the keys or how they keep them.
 - **The chain itself:** one band per descriptor, newest first, with its active period, status (active, swept, residual, unsweepable), balance, and the rounds that spent from it. A residual descriptor holding coins is shown until it is swept.
