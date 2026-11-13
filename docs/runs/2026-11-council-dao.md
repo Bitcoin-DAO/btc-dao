@@ -76,3 +76,10 @@ Practice mode: a schedule "day" lasts about 86 seconds (10-minute votes / 7).
 4. **One round:** the council prepares the round: tranche 1 of the staged payout and the bounty, choosing which claimant to pay. Sign 2 of 3, broadcast. Check the outputs: 1,000 to the staged recipient, 1,000 to the chosen claimant.
 5. **Lapse:** write no report for tranche 2; about 31 minutes after approval it shows "lapsed", and the treasury's "promised in tranches" line disappears.
 6. **Decline (optional):** report tranche 2 of another schedule, have one council member decline the round with a reason, replace the round without it, write a new report, pay it.
+
+## v0.8.x in the wild: paid on delivery
+
+22. **"Paid in tranches" seemed to do nothing** on a phone: the tranche fields opened below the screen. Fixed in v0.8.1 (scrolls to them); v0.8.2 fixed the remove button (✕) squeezing the fields to nothing with two tranches.
+23. **Slow first load (~30 s):** one relay connected but never answered, and the first load waited until the 30-second refresh. Fixed in v0.8.1 (each read ends after about 6.5 s with what arrived).
+24. **Same proposal published three times** (probably: the proposal went out, the address confirmation failed, the form stayed open and was sent again). Fixed in v0.8.3: one proposal per form.
+25. **Disputed count:** @Member's phone counted at 18:13 with 1 vote, @CouncilB's with 2 (@CouncilB's vote dated 18:12, at the close). Either the vote was still on its way, or @CouncilB's clock was behind. The app had no way out but council approval of a count, which Carl judged contentious ("looks like fudging the numbers"). v0.8.3: the fuller count wins and counts correct themselves within 10 minutes; counting waits 90 s after the close; the app dates everything by its own time (from the site server); the relay refuses events more than 10 minutes ahead.
