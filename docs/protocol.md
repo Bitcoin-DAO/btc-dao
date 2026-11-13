@@ -243,6 +243,7 @@ A `change_council` proposal changes who holds the treasury keys, the threshold, 
 - **Keys:** `out_key` must be a current council member. `in_key` must be a member on the roster and not on the council, with one exception: it may be the same person as `out_key` (their current identity key), which replaces that member's treasury key with a new one, for example after a `lost_key`. `in_xpub` and `in_fingerprint` must be a valid xpub for the DAO's network at the path in section 1.4, with a matching fingerprint, and must not be a key already on the new council. The optional `in_device` (`"seedsigner"`) says where the incoming key lives; it is copied to the new council entry as `device` and is informational, as on any council entry.
 - **Threshold:** at least 1 and at most the size of the new council.
 - **Descriptor:** `new_descriptor` must be exactly the descriptor a client derives from the new council's xpubs (the current council's, minus `out_key`'s, plus `in_xpub`, in council order with the incoming key last) and the new threshold, in the same script type as the current descriptor. A client rebuilds it and rejects the proposal if it differs. This is what ties the migration's destination to the keys members voted for: a migration round can only pay an address the members could have checked.
+- **Floor:** clients show the floor check for `new_descriptor` (section 6.5), with a red notice if the change weakens the treasury, including a lower threshold or a council grown without its threshold. The notice informs the vote; it does not change the majority needed.
 
 The majority needed is set by `twoThirdsMajority` in the rules (two thirds in the reference rules, as for `close`).
 
@@ -255,6 +256,8 @@ Valid when the address appears in the proposal's outputs, or is the `destination
 **Standing.** A member may instead confirm one address for all their payouts: no `e` tag, content `{"address": "<address>", "standing": true}`, optionally with `"bip322"`. It is valid when the signer is on the roster at its `created_at`, and the address is valid for the DAO's network, is not a treasury address and is not reserved for a pledge. A member has at most one standing address: their latest valid standing confirmation counts, by `created_at`, then by `id`, and `{"standing": false}` withdraws it. It ends when the member leaves, is removed or has their key replaced (sections 5.2, 5.3); a new key sets its own.
 
 A payout output whose `member` field names a member counts as confirmed if, when a round including it is published, that member's standing address is that output's address. The check is made then, not when the proposal is published, so a member who replaces or withdraws a lost wallet's address stops every unpaid payout to it. An output that no standing address covers needs a confirmation for its proposal, as above. A standing address is reused on chain; a fresh address per payout remains more private, and apps should say so.
+
+**Used addresses.** When a payout address is entered in a proposal or a confirmation, the app checks the chain. If the address has received coins before, it shows a warning ("This address has been used before. A fresh one protects your privacy.") but accepts it: the recipient decides. A member's own standing address is exempt, since reusing it is the member's stated choice.
 
 ### 4.3 `dao.vote`
 
@@ -464,6 +467,50 @@ Tags: `["e", <round id>]`. Content: `{"txid": "<hex>", "block_height": 1234567}`
 
 - The treasury page shows one receive address: the lowest-index unused address on the receive branch (`/0/*`). It keeps showing it until that address receives a payment, then moves to the next. Unused addresses never pile up, so a standard wallet restoring from the recovery sheet, with its default gap limit, always finds every coin.
 - When the balance reaches `treasuryCapSats`, the page shows no donation address. If the balance goes over the cap anyway, every client shows it, and the excess is settled by a members' vote: a `change_rules` proposal raising the cap, or a payout.
+
+### 6.5 Descriptor floor (requirement S10)
+
+The floor is a minimum shape for a treasury descriptor. Clients and dashboards compute it from the descriptor alone, so anyone holding a published descriptor can check it without trusting the app. It adds no event and blocks nothing: the protocol's own limits (section 4.1.2) still decide what is valid, and members decide by vote. The floor says plainly what they are voting for.
+
+A descriptor meets the floor when every line holds:
+
+| Line | Rule |
+| --- | --- |
+| Keys | 3 to 7 keys |
+| Threshold | at least 2 |
+| Majority | threshold more than half the keys, so no minority of keyholders can move funds |
+| Spare | threshold at most keys − 1, so one lost key never freezes the treasury |
+| Distinct keys | no xpub and no fingerprint appears twice |
+| Script | a multisig script type the protocol supports (P2WSH multisig today) |
+
+The lines leave a narrow range for each council size: 2 of 3; 3 of 4; 3 or 4 of 5; 4 or 5 of 6; 4 to 6 of 7. Majority guards against theft, spare against loss.
+
+**Weakening.** A new descriptor weakens the treasury, compared with the one in force, when any of these holds:
+- it breaks a floor line the current descriptor meets;
+- its threshold is lower: fewer keyholders can move the funds;
+- its threshold is a smaller share of its keys (threshold ÷ keys): the council grew without the threshold rising with it, as in 3 of 5 → 3 of 6, or 3 of 5 → 3 of 7.
+
+Keys and threshold change together. Every threshold change is a different script, so a different wallet: the migration round moves the whole balance into it, and from then on that threshold is what it takes to spend.
+
+**Where it is shown**
+- **Founding setup:** the floor check for the genesis descriptor, line by line, before the council endorses it.
+- **Council-change proposals:** the floor check for `new_descriptor`, on the proposal page, on the vote screen and on every signing screen of the migration round. A proposal whose new descriptor meets the floor is shown in green. One that weakens the treasury carries a red **weakens the treasury** notice naming each reason (each broken line, a lower threshold, a smaller share), with the old and new shape side by side ("3 of 5 → 3 of 6: 3 keyholders could move funds, now a minority"). The majority needed is unchanged.
+- **The proposal form:** keys and threshold sit together, and the form reminds the proposer that they go together. Adding a seat suggests the lowest threshold that keeps the share at least as high and meets the floor (3 of 5 + 1 key → 4 of 6; + 2 keys → 5 of 7). Removing a seat suggests the threshold that keeps a spare key (3 of 4 − 1 key → 2 of 3) and says the change will still be shown as weakening, because fewer keyholders can then move funds. The proposer may choose otherwise; the notice follows the choice.
+- **Rules page and DAO history:** the current descriptor's result, and its floor history (section 6.6).
+
+### 6.6 Descriptor chain
+
+The descriptor chain is the ordered list of every treasury descriptor the DAO has used: the genesis descriptor, then the descriptor of each settings version that changed it. It is already in the record (section 3.4) and is the spine of the DAO's history: rounds, receipts, sweeps and reconciliation all hang off the descriptor they spend from. Clients derive for each link:
+
+- the descriptor and its checksum, and its floor result (6.5);
+- whether it strengthened, kept or weakened the previous link (weakening as in 6.5);
+- the proposal and tally that created it, and the migration round and txid that moved the treasury to it (none for the genesis);
+- its active period, from the block of the migration that made it current to the block of the migration that replaced it;
+- its status: **active** (the descriptor in force), **swept** (an earlier descriptor holding nothing), **residual** (an earlier descriptor holding coins, still watched until swept) or **unsweepable** (section 6.1).
+
+**Floor history:** a DAO whose every link has met the floor shows "never below the floor"; otherwise the periods below it are listed.
+
+**Publishing:** the descriptor is public in the listing (7.2), and every earlier one in the settings chain, so anyone can follow the whole treasury history. A descriptor gives no power to spend. Its cost is privacy: every address, balance and payout of the DAO can be read on chain. Council keys are therefore made for one DAO only and never used in a personal wallet, and payout recipients should give a fresh address (4.2).
 
 ## 7. Record and discovery
 

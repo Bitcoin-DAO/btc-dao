@@ -87,6 +87,8 @@
 
 - [ ] Sections 1 to 7 ticked
 - [ ] Treasury cap set in the charter at an amount the members can afford to lose (S9)
+- [ ] The mainnet descriptor meets the floor, and the council's treasury keys are made for this DAO only (S10)
+- [ ] Watcher passed in the wild: a spend made outside the app on a testnet4 DAO shown as unmatched on every member's Home page within minutes
 - [ ] Main and spare SeedSigner from different sources (S8)
 - [ ] Mainnet config: chain sources (own indexer first), fee setting, relays
 

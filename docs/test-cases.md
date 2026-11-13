@@ -105,6 +105,9 @@ Cases marked with a gap number tested a rule `protocol.md` did not settle when t
 | C-S08 | F1 leaves, is removed, or has their key replaced | Standing address ends at that moment; the new key has none | 4.2, 5.2, 5.3 |
 | C-S09 | Two standing confirmations by F1 with the same `created_at` | The one with the higher `id` counts | 4.2 |
 | C-S10 | Round published including an output covered only by a standing address that was withdrawn before the round | Sign refused | 4.2, 6.1 |
+| C-R01 | Payout address entered that has received coins before | Warning shown; the address is accepted | 4.2 |
+| C-R02 | Fresh payout address entered | No warning | 4.2 |
+| C-R03 | Member's own standing address used for a payout, already used on chain | No warning | 4.2 |
 
 ## 6. Votes
 
@@ -273,6 +276,41 @@ Cases for the app's publishing to discovery relays and for any dashboard. "Dashb
 | N-05 | Two rounds share an input; one confirms | Confirmed one authorised; the other shown void, not unauthorised | 6.1 |
 | N-06 | Matching round arrives after the spend was marked unauthorised | Re-marked authorised; the change shown in the DAO's history | dashboard spec 2 |
 | N-07 | Receipt names a txid the chain does not confirm at that height | Receipt rejected; reconciliation uses the chain, not the receipt | 6.3 |
+
+## 16. Descriptor floor and chain
+
+Cases for the floor check (requirement S10) and the descriptor chain, in the app and on any dashboard.
+
+| ID | Case | Expected | § |
+| --- | --- | --- | --- |
+| B-01 | Descriptor 3 of 5, five distinct keys | Meets the floor; "3 of 5, 2 spare keys" | 6.5 |
+| B-02 | Descriptor 2 of 3 | Meets the floor | 6.5 |
+| B-03 | Descriptor 2 of 2 | Below the floor: keys, spare | 6.5 |
+| B-04 | Descriptor 1 of 3 | Below the floor: threshold | 6.5 |
+| B-05 | Descriptor 3 of 3 | Below the floor: spare | 6.5 |
+| B-06 | Descriptor with the same xpub twice, or two keys with one fingerprint | Below the floor: distinct keys | 6.5 |
+| B-07 | Descriptor with 8 keys | Below the floor: keys | 6.5 |
+| B-08 | Founding setup with a genesis descriptor below the floor | Floor check shown line by line before endorsement; founding still possible | 6.5, 3.5 |
+| B-09 | Council change 3 of 5 → 3 of 5 (one key replaced) | Green "meets the floor"; usual majority | 4.1.2, 6.5 |
+| B-10 | Council change 3 of 5 → 2 of 5 | Below the floor: majority. Red notice: majority line broken, threshold lower | 4.1.2, 6.5 |
+| B-11 | Council change 3 of 4 → 3 of 3 (recall, no replacement) | Red "weakens the treasury" notice naming the spare line, on the proposal, the vote and every signing screen of the migration; usual majority | 4.1.2, 6.5 |
+| B-12 | Council change from a descriptor already below the floor to one that meets it | Green; the floor history shows the period below it ending | 6.5, 6.6 |
+| B-13 | Descriptor 2 of 4 | Below the floor: majority | 6.5 |
+| B-14 | Council change 3 of 5 → 3 of 7 (two seats added, threshold unchanged) | Below the floor: majority (3 of 7 is a minority). Red notice: majority line broken, threshold a smaller share (3 of 5 → 3 of 7) | 4.1.2, 6.5 |
+| B-15 | Council change 3 of 5 → 3 of 6 | Below the floor: majority; red notice: majority line broken, smaller share | 4.1.2, 6.5 |
+| B-16 | Council change 3 of 5 → 4 of 6 | Green: share 0.6 → 0.67, floor met | 4.1.2, 6.5 |
+| B-17 | Council change 3 of 4 → 2 of 3 (recall) | Meets the floor; red notice: threshold lower | 4.1.2, 6.5 |
+| B-18 | Proposal form: adding a seat to 3 of 5 | Reminder that keys and threshold go together; threshold suggested 4 of 6 | 6.5 |
+| B-19 | Proposal form: adding two seats to 3 of 5 | Threshold suggested 5 of 7 | 6.5 |
+| B-20 | Proposal form: removing a seat from 3 of 4 | Threshold suggested 2 of 3, with a note that the change will show as weakening | 6.5 |
+| H-01 | DAO with no council change | Chain of 1 descriptor, active; "never below the floor" if it meets it | 6.6 |
+| H-02 | DAO after two council changes, earlier treasuries empty | Chain of 3; the two earlier ones swept, each with its active period, proposal and migration txid | 6.6 |
+| H-03 | Coins arrive at an earlier descriptor after its migration | That link shown residual until a sweep round confirms, then swept | 6.1, 6.6 |
+| H-04 | Earlier descriptor the continuing keys cannot sweep | Shown unsweepable from the migration's receipt | 6.1, 6.6 |
+| H-05 | One council change in the chain weakened the treasury, a later one restored it | Floor history lists the period below the floor, linked to both changes | 6.6 |
+| H-06 | Same chain rebuilt by two clients from events in a different order | Same chain, statuses and floor history | 6.6, 8 |
+| N-08 | Treasury spend in the mempool with no published round | Shown at once as unmatched, in red, on the dashboard and as a notice on every member's Home page | dashboard spec 2 |
+| N-09 | Unmatched spend, then its round arrives before it confirms | Re-marked pending match, then authorised on confirmation; the notice is cleared and recorded in the history | dashboard spec 2 |
 
 ## Test vectors
 

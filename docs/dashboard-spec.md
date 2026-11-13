@@ -32,7 +32,9 @@ Because a round's txid is fixed by its unsigned transaction, a matching round pr
 
 **What it proves, and what it doesn't.** It proves the treasury has moved only on recorded decisions. It does not prove the decisions were wise, or that a payee delivered.
 
-The same check runs inside the DAO app during the trial stages, so the key metric is proven locally before it is shown in public.
+The same check runs inside the DAO app at every stage, so the key metric is proven locally before it is shown in public.
+
+**The watcher.** Reconciliation is also the DAO's alarm. A treasury spend for which no round has been published is suspicious from the moment it reaches the mempool, because every legitimate spend is published as a round before it is signed. The app and the dashboard show such a spend at once as **unmatched**, in red, without waiting for the grace period: on the dashboard's DAO page, and as a notice on every member's Home page in the app. It becomes unauthorised when it confirms with still no matching round after the grace period, or authorised if a matching round arrives. The watcher cannot stop a spend; it makes one public within minutes. Because the descriptor chain is public, anyone can run the same watcher.
 
 ## 2a. Steady I/O: is the funding model working?
 
@@ -65,6 +67,19 @@ It measures whether money arrives **regularly** compared with what the DAO regul
 - Median monthly outflow of 0: "no regular spending", with the totals.
 - The dashboard does not rank DAOs by this number.
 
+## 2b. Descriptor chain and floor
+
+The second thing an outsider wants to know is how the treasury is held. The dashboard answers from the descriptor chain (protocol 6.6), which it already reads for reconciliation.
+
+- **Structural grade:** the current descriptor's floor result (protocol 6.5), line by line: keys, threshold, majority, spare key, distinct keys, script type. Shown as "meets the floor" or "below the floor" with the lines broken, plus the shape in words ("3 of 5, 2 spare keys").
+- **Floor history:** "never below the floor" or the periods below it, with a link to each council change that weakened or restored the structure.
+- **What it measures, and what it doesn't.** The grade is a structural check of the public descriptor. Five distinct keys prove five seeds, not five people. It says nothing about who holds the keys or how they keep them.
+- **The chain itself:** one band per descriptor, newest first, with its active period, status (active, swept, residual, unsweepable), balance, and the rounds that spent from it. A residual descriptor holding coins is shown until it is swept.
+
+The headline for a listed DAO joins sections 2 and 2b in one line:
+
+> **Chain of N descriptors · never below the floor · unauthorised spends: 0**
+
 ## 3. Data sources
 
 The dashboard has two inputs and writes nothing back:
@@ -94,6 +109,7 @@ Every listed DAO gets the same standard view. There are no per-item display choi
 - Listed DAOs on mainnet, by funding model, with how many have a steady I/O above 1.
 - BTC held in mainnet treasuries, summed from their descriptors, with the part held for members shown apart.
 - Spends reconciled to date.
+- Listed mainnet DAOs meeting the descriptor floor, and how many have never been below it.
 - Proposals currently open for voting.
 
 **DAO page**, like an address page in a block explorer:
@@ -101,7 +117,8 @@ Every listed DAO gets the same standard view. There are no per-item display choi
 - Name, site, stage, software version and build check (protocol section 7.2).
 - Funding model (`rules.fundingModel`): shown as a label with a colour, never colour alone. Grant, production, mutual, revolving, or "not stated" when unset or unknown.
 - **Steady I/O** beside the funding model, with the 12-month totals in and out and a monthly chart (section 2a).
-- The reconciliation badge: authorised spends and **unauthorised spends: 0**, with the time of the last check.
+- The headline line (section 2b) and the reconciliation badge: authorised spends and **unauthorised spends: 0**, with the time of the last check, and any unmatched spend in red at the top.
+- Structural grade and floor history (section 2b), and the descriptor chain with each descriptor's status.
 - Treasury: balance in two parts, **DAO funds** (what the members decide on together) and **held for members** (open pledges, each with its progress), then UTXOs, multisig policy, and the full transaction history across every descriptor the DAO has used, each row tagged received, authorised spend, pending match or unauthorised.
 - Member count and council count.
 - Proposal list, newest first, with number, status and tally.
@@ -154,7 +171,10 @@ flowchart LR
 ## 8. Tasks
 
 - [ ] Add the *show on public dashboards* switch to the DAO app's settings page, setting `listed` in the listing.
-- [ ] Run reconciliation locally in the DAO app during the trial stages.
+- [ ] Run reconciliation locally in the DAO app at every stage.
+- [ ] Watcher: an unmatched treasury spend (no published round) shown at once, from the mempool, on the dashboard and as a notice on every member's Home page in the app.
+- [ ] Descriptor floor check (protocol 6.5): structural grade on the DAO page and the front-page count; the same function used by the app's founding setup and council-change proposals.
+- [ ] Descriptor chain view (protocol 6.6): one band per descriptor with status, active period and floor result; residual descriptors highlighted; the headline line.
 - [ ] Pick the discovery relays shipped with the first release, and set up the btcdao.tech relay with the discovery policy.
 - [ ] Confirm kinds 3570–3586 are unused on large relays (`decisions.md`).
 - [ ] Write the protocol up as a draft NIP, with the app (publisher) and the dashboard (reader) as its two implementations, and submit it to nostr-protocol/nips after the first mainnet DAO.
@@ -163,6 +183,7 @@ flowchart LR
 
 - [ ] Should testnet stages publish their events to relays, or keep all data local to the DAO? The protocol currently publishes them through the DAO relay.
 - [ ] Grace period before a confirmed, unmatched spend is marked unauthorised.
+- [ ] Should the dashboard flag a treasury xpub that appears in more than one listed DAO? Such DAOs share wallets, so one DAO's spends would show as unmatched in the other; but checking means comparing keys across DAOs, which principle 2 rules out for identity keys. Treasury xpubs are already public in each listing.
 - [ ] How a pledge address is put on the public record, so dashboards can find it: a statement proposal at first, a `pledge` proposal type later?
 - [ ] Should a DAO be able to hide which council keys signed on chain (for example with a Taproot multisig)?
 - [ ] Who hosts the reference instance at btcdao.tech, and how do others run their own?

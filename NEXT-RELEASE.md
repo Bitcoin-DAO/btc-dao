@@ -77,6 +77,23 @@ Design: `docs/drafts/discussion-and-comms.md`, section 4.
 - [ ] Gateway: watch the DAO relay for record events, post once per event (no duplicates after a restart)
 - [ ] Tests: gateway unit tests for each feed note and the announcement; end-to-end announcement passed and published
 
+## D. Descriptor floor, descriptor chain and watcher (from the 13 November review)
+
+Design: `docs/protocol.md` 6.5 and 6.6, `docs/dashboard-spec.md` sections 2 and 2b, requirement S10. Decisions of 13 November 2026 in `docs/decisions.md`. The timelock and challenge draft from the same review is not in v1 (`docs/spec.md`, Out of scope).
+
+- [ ] Floor check: one function from a descriptor to its floor result, line by line, shared by the app and the dashboard
+- [ ] Founding setup: the floor check for the genesis descriptor, before endorsement (replaces the threshold-equals-council warning from UNO's practice finding 16)
+- [ ] Council-change proposals: green, or the red "weakens the treasury" notice naming each reason (a broken line, a lower threshold, a council grown without its threshold), old and new shape side by side, on the proposal page, the vote screen and every signing screen of the migration round
+- [ ] Council-change form: keys and threshold together, with the reminder that they go together and a suggested threshold when a seat is added or removed
+- [ ] Descriptor chain: derived from the settings chain with each link's floor result, status (active, swept, residual, unsweepable), active period, proposal and migration txid
+- [ ] DAO history page: the chain as bands, residual highlighted, and the headline line "Chain of N descriptors · never below the floor · unauthorised spends: 0"
+- [ ] Rules page: the current descriptor's floor result
+- [ ] Watcher in the app: reconciliation at every stage, and an unmatched treasury spend (no published round) shown at once, from the mempool, as a notice on every member's Home page
+- [ ] Payout address check: warn, without refusing, when an address entered in a proposal or confirmation has received coins before; standing addresses exempt
+- [ ] Guide: council treasury keys are for this DAO only, never a personal wallet (joins the open item "one key per DAO" below); payees give a fresh address for every payout
+- [ ] Tests: unit tests for cases B-01 to B-20, H-01 to H-06, C-R01 to C-R03, N-08, N-09; end-to-end: a council change that weakens the treasury shows the red notice on every screen
+- [ ] In the wild: a council change on a testnet4 DAO that breaks a floor line, then one that restores it, both shown in the history
+
 ## Open items
 
 - [x] **Paid on delivery** (protocol 4.6): staged payouts and bounties, v0.8.0. Built: staged payouts (schedule in the form, reports as thread cards, a tranche joins a round only after its report, lapse, the committed line on the treasury page), then bounties (claims; the council's round picks the claimant). Reports are read in Discussion (a chip on the thread and a Reports filter) and on the proposal page (the schedule with each tranche's status); not on Home or in the footer

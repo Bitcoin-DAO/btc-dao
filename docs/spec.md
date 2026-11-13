@@ -287,7 +287,7 @@ Statements use the common fields only.
 3. If proposer and recipient differ, the recipient confirms the address on the proposal page. Confirming is the recipient's responsibility and can happen at any time; a passed payout joins a payout round only once it is confirmed, and lapses like any other if it is not made binding within 2 rounds.
 4. At signing, each council member checks the address on the SeedSigner screen against the proposal page.
 
-Proposals are public forever, so recipients should use an address not reused elsewhere. A Lightning address option follows once payouts by swap arrive.
+Proposals are public forever, and the treasury descriptor is public, so every payout can be traced to its address. Recipients should use a fresh address for every payout; the app warns when an address entered has been used before (protocol 4.2). A Lightning address option follows once payouts by swap arrive.
 
 ## Payout rounds and signing
 
@@ -328,8 +328,8 @@ The history page is linked from the footer, next to Rules. (The DAO name in the 
 
 | Entry | Derived from | Shows |
 | --- | --- | --- |
-| Founded | `dao.genesis` and its endorsements | Date, founding council and founders, threshold, funding model, stage (practice, testnet, mainnet) |
-| Council changed | Settings version with a new council, its `change_council` proposal and migration receipt | Who left, who joined, the reason, old and new threshold, the migration txid |
+| Founded | `dao.genesis` and its endorsements | Date, founding council and founders, threshold, the first treasury descriptor and its floor result, funding model, stage (practice, testnet, mainnet) |
+| Council changed | Settings version with a new council, its `change_council` proposal and migration receipt | Who left, who joined, the reason, old and new threshold, the new descriptor with its floor result (strengthened, kept or weakened), the migration txid |
 | Rules changed | Settings version from a `change_rules` proposal | Only the values that changed, as from → to; a charter change shows the new charter's hash and language |
 | Funding model changed | As rules changed, when `rules.fundingModel` changes | Old and new model, shown in its dashboard colour |
 | Address moved | Endorsed `dao.listing` with a new `site` | Old and new address, the endorsing council members |
@@ -338,6 +338,8 @@ The history page is linked from the footer, next to Rules. (The DAO name in the 
 | Closed | Final settings version with `"closed": true` | Destination and the closing round's txid |
 
 Membership is not listed entry by entry, which would turn the page into a log. Instead the page shows a running count beside each entry (members and council at that date), and the Members page keeps the full roster history. A disputed roster or settings version appears as an entry of its own, flagged, until the council resolves it.
+
+**The descriptor chain** (protocol 6.6) runs alongside the entries: one band per treasury descriptor the DAO has used, from the migration that made it current to the one that replaced it, each with its floor result and its status (active, swept, residual or unsweepable). Rounds and sweeps sit inside the band they spent from. A residual band stays highlighted until it is swept. The top of the page carries one line: "Chain of N descriptors · never below the floor · unauthorised spends: 0", or what broke it.
 
 The page is public, like the rest of the record, and reads the same on every client because it follows the roster and settings chains (protocol section 8). A trial stage shows its stage at the top, so a practice DAO's history is never mistaken for a live one.
 
@@ -393,7 +395,8 @@ The signing device's screen is the final authority: no attack on the website, re
 | Member identity key phished | False votes or proposals in that member's name | Council review before signing; remove-member vote; votes visible to all |
 | Council member's seed lost | One key gone | Threshold still met; council-change migration |
 | Council member's SeedQR card or seed lost or exposed | Attacker holds 1 of 3 needed keys | Report at once; migrate before any further loss; cards never stored together |
-| Three council members collude | Funds moved against the member vote | Public record of every payout and vote; members choose keyholders; council-change by members' 2/3 vote |
+| Three council members collude | Funds moved against the member vote | Treasury cap limits the loss (S9); every spend reconciled against a round, and an unmatched spend shown at once to every member and on the dashboard; public record of every payout and vote; members choose keyholders; council-change by members' 2/3 vote. Not prevented: there is no script delay in v1 (see Out of scope, veto window) |
+| Council weakens the treasury step by step | A series of council changes leaves a structure easier to drain or freeze (lower threshold, a council grown without its threshold, no spare key, a duplicated key) | Descriptor floor checked on every council-change proposal and signing screen, with a red notice naming each broken line (S10); floor history on the DAO history page and the dashboard |
 | Software or site disappears | No interface | Recovery sheet plus 3 seeds restore in Sparrow |
 | Domain lost or not renewed | Members' passkeys stop working; the site has to move | Several years paid with auto-renew; two council members can reach the registrar account; members restore from identity cards at a council-endorsed new address; the recovery sheet still recovers funds |
 | Device vendor bug | Faulty signing on one brand | Mixed devices: no single brand holds 3 keys |
@@ -415,6 +418,7 @@ The design review found the treasury safe for a capped trial, provided the requi
 | S7 | The wallet descriptor is loaded on the SeedSigner at every signing and change shows as verified; skipping verification is not allowed. SeedSigner shows change addresses on one line only, so this check is what protects the change | Otherwise a round could quietly redirect the change | Phase 2 (hard gate) |
 | S8 | Main and spare SeedSigner bought from different sources, sealed between rounds; signing times not announced | Hardware tampering, and three SeedQR cards in one room | Phase 3 |
 | S9 | Treasury capped during the trial at an amount the community can afford to lose; the cap is a rule changed only by a two-thirds vote, and the donation address is hidden once it is reached | Limits the cost of any flaw not yet found | Phase 3 |
+| S10 | The descriptor floor (protocol 6.5) is checked at founding and on every council change; a change that weakens the treasury carries a red notice on the proposal, the vote and every signing screen; the descriptor chain and its floor history are shown in the DAO history and on the dashboard; council keys are made for one DAO only | Each council change is a chance to weaken the structure quietly; the floor makes it visible and lets outsiders judge a DAO's structure from its public descriptor | Phase 3 |
 
 Audit timing: this design review now; an independent code review by a bitcoin-experienced developer at the end of phase 2, before mainnet funds; a sats bug bounty once the fork kit is public.
 
@@ -433,7 +437,8 @@ Later additions, in likely order:
 1. **Lightning payouts by swap:** council signs an on-chain PSBT to a non-custodial swap service that pays the recipient's Lightning invoice. No Lightning funds held.
 2. **The Purse:** a small Lightning balance for instant payouts and incoming tips, with a spending cap, topped up from the treasury by payout round.
 3. **Proposal deposit:** a small refundable payment to curb spam, if membership alone proves insufficient.
-4. **Veto window:** payouts held in a timelocked output for about a day, during which a recovery path can return funds. Needs pre-signed transactions; revisit if covenant upgrades activate on Bitcoin.
+4. **Veto window:** payouts held in a timelocked output for about a day, during which a recovery path can return funds. Reviewed 13 November 2026 and left out of v1: a relative timelock on the treasury (`older(144)`) counts from when each coin confirmed, so coins older than the delay can be spent at once and three colluding keyholders face no delay; a two-stage round (treasury to a timelocked pending output, then to payees) can be skipped by the same three keys, since a script cannot fix where coins go next. A working version needs covenants (for example CTV or OP_VAULT) or pre-signed transactions from a larger key set, which is too heavy for v1. Revisit if covenant upgrades activate on Bitcoin.
+5. **Delayed recovery path:** a second spending path for a set of guardians after a long delay (months), for a council that becomes unresponsive or is captured. Well supported in wallets (the Liana pattern); needs SeedSigner to verify a miniscript policy first.
 
 ## Build plan and fork-readiness
 
