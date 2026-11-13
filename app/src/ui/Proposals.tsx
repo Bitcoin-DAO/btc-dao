@@ -6,7 +6,7 @@ import { fmtDate, fmtDateTime, fmtLeft, fmtSats, t } from '../i18n';
 import { KIND, tagValue, type Event } from '../core/events';
 import { proposalLabel, type Choice, type Output, type ProposalView } from '../core/state';
 import { formatShortCode, shortCode } from '../core/shortcode';
-import { hashJson, parseJson } from '../core/util';
+import { parseJson } from '../core/util';
 import { Address, Footer, Header, errText, go } from './parts';
 import { PaymentLine } from './Round';
 import { Delivery } from './Delivery';
@@ -112,18 +112,6 @@ export function ProposalDetail({ id }: { id: string }) {
     setBusy(true);
     try {
       await signAndPublish(KIND.vote, { choice }, [['e', p.event.id]]);
-    } catch (e) {
-      setMsg(errText(e));
-    } finally {
-      setBusy(false);
-    }
-  };
-  // A disputed count: council members approve one (dao.endorse, object tally; protocol 4.4).
-  const approveCount = async (target: Event) => {
-    setMsg(undefined);
-    setBusy(true);
-    try {
-      await signAndPublish(KIND.endorse, { object: 'tally', hash: hashJson(parseJson(target.content)) }, [['e', target.id]]);
     } catch (e) {
       setMsg(errText(e));
     } finally {
@@ -243,27 +231,7 @@ export function ProposalDetail({ id }: { id: string }) {
           {p.tally && <p class="small">{t('pd.tally', { names: [...new Set(p.tally.events.map(e => nameOf(e.pubkey)))].join(', ') })}</p>}
           {p.tallyMismatch && <p class="warnbox">{t('pd.tallyMismatch')}</p>}
           {p.untallied.length > 0 && <p class="warnbox">{t('pd.untallied')}</p>}
-          {p.status === 'disputed' && (
-            <>
-              <p class="warnbox">{t('pd.disputedText', { m })}</p>
-              {p.tallies.map(g => {
-                const r = g.content.result;
-                const mine = !!myPerson && g.approvedBy.includes(myPerson);
-                return (
-                  <div class="card tint" style="gap:6px">
-                    <strong>{t('pd.countLine', { yes: r.yes, no: r.no, abstain: r.abstain })}</strong>
-                    <span class="small">{t('pd.countBy', { names: [...new Set(g.events.map(e => nameOf(e.pubkey)))].join(', '), n: g.content.counted.length })}</span>
-                    <span class={g.matches ? 'ok' : 'small'}>{t(g.matches ? 'pd.countMatches' : 'pd.countDiffers')}</span>
-                    <span class="small">{t('pd.countApproved', { n: g.approvedBy.length, m })}{g.approvedBy.length ? `: ${g.approvedBy.map(x => s.members.find(y => y.person === x)?.name ?? x.slice(0, 8)).join(', ')}` : ''}</span>
-                    {app.isCouncil && app.secret && !mine && (
-                      <button type="button" class={g.matches ? 'btn primary' : 'btn secondary'} disabled={busy} onClick={() => approveCount(g.events[0])}>{t('pd.countApprove')}</button>
-                    )}
-                    {mine && <span class="ok">{t('pd.countYours')}</span>}
-                  </div>
-                );
-              })}
-            </>
-          )}
+          {p.status === 'disputed' && <p class="warnbox">{t('pd.disputedText')}</p>}
           {msg && <p class="warnbox">{msg}</p>}
         </section>
 
