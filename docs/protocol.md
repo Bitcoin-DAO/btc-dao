@@ -243,7 +243,7 @@ A `change_council` proposal changes who holds the treasury keys, the threshold, 
 - **Keys:** `out_key` must be a current council member. `in_key` must be a member on the roster and not on the council, with one exception: it may be the same person as `out_key` (their current identity key), which replaces that member's treasury key with a new one, for example after a `lost_key`. `in_xpub` and `in_fingerprint` must be a valid xpub for the DAO's network at the path in section 1.4, with a matching fingerprint, and must not be a key already on the new council. The optional `in_device` (`"seedsigner"`) says where the incoming key lives; it is copied to the new council entry as `device` and is informational, as on any council entry.
 - **Threshold:** at least 1 and at most the size of the new council.
 - **Descriptor:** `new_descriptor` must be exactly the descriptor a client derives from the new council's xpubs (the current council's, minus `out_key`'s, plus `in_xpub`, in council order with the incoming key last) and the new threshold, in the same script type as the current descriptor. A client rebuilds it and rejects the proposal if it differs. This is what ties the migration's destination to the keys members voted for: a migration round can only pay an address the members could have checked.
-- **Floor:** clients show the floor check for `new_descriptor` (section 6.5), with a red notice if the change weakens the treasury, including a lower threshold or a council grown without its threshold. The notice informs the vote; it does not change the majority needed.
+- **Floor:** clients show the floor check for `new_descriptor` (section 6.5), with a red notice if the change weakens the treasury: it breaks a floor line, or fewer keyholders could move the funds. The notice informs the vote; it does not change the majority needed.
 
 The majority needed is set by `twoThirdsMajority` in the rules (two thirds in the reference rules, as for `close`).
 
@@ -485,17 +485,28 @@ A descriptor meets the floor when every line holds:
 
 The lines leave a narrow range for each council size: 2 of 3; 3 of 4; 3 or 4 of 5; 4 or 5 of 6; 4 to 6 of 7. Majority guards against theft, spare against loss.
 
-**Weakening.** A new descriptor weakens the treasury, compared with the one in force, when any of these holds:
-- it breaks a floor line the current descriptor meets;
-- its threshold is lower: fewer keyholders can move the funds;
-- its threshold is a smaller share of its keys (threshold ÷ keys): the council grew without the threshold rising with it, as in 3 of 5 → 3 of 6, or 3 of 5 → 3 of 7.
+**Weakening.** A treasury can be weakened in two ways: against theft (how many keyholders it takes to move the funds, and whether they are a majority) and against loss (how many keys can be lost before it freezes: the spare keys). A new descriptor weakens the treasury, compared with the one in force, when either holds:
+- it breaks a floor line the current descriptor meets (a minority could move the funds, no spare key, too few or too many keys, a key twice);
+- its threshold is lower: fewer keyholders could move the funds.
+
+Anything else is shown green, including a council that grows by more than its threshold rises: 2 of 3 → 3 of 5 needs more keyholders and has more spare keys, so it is stronger on both counts. A council grown until a minority could move the funds (3 of 5 → 3 of 7) breaks the majority line. A drop in spare keys is covered by the spare line, which keeps at least one. Removing a seat without a replacement usually lowers the threshold and is shown as weakening, honestly: the notice says what the change costs, not that it is wrong.
 
 Keys and threshold change together. Every threshold change is a different script, so a different wallet: the migration round moves the whole balance into it, and from then on that threshold is what it takes to spend.
 
 **Where it is shown**
 - **Founding setup:** the floor check for the genesis descriptor, line by line, before the council endorses it.
-- **Council-change proposals:** the floor check for `new_descriptor`, on the proposal page, on the vote screen and on every signing screen of the migration round. A proposal whose new descriptor meets the floor is shown in green. One that weakens the treasury carries a red **weakens the treasury** notice naming each reason (each broken line, a lower threshold, a smaller share), with the old and new shape side by side ("3 of 5 → 3 of 6: 3 keyholders could move funds, now a minority"). The majority needed is unchanged.
-- **The proposal form:** keys and threshold sit together, and the form reminds the proposer that they go together. Adding a seat suggests the lowest threshold that keeps the share at least as high and meets the floor (3 of 5 + 1 key → 4 of 6; + 2 keys → 5 of 7). Removing a seat suggests the threshold that keeps a spare key (3 of 4 − 1 key → 2 of 3) and says the change will still be shown as weakening, because fewer keyholders can then move funds. The proposer may choose otherwise; the notice follows the choice.
+- **Council-change proposals:** the floor check for `new_descriptor`, on the proposal page, on the vote screen and on every signing screen of the migration round. A proposal whose new descriptor meets the floor is shown in green. One that weakens the treasury carries a red **weakens the treasury** notice. Both carry the old and new shape side by side and one plain line per point, so members see what changes either way:
+
+  > **This change weakens the treasury** · 3 of 4 → 2 of 3
+  > • 2 keyholders could move the funds, not 3.
+  > The vote needs the usual majority.
+
+  > **Meets the floor** · 2 of 3 → 3 of 5
+  > • 3 keyholders needed to move the funds, was 2.
+  > • 2 keys can be lost without freezing the treasury, was 1.
+
+  The red lines name each reason: each broken floor line in words ("A minority, 3 of 7, could move the funds"; "No spare key: losing one key would freeze the treasury"), and a lower threshold. The majority needed is unchanged.
+- **The proposal form:** keys and threshold sit together, and the form reminds the proposer that they go together. Adding a seat suggests the lowest threshold that meets the floor without lowering the current one (3 of 5 + 1 key → 4 of 6; + 2 keys → 4 of 7). Removing a seat suggests the threshold that keeps a spare key (3 of 4 − 1 key → 2 of 3) and says the change will still be shown as weakening, because fewer keyholders can then move funds. The proposer may choose otherwise; the notice follows the choice.
 - **Rules page and DAO history:** the current descriptor's result, and its floor history (section 6.6).
 
 ### 6.6 Descriptor chain

@@ -296,13 +296,15 @@ Cases for the floor check (requirement S10) and the descriptor chain, in the app
 | B-11 | Council change 3 of 4 → 3 of 3 (recall, no replacement) | Red "weakens the treasury" notice naming the spare line, on the proposal, the vote and every signing screen of the migration; usual majority | 4.1.2, 6.5 |
 | B-12 | Council change from a descriptor already below the floor to one that meets it | Green; the floor history shows the period below it ending | 6.5, 6.6 |
 | B-13 | Descriptor 2 of 4 | Below the floor: majority | 6.5 |
-| B-14 | Council change 3 of 5 → 3 of 7 (two seats added, threshold unchanged) | Below the floor: majority (3 of 7 is a minority). Red notice: majority line broken, threshold a smaller share (3 of 5 → 3 of 7) | 4.1.2, 6.5 |
-| B-15 | Council change 3 of 5 → 3 of 6 | Below the floor: majority; red notice: majority line broken, smaller share | 4.1.2, 6.5 |
-| B-16 | Council change 3 of 5 → 4 of 6 | Green: share 0.6 → 0.67, floor met | 4.1.2, 6.5 |
-| B-17 | Council change 3 of 4 → 2 of 3 (recall) | Meets the floor; red notice: threshold lower | 4.1.2, 6.5 |
+| B-14 | Council change 3 of 5 → 3 of 7 (two seats added, threshold unchanged) | Below the floor: majority. Red notice: "A minority, 3 of 7, could move the funds" | 4.1.2, 6.5 |
+| B-15 | Council change 3 of 5 → 3 of 6 | Below the floor: majority; red notice: majority line broken | 4.1.2, 6.5 |
+| B-16 | Council change 3 of 5 → 4 of 6 | Green: 4 keyholders needed, was 3; 2 spare keys, as before | 4.1.2, 6.5 |
+| B-17 | Council change 3 of 4 → 2 of 3 (recall) | Meets the floor; red notice: "2 keyholders could move the funds, not 3" | 4.1.2, 6.5 |
 | B-18 | Proposal form: adding a seat to 3 of 5 | Reminder that keys and threshold go together; threshold suggested 4 of 6 | 6.5 |
-| B-19 | Proposal form: adding two seats to 3 of 5 | Threshold suggested 5 of 7 | 6.5 |
+| B-19 | Proposal form: adding two seats to 3 of 5 | Threshold suggested 4 of 7 | 6.5 |
 | B-20 | Proposal form: removing a seat from 3 of 4 | Threshold suggested 2 of 3, with a note that the change will show as weakening | 6.5 |
+| B-21 | Council change 2 of 3 → 3 of 5 | Green: "3 keyholders needed to move the funds, was 2"; "2 keys can be lost without freezing the treasury, was 1" | 4.1.2, 6.5 |
+| B-22 | Council change 4 of 5 → 4 of 6 | Green: same 4 keyholders, still a majority; one more spare key | 4.1.2, 6.5 |
 | H-01 | DAO with no council change | Chain of 1 descriptor, active; "never below the floor" if it meets it | 6.6 |
 | H-02 | DAO after two council changes, earlier treasuries empty | Chain of 3; the two earlier ones swept, each with its active period, proposal and migration txid | 6.6 |
 | H-03 | Coins arrive at an earlier descriptor after its migration | That link shown residual until a sweep round confirms, then swept | 6.1, 6.6 |
