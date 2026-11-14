@@ -92,6 +92,7 @@ y = section('Before the workshop (organiser)', [
     ('SeedSigner ready.', 'Firmware 0.8.6. Settings → Advanced → Bitcoin network: Testnet, and turn on Persistent settings so it stays on Testnet after a restart.'),
     ('Cards and dice.', 'Print this file single-sided at 100%. Cut out each sheet\'s three cards. One die (or five) for the key of your own.'),
     ('Phones.', f'Each council member brings the phone and browser they will use for the DAO. The organiser prepares the founding on the {NAME} site.'),
+    ('A testnet wallet.', 'Each council member installs Mycelium Testnet Wallet on that phone: a separate app from Mycelium’s ordinary wallet, for test coins only. The DAO’s payouts to you arrive there.'),
 ], y)
 
 y = section('A. The ready-made key (cards 1 and 2), about 10 minutes', [
