@@ -535,7 +535,12 @@ export function PaymentLine({ id }: { id: string }) {
   const date = pay.lapseAt ? new Intl.DateTimeFormat(app.lang === 'en' ? 'en-GB' : 'it-IT', { day: 'numeric', month: 'long' }).format(new Date(pay.lapseAt * 1000)) : '';
   const round = pay.round?.content.round ?? '';
   const isClose = s.proposals.find(p => p.event.id === id)?.content.type === 'close';
-  const text = pay.status === 'paid' && isClose ? t('pay.closeDone') : t(`pay.${pay.status}` as 'pay.waiting', { date, round });
+  // A payout in tranches that lapsed part-way: say what was paid before the rest lapsed.
+  const paidPart = pay.status === 'lapsed' ? (pay.tranches ?? []).filter(v => v.status === 'paid') : [];
+  const lapsedAt = pay.tranches?.find(v => v.status === 'lapsed');
+  const text = pay.status === 'paid' && isClose ? t('pay.closeDone')
+    : paidPart.length && lapsedAt ? t('pay.lapsedPart', { paid: paidPart.length, total: pay.tranches!.length, sats: fmtSats(paidPart.reduce((a, v) => a + v.amount_sat, 0)), n: lapsedAt.n, date })
+    : t(`pay.${pay.status}` as 'pay.waiting', { date, round });
   return pay.round ? <a class={pay.status === 'paid' ? 'ok' : 'small'} href={`#/round/${pay.round.event.id}`}>{text}</a> : <p class={pay.status === 'lapsed' ? 'warn' : 'small'}>{text}</p>;
 }
 
