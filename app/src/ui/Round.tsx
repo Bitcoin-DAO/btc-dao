@@ -212,7 +212,14 @@ export function PrepareRound() {
             {aboveCap && <p class="warnbox">{t('rd.feeAboveCap', { max, rate: suggested! })}</p>}
             {shortBy > 0 && <p class="warnbox">{t('rd.shortBy', { missing: fmtSats(shortBy), balance: fmtSats(app.treasury!.utxos.reduce((a, u) => a + u.value, 0)) })}</p>}
             <button type="button" class="btn secondary" disabled={!rateOk || !live || shortBy > 0} onClick={build}>{t('rd.build')}</button>
-            {!live && (app.treasuryLoading || !app.treasuryError) && <p class="small">{t('rd.readingCoins')}</p>}
+            {!live && (app.treasuryLoading || !app.treasuryError) && (
+              <p class="small">
+                {t('rd.readingCoins')}
+                {app.treasuryLoading && app.treasuryProgress && app.treasuryProgress.checked > 0 && (
+                  <> {t('rd.readingProgress', { n: app.treasuryProgress.checked, source: app.treasuryProgress.source ?? '…' })}</>
+                )}
+              </p>
+            )}
             {!live && !app.treasuryLoading && app.treasuryError && (
               <p class="small">{t('rd.coinsError', { msg: app.treasuryError })} <button type="button" class="btn link" onClick={() => refreshTreasury()}>{t('retry')}</button></p>
             )}
@@ -576,7 +583,7 @@ export function SweepRound() {
   if (!app.isCouncil || !app.secret) return <CouncilOnly />;
   if (!descriptor) return <><Header /><main><p class="lead">{t('sw.none')}</p></main><Footer /></>;
   const tr = app.treasury;
-  const fresh = !!tr && !app.treasuryLoading && (app.treasuryAt ?? 0) >= opened && !!tr.descriptor && sameWallet(tr.descriptor, settings.descriptor);
+  const fresh = !!tr && !app.treasuryLoading && !app.othersLoading && (app.treasuryAt ?? 0) >= opened && !!tr.descriptor && sameWallet(tr.descriptor, settings.descriptor);
   const old = tr?.others?.find(o => o.descriptor === descriptor)?.view;
   const to = fresh && tr!.donationIndex >= 0 && tr!.donationIndex < RECEIVE_WINDOW ? tr!.donationAddress : undefined;
   const already = openSweeps(s).find(r => r.content.sweep === descriptor);
