@@ -80,8 +80,10 @@ async function decodeQrIn(page, selector) {
     await council[0].page.goto(URL0 + route);
     await council[0].page.waitForTimeout(800);
     const text = await council[0].page.locator('main').innerText().catch(() => '');
-    check(text.trim().length > 20 && !/could not be shown|non si è potuta aprire/.test(text), `before founding, ${route} shows a page`);
+    check(text.trim().length > 20 && !/could not be shown|non si è potuta aprire/.test(text), `before founding, ${route} shows a page: ${JSON.stringify(text.trim().slice(0, 80))}`);
   }
+  await council[0].page.goto(URL0 + '#/');
+  await council[0].page.getByText('Modalità fondazione.').waitFor();
 
   log('Founder sign-up on every phone');
   for (const c of council) Object.assign(c, await signUp(c, c.name, true, c === council[1]));

@@ -114,15 +114,17 @@ function App() {
       </div>
     );
   }
+  // Before the founding, only the founding pages; any other link shows how to join (review U-8).
+  if (!app.daoId && !BEFORE_FOUNDING.has(path)) return <Guard path={path}><div class="app"><Join /></div></Guard>;
   const param = path.match(/^\/(p|confirm|round)\/([0-9a-f]{64})$/);
   if (param) {
     const [, kind, id] = param;
-    return <div class="app">{kind === 'p' ? <ProposalDetail id={id} /> : kind === 'confirm' ? <Confirm id={id} /> : <RoundDetail id={id} />}</div>;
+    return <Guard path={path}><div class="app">{kind === 'p' ? <ProposalDetail id={id} /> : kind === 'confirm' ? <Confirm id={id} /> : <RoundDetail id={id} />}</div></Guard>;
   }
   const thread = path.match(/^\/d\/([0-9a-f]{64})(\/version)?$/);
-  if (thread) return <div class="app">{thread[2] ? <NewProposal draftId={thread[1]} /> : <ThreadView id={thread[1]} />}</div>;
+  if (thread) return <Guard path={path}><div class="app">{thread[2] ? <NewProposal draftId={thread[1]} /> : <ThreadView id={thread[1]} />}</div></Guard>;
   const Screen = routes[path] ?? Home;
-  return <div class="app"><Screen /></div>;
+  return <Guard path={path}><div class="app"><Screen /></div></Guard>;
 }
 
 render(<App />, document.getElementById('root')!);
