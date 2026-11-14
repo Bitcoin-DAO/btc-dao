@@ -81,4 +81,6 @@ Signature checks before use (relay and app); outputs of ordinary payouts must ma
 | 6. Identity and record | I-2 (a private key refused wherever a public key is expected, with a warning not to show it), I-3/R-M5 (every passkey backup kept; sign-in uses the one that opens to its own key), I-5 (report links http(s) only, in the record and on screen), R-H3 (roster and settings chains no longer capped) | 0e47a57 | 5 new unit cases (fail on the old code) |
 | 7. UI for the workshop | U-1, U-2 (funds checks count the next tranche only), U-4 (rule values in words), U-5 (paid staged payout names its round), U-6 (Leave), U-7 (a vote closes on screen at the exact time), U-8 (pages before the founding show how to join; a page that throws shows a way home) | 2a30384, ea07a79 | next-tranche unit case; founding (pages before founding) and governance (vote closing) end-to-end. Blocks 5 to 7 together: all 12 end-to-end suites, 292 checks |
 
-Phase A still open: X-4 (pin the relay to ALPHA DAO's id, after its founding) and I-1 (ALPHA DAO's own origin).
+| I-1 for ALPHA DAO | ALPHA DAO has a web address of its own, https://alpha.byob.zone (repo byob-zone/alpha-dao, a separate GitHub organisation, domain verified there), so its keys and passkeys share no origin with the other DAOs; the gateway accepts that origin | 2211691 (gateway) | site loads at the new address over HTTPS |
+
+Phase A still open: X-4 (pin the relay to ALPHA DAO's id, after its founding). Every other DAO gets its own origin before mainnet (I-1, phase B).
