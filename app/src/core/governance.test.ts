@@ -347,6 +347,7 @@ describe('settings (3.4)', () => {
 // ---------- payout rounds (6.1-6.3) and closing ----------
 import { mnemonicToSeedSync } from '@scure/bip39';
 import { buildRound, finalizeRound, masterFromSeed, signWithMnemonicKey, type Utxo } from './round';
+import { nextRoundOutputs } from './next';
 
 describe('payout rounds (6.1-6.3)', () => {
   const masters = MNEMONICS.map(m => masterFromSeed(mnemonicToSeedSync(m), 'testnet4'));
@@ -706,6 +707,19 @@ describe('payout rounds (6.1-6.3)', () => {
     const e = d.ev(KIND.round, { round: '2026-12', proposals: ids, psbt: r.psbt, fee_rate_sat_vb: fee, fee_sat: r.fee }, who, at);
     return { e, r };
   }
+
+  it('funds checks count only the next tranche of a staged payout (review U-1, U-2)', () => {
+    const d = dao();
+    const schedule = [{ amount_sat: 100_000, due_days: 14 }, { amount_sat: 200_000, due_days: 45 }];
+    const p = d.propose(d.f[0], { type: 'payout', payload: { recipient: 'Tipografia', outputs: [{ address: RECIPIENT, amount_sat: 300_000 }], schedule } }, d.T + 1);
+    d.ev(KIND.confirm, { address: RECIPIENT }, newSecret(), d.T + 2, [['e', p.id]]);
+    for (const i of [0, 1, 2]) d.vote(d.f[i], p, 'yes', d.T + 2);
+    d.tally(d.c[0], d.state(d.T + 8 * DAY), p, d.T + 8 * DAY);
+    d.ev(KIND.report, { tranche: 1, text: 'Fatto.' }, d.f[0], d.T + 8 * DAY + 5, [['e', p.id]]);
+    const s = d.state(d.T + 8 * DAY + 10);
+    const view = s.proposals.find(x => x.event.id === p.id)!;
+    expect(nextRoundOutputs(s, view)).toEqual([{ address: RECIPIENT, amount_sat: 100_000 }]); // not 300,000
+  });
 
   it('the same proposal listed twice in one round is refused (review M-F1)', () => {
     const d = dao();

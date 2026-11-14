@@ -1,4 +1,4 @@
-import { render } from 'preact';
+import { Component, render, type ComponentChildren } from 'preact';
 import { useEffect, useState } from 'preact/hooks';
 import '@fontsource/ibm-plex-sans/400.css';
 import '@fontsource/ibm-plex-sans/500.css';
@@ -53,6 +53,32 @@ const routes: Record<string, () => preact.JSX.Element> = {
 };
 
 const currentPath = () => location.hash.replace(/^#/, '') || '/';
+
+/** Pages that make sense before the DAO is founded; any other link opened then shows how to join (review U-8). */
+const BEFORE_FOUNDING = new Set(['/', '/join', '/founder', '/setup', '/restore', '/qrtest', '/history']);
+
+/** A page that still throws shows a message and a way back, never a blank screen. */
+class Guard extends Component<{ children: ComponentChildren; path: string }, { failed?: string }> {
+  state: { failed?: string } = {};
+  componentDidCatch(e: unknown) {
+    this.setState({ failed: String((e as Error)?.message ?? e) });
+  }
+  componentDidUpdate(prev: { path: string }) {
+    if (prev.path !== this.props.path && this.state.failed) this.setState({ failed: undefined });
+  }
+  render() {
+    if (!this.state.failed) return this.props.children;
+    return (
+      <div class="app">
+        <Header />
+        <main>
+          <p class="warnbox">{t('error.page', { msg: this.state.failed })}</p>
+          <button type="button" class="btn secondary" onClick={() => { this.setState({ failed: undefined }); location.hash = '#/'; }}>{t('error.toHome')}</button>
+        </main>
+      </div>
+    );
+  }
+}
 
 function App() {
   const app = useApp();

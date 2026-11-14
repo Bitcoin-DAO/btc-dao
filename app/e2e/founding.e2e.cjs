@@ -75,6 +75,13 @@ async function decodeQrIn(page, selector) {
   await council[0].page.getByText('Modalità fondazione.').waitFor();
   await council[0].page.screenshot({ path: `${SHOTS}/01-home-prefounding.png`, fullPage: true });
   check(true, 'founding mode shown');
+  // Links to DAO pages opened before the founding show how to join, not a blank page (review U-8).
+  for (const route of ['#/members', '#/council', '#/new', '#/round/new', '#/sponsor', '#/discussion']) {
+    await council[0].page.goto(URL0 + route);
+    await council[0].page.waitForTimeout(800);
+    const text = await council[0].page.locator('main').innerText().catch(() => '');
+    check(text.trim().length > 20 && !/could not be shown|non si è potuta aprire/.test(text), `before founding, ${route} shows a page`);
+  }
 
   log('Founder sign-up on every phone');
   for (const c of council) Object.assign(c, await signUp(c, c.name, true, c === council[1]));

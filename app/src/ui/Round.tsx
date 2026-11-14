@@ -16,6 +16,7 @@ import { SeedSignerSign } from './Hw';
 import { buildRound, estimateVsize, finalizeRound, masterFromSeed, memberSignatures, RECEIVE_WINDOW, signWithMnemonicKey, type BuiltRound } from '../core/round';
 import { cadenceOf, roundLabel } from '../core/time';
 import { proposalLabel, type Output, type ProposalView, type RoundView } from '../core/state';
+export { nextRoundOutputs } from '../core/next';
 import { CouncilOnly, Address, Footer, Header, errText, go, askText } from './parts';
 import { useNameOf } from './Proposals';
 
@@ -555,15 +556,22 @@ export function PaymentLine({ id }: { id: string }) {
   const pay = s.payments.get(id);
   if (!pay) return null;
   const date = pay.lapseAt ? new Intl.DateTimeFormat(app.lang === 'en' ? 'en-GB' : 'it-IT', { day: 'numeric', month: 'long' }).format(new Date(pay.lapseAt * 1000)) : '';
-  const round = pay.round?.content.round ?? '';
-  const isClose = s.proposals.find(p => p.event.id === id)?.content.type === 'close';
+  // The round to name and link: the one in hand, else the round that paid it (for a payout in tranches, the one
+  // that paid its last tranche; review U-5: a fully paid one said "Paid in round" with no round).
+  const lastTranche = pay.tranches?.filter(v => v.paidRound).slice(-1)[0]?.paidRound;
+  const shown = pay.round ?? (lastTranche ? s.rounds.find(r => r.event.id === lastTranche) : undefined)
+    ?? (pay.status === 'paid' ? s.rounds.find(r => r.status === 'paid' && r.content.proposals.includes(id)) : undefined);
+  const round = shown?.content.round ?? '';
+  const type = s.proposals.find(p => p.event.id === id)?.content.type;
+  const isClose = type === 'close';
   // A payout in tranches that lapsed part-way: say what was paid before the rest lapsed.
   const paidPart = pay.status === 'lapsed' ? (pay.tranches ?? []).filter(v => v.status === 'paid') : [];
   const lapsedAt = pay.tranches?.find(v => v.status === 'lapsed');
   const text = pay.status === 'paid' && isClose ? t('pay.closeDone')
+    : pay.status === 'paid' && type === 'change_council' ? t('pay.councilMoved', { round })
     : paidPart.length && lapsedAt ? t('pay.lapsedPart', { paid: paidPart.length, total: pay.tranches!.length, sats: fmtSats(paidPart.reduce((a, v) => a + v.amount_sat, 0)), n: lapsedAt.n, date })
     : t(`pay.${pay.status}` as 'pay.waiting', { date, round });
-  return pay.round ? <a class={pay.status === 'paid' ? 'ok' : 'small'} href={`#/round/${pay.round.event.id}`}>{text}</a> : <p class={pay.status === 'lapsed' ? 'warn' : 'small'}>{text}</p>;
+  return shown ? <a class={pay.status === 'paid' ? 'ok' : 'small'} href={`#/round/${shown.event.id}`}>{text}</a> : <p class={pay.status === 'lapsed' ? 'warn' : 'small'}>{text}</p>;
 }
 
 /** The round in hand: open, and not replaced by a later round on its coins. */
