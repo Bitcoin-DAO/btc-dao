@@ -347,6 +347,7 @@ describe('settings (3.4)', () => {
 // ---------- payout rounds (6.1-6.3) and closing ----------
 import { mnemonicToSeedSync } from '@scure/bip39';
 import { buildRound, finalizeRound, masterFromSeed, signWithMnemonicKey, type Utxo } from './round';
+import { nextRoundOutputs } from './next';
 
 describe('payout rounds (6.1-6.3)', () => {
   const masters = MNEMONICS.map(m => masterFromSeed(mnemonicToSeedSync(m), 'testnet4'));
@@ -706,6 +707,19 @@ describe('payout rounds (6.1-6.3)', () => {
     const e = d.ev(KIND.round, { round: '2026-12', proposals: ids, psbt: r.psbt, fee_rate_sat_vb: fee, fee_sat: r.fee }, who, at);
     return { e, r };
   }
+
+  it('funds checks count only the next tranche of a staged payout (review U-1, U-2)', () => {
+    const d = dao();
+    const schedule = [{ amount_sat: 100_000, due_days: 14 }, { amount_sat: 200_000, due_days: 45 }];
+    const p = d.propose(d.f[0], { type: 'payout', payload: { recipient: 'Tipografia', outputs: [{ address: RECIPIENT, amount_sat: 300_000 }], schedule } }, d.T + 1);
+    d.ev(KIND.confirm, { address: RECIPIENT }, newSecret(), d.T + 2, [['e', p.id]]);
+    for (const i of [0, 1, 2]) d.vote(d.f[i], p, 'yes', d.T + 2);
+    d.tally(d.c[0], d.state(d.T + 8 * DAY), p, d.T + 8 * DAY);
+    d.ev(KIND.report, { tranche: 1, text: 'Fatto.' }, d.f[0], d.T + 8 * DAY + 5, [['e', p.id]]);
+    const s = d.state(d.T + 8 * DAY + 10);
+    const view = s.proposals.find(x => x.event.id === p.id)!;
+    expect(nextRoundOutputs(s, view)).toEqual([{ address: RECIPIENT, amount_sat: 100_000 }]); // not 300,000
+  });
 
   it('the same proposal listed twice in one round is refused (review M-F1)', () => {
     const d = dao();
@@ -1073,5 +1087,42 @@ describe('vote counts can be checked (review block 2)', () => {
     const v = view(d.state(C(d) + 1), p);
     expect(v.status).toBe('passed');
     expect(v.counts.yes).toBe(3);
+  });
+});
+
+// Review of 14 November 2026, block 6.
+describe('identity and record checks (review block 6)', () => {
+  it('the member list keeps growing past 50 versions (review R-H3)', () => {
+    const d = dao();
+    const first = d.state(d.T).rosters[0];
+    let prev = { content: first.content as unknown, hash: first.hash };
+    for (let v = 2; v <= 61; v++) {
+      const content = { version: v, prev: prev.hash, basis: [], members: (first.content as { members: unknown[] }).members };
+      const e = d.ev(KIND.roster, content, d.c[0], d.T + v * 10);
+      for (const i of [0, 1, 2]) d.endorse(d.c[i], e, 'roster', d.T + v * 10 + 1);
+      prev = { content, hash: hashJson(content) };
+    }
+    expect(d.state(d.T + 1000).rosters.length).toBe(61);
+  });
+
+  it('a report link must be a web address (review I-5)', () => {
+    const d = dao();
+    const p = d.propose(d.f[0], { type: 'payout', payload: { recipient: 'R', outputs: [{ address: ADDR, amount_sat: 10_000 }], report: 'requested' } }, d.T);
+    for (const i of [0, 1, 2]) d.vote(d.f[i], p, 'yes', d.T + 1);
+    d.tally(d.c[0], d.state(d.T + 8 * DAY), p, d.T + 8 * DAY);
+    const bad = d.ev(KIND.report, { tranche: 1, text: 'fatto', link: 'javascript:alert(1)' }, d.f[0], d.T + 8 * DAY + 5, [['e', p.id]]);
+    const good = d.ev(KIND.report, { tranche: 1, text: 'fatto', link: 'https://example.org/x' }, d.f[0], d.T + 8 * DAY + 6, [['e', p.id]]);
+    const s = d.state(d.T + 9 * DAY);
+    expect(s.rejected.find(r => r.event.id === bad.id)?.reason).toBe('report: malformed');
+    expect(s.rejected.some(r => r.event.id === good.id)).toBe(false);
+  });
+
+  it('a junk passkey backup under another member\'s tag does not hide the real one (review I-3)', () => {
+    const d = dao();
+    d.ev(KIND.keywrap, { nonce: 'aa', ct: 'real' }, d.f[0], d.T + 1, [['c', 'tag0']]);
+    d.ev(KIND.keywrap, { nonce: 'bb', ct: 'junk' }, d.f[1], d.T + 2, [['c', 'tag0']]); // a later one by someone else
+    d.ev(KIND.keywrap, { nonce: 'cc', ct: 'future' }, d.f[1], d.T + 10 * DAY, [['c', 'tag0']]); // dated far ahead
+    const list = d.state(d.T + 3).keywraps.get('tag0')!;
+    expect(list.map(k => k.ct)).toEqual(['junk', 'real']); // both kept, newest first; sign-in tries each
   });
 });

@@ -439,15 +439,24 @@ export async function signIn(): Promise<'ok' | 'no-prf' | 'not-found'> {
   if (!site || !daoId) throw new Error('not-founded');
   const a = await getPrf({ passkeyDomain: site.passkeyDomain, salt: prfSalt(daoId) });
   if (!a.prf) return 'no-prf';
-  let kw = state.dao?.keywraps.get(a.credTag);
-  if (!kw) {
+  let kws = state.dao?.keywraps.get(a.credTag);
+  if (!kws?.length) {
     const evs = await query(relaysOf(site), { kinds: [KIND.keywrap], '#D': [daoId], '#c': [a.credTag] });
     derive([...state.events, ...evs]);
-    kw = state.dao?.keywraps.get(a.credTag);
+    kws = state.dao?.keywraps.get(a.credTag);
   }
-  if (!kw) return 'not-found';
-  const secret = unwrapSecret(a.prf, kw);
-  if (pubkeyOf(secret) !== kw.pubkey) return 'not-found';
+  // Newest first; the first that opens with this passkey to the key that signed it is this member's (review I-3).
+  let found: { kw: NonNullable<typeof kws>[number]; secret: string } | undefined;
+  for (const kw of kws ?? []) {
+    try {
+      const secret = unwrapSecret(a.prf, kw);
+      if (pubkeyOf(secret) === kw.pubkey) { found = { kw, secret }; break; }
+    } catch {
+      // not opened by this passkey: someone else's, or junk
+    }
+  }
+  if (!found) return 'not-found';
+  const { kw, secret } = found;
   const existing = await store.getIdentity(daoId);
   const identity: LocalIdentity = { ...existing, daoId, pubkey: kw.pubkey, credId: a.credId, wrapped: { nonce: kw.nonce, ct: kw.ct } };
   await store.setIdentity(identity);
