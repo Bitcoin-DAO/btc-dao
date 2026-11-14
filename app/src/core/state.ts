@@ -1,11 +1,11 @@
 // Rebuilding the DAO from events (protocol 8): genesis, rosters, settings, membership events,
 // proposals, confirmations, votes and tallies. Pure: the same events give the same state everywhere.
 import { Address } from '@scure/btc-signer';
-import type { CouncilEntry, DaoConfig, Network, Rules, SiteConfig } from './config';
+import { ruleValueError, type CouncilEntry, type DaoConfig, type Network, type Rules, type SiteConfig } from './config';
 import { KIND, byTime, tagValue, verified, type Event } from './events';
 import { btcNetwork, parseDescriptor, sameWallet, treasuryAddress } from './descriptor';
 import { shortCode } from './shortcode';
-import { hashJson, nowSec, parseJson } from './util';
+import { hashJson, nowSec, parseJson, safeTimeZone, validTimeZone } from './util';
 import { maxScheduleDays, REPORT_MAX, scheduleDay, scheduleRulesError, scheduleShapeError, type ClaimView, type ReportView, type Tranche, type TrancheView } from './delivery';
 import { inspectRound, memberSignatures, RECEIVE_WINDOW, type RoundContent, type RoundInspection } from './round';
 import { cadenceOf, roundDatesAfter } from './time';
@@ -336,7 +336,11 @@ export function proposalSchemaError(c: ProposalContent, network: DaoConfig['netw
       return;
     case 'change_rules':
       if (!Array.isArray(p.changes) || !p.changes.length) return 'changes';
-      for (const ch of p.changes) if (!(typeof ch?.path === 'string' && /^rules\.[A-Za-z]+$/.test(ch.path) && 'from' in ch && 'to' in ch)) return 'change';
+      if (p.changes.length > 20) return 'changes';
+      for (const ch of p.changes) {
+        if (!(ch && typeof ch === 'object' && typeof ch.path === 'string' && /^rules\.[A-Za-z]+$/.test(ch.path) && 'from' in ch && 'to' in ch)) return 'change';
+        if (ruleValueError(ch.path.slice(6), ch.to, { timeZone: validTimeZone })) return 'change value';
+      }
       return;
     case 'change_council':
       return councilChangeSchemaError(p as Partial<CouncilChange>);
@@ -349,7 +353,49 @@ export function proposalSchemaError(c: ProposalContent, network: DaoConfig['netw
 // ---------- rebuild ----------
 
 /** `prefer`: a key this device signed up with; a founded genesis listing it wins over others for the same site. */
+/**
+ * Rebuild the DAO state. No event may take the app down for everyone (review R-C1): the checks in rebuildOnce
+ * should reject anything malformed, and if something still throws, the event that causes it is found (the last
+ * event of the shortest list, in time order, that still throws), set aside as rejected, and the state rebuilt
+ * without it.
+ */
 export function rebuild(site: SiteConfig, events: Event[], prefer?: string, now = nowSec()): DaoState {
+  try {
+    return rebuildOnce(site, events, prefer, now);
+  } catch (first) {
+    let pool = [...events].sort(byTime);
+    const setAside: Event[] = [];
+    const throws = (list: Event[]) => {
+      try {
+        rebuildOnce(site, list, prefer, now);
+        return false;
+      } catch {
+        return true;
+      }
+    };
+    for (let attempt = 0; attempt < 20 && pool.length; attempt++) {
+      let lo = 1;
+      let hi = pool.length;
+      while (lo < hi) {
+        const mid = (lo + hi) >> 1;
+        if (throws(pool.slice(0, mid))) hi = mid;
+        else lo = mid + 1;
+      }
+      setAside.push(pool[hi - 1]);
+      pool = pool.filter((_, i) => i !== hi - 1);
+      try {
+        const st = rebuildOnce(site, pool, prefer, now);
+        st.rejected.push(...setAside.map(event => ({ event, reason: 'could not be read: set aside so the rest of the record can be' })));
+        return st;
+      } catch {
+        // another one: go round again
+      }
+    }
+    throw first;
+  }
+}
+
+function rebuildOnce(site: SiteConfig, events: Event[], prefer?: string, now = nowSec()): DaoState {
   const rejected: Rejected[] = [];
   const seen = new Set<string>();
   const all = events
@@ -417,7 +463,7 @@ export function rebuild(site: SiteConfig, events: Event[], prefer?: string, now 
     version: 1,
     members: [
       ...cfg.council.map(c => ({ key: c.identityKey, name: c.label, since: since0, verified: 'in_person' as Verified, council: true })),
-      ...cfg.founders.map(f => ({ key: f.identityKey, name: f.name, since: since0, verified: f.verified, council: false })),
+      ...(Array.isArray(cfg.founders) ? cfg.founders : []).map(f => ({ key: f.identityKey, name: f.name, since: since0, verified: f.verified, council: false })),
     ],
   };
   const settings1: SettingsContent = { version: 1, rules: cfg.rules, closed: false, council: cfg.council, threshold: cfg.threshold, descriptor: cfg.descriptor };
@@ -428,7 +474,7 @@ export function rebuild(site: SiteConfig, events: Event[], prefer?: string, now 
   /** Round dates follow the settings in force at each moment (6.1). */
   const roundRulesAt = (t: number) => {
     const r = settingsAt(t).content.rules;
-    return { cadence: cadenceOf(r.payoutRound), tz: r.timezone || 'UTC', changes: settings.map(s => s.effectiveAt) };
+    return { cadence: cadenceOf(r.payoutRound), tz: safeTimeZone(r.timezone), changes: settings.map(s => s.effectiveAt) };
   };
 
   // Persons and keys: a key replacement moves a person to a new key from its effective time.
@@ -677,7 +723,7 @@ export function rebuild(site: SiteConfig, events: Event[], prefer?: string, now 
       const groups = new Map<string, { events: Event[]; content: TallyContent }>();
       for (const t of tallyEvents.filter(t => tagValue(t, 'e') === e.id)) {
         const b = parseJson<TallyContent>(t.content);
-        if (!b || b.proposal !== e.id || b.closed_at !== closeAt || b.number !== number || t.created_at < closeAt || !isCouncilAt(t.pubkey, t.created_at) || !Array.isArray(b.counted) || !Array.isArray(b.excluded) || !b.result) {
+        if (!b || b.proposal !== e.id || b.closed_at !== closeAt || b.number !== number || t.created_at < closeAt || !isCouncilAt(t.pubkey, t.created_at) || !tallyShapeOk(b)) {
           proposalRejected.push({ event: t, reason: 'tally: invalid' });
           continue;
         }
@@ -816,7 +862,8 @@ export function rebuild(site: SiteConfig, events: Event[], prefer?: string, now 
       const errors: string[] = [];
       const sv = settingsAt(e.created_at).content;
       const isSweep = !!c && typeof c.sweep === 'string';
-      if (!c || !Array.isArray(c.proposals) || (!c.proposals.length && !isSweep) || (isSweep && c.proposals.length) || typeof c.psbt !== 'string') {
+      const tranchesOk = c?.tranches === undefined || (!!c.tranches && typeof c.tranches === 'object' && !Array.isArray(c.tranches) && Object.values(c.tranches).every(n => Number.isInteger(n) && n >= 1 && n <= 10));
+      if (!c || !Array.isArray(c.proposals) || !c.proposals.every(id => typeof id === 'string' && /^[0-9a-f]{64}$/.test(id)) || (!c.proposals.length && !isSweep) || (isSweep && c.proposals.length) || typeof c.psbt !== 'string' || !tranchesOk || (c.sweep !== undefined && typeof c.sweep !== 'string')) {
         proposalRejected.push({ event: e, reason: 'round: malformed' });
         continue;
       }
@@ -1210,7 +1257,7 @@ export function rebuild(site: SiteConfig, events: Event[], prefer?: string, now 
   const latestNotice = new Map<string, { lost: boolean; at: number }>();
   for (const e of ofKind(KIND.keystatus)) {
     const c = parseJson<{ fingerprint?: string; state?: string }>(e.content);
-    const fp = c?.fingerprint?.toLowerCase();
+    const fp = typeof c?.fingerprint === 'string' ? c.fingerprint.toLowerCase() : undefined;
     if (!fp || (c!.state !== 'lost' && c!.state !== 'found')) { rejected.push({ event: e, reason: 'keystatus: malformed' }); continue; }
     const entry = settingsAt(e.created_at).content.council.find(x => personOf(x.identityKey) === personOf(e.pubkey));
     if (!entry || entry.fingerprint.toLowerCase() !== fp) { rejected.push({ event: e, reason: 'keystatus: not the signer\'s council key' }); continue; }
@@ -1243,6 +1290,15 @@ export const TALLY_SETTLE = 600;
 /** The votes a count saw: those it counted and those it set aside. */
 const knownOf = (t: TallyContent) => new Set([...t.counted, ...t.excluded.map(x => x.id)]);
 const isSubset = (a: Set<string>, b: Set<string>) => [...a].every(x => b.has(x));
+
+/** Every field a tally's comparison reads has the type it needs (review R-C1: a null or 1e999 there threw). */
+function tallyShapeOk(b: TallyContent): boolean {
+  const r = b.result as unknown as Record<string, unknown> | undefined;
+  return Array.isArray(b.counted) && b.counted.every(x => typeof x === 'string')
+    && Array.isArray(b.excluded) && b.excluded.every(x => !!x && typeof x === 'object' && typeof x.id === 'string' && typeof x.reason === 'string')
+    && !!r && typeof r === 'object' && ['yes', 'no', 'abstain'].every(k => Number.isInteger(r[k]) && (r[k] as number) >= 0)
+    && typeof r.quorum_met === 'boolean' && typeof r.passed === 'boolean';
+}
 
 function tallyKey(t: TallyContent): string {
   return hashJson({

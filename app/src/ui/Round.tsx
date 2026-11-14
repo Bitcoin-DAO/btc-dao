@@ -1,4 +1,5 @@
 // Payout rounds (protocol 6.1-6.3): prepare (council), check and sign, broadcast, receipt.
+import { safeTimeZone } from '../core/util';
 import { useEffect, useState } from 'preact/hooks';
 import { mnemonicToSeedSync } from '@scure/bip39';
 import { broadcastRound, chainApis, receiptDepth, refreshTreasury, signAndPublish, signingKey, useApp } from '../app';
@@ -135,7 +136,7 @@ export function PrepareRound() {
     setBusy(true);
     try {
       const { event } = await signAndPublish(KIND.round, {
-        round: roundLabel(s.now, settings.rules.timezone, cadenceOf(settings.rules.payoutRound)), proposals: list.map(p => p.event.id), ...(Object.keys(tranchesOf).length ? { tranches: tranchesOf } : {}), psbt: built.psbt, fee_rate_sat_vb: r, fee_sat: built.fee,
+        round: roundLabel(s.now, safeTimeZone(settings.rules.timezone), cadenceOf(settings.rules.payoutRound)), proposals: list.map(p => p.event.id), ...(Object.keys(tranchesOf).length ? { tranches: tranchesOf } : {}), psbt: built.psbt, fee_rate_sat_vb: r, fee_sat: built.fee,
       });
       const tk = signingKey();
       if (tk) await signAndPublish(KIND.sign, { psbt: signWithMnemonicKey(built.psbt, masterFromSeed(mnemonicToSeedSync(tk.mnemonic), cfg.network)) }, [['e', event.id]]);
@@ -608,7 +609,7 @@ export function SweepRound() {
     setMsg(undefined);
     try {
       const { event } = await signAndPublish(KIND.round, {
-        round: roundLabel(s.now, settings.rules.timezone, cadenceOf(settings.rules.payoutRound)), proposals: [], sweep: descriptor, psbt: built.psbt, fee_rate_sat_vb: r, fee_sat: built.fee,
+        round: roundLabel(s.now, safeTimeZone(settings.rules.timezone), cadenceOf(settings.rules.payoutRound)), proposals: [], sweep: descriptor, psbt: built.psbt, fee_rate_sat_vb: r, fee_sat: built.fee,
       });
       go(`/round/${event.id}`);
     } catch (e) {

@@ -1,4 +1,5 @@
 import { openRound, openSweeps, startSweep } from './Round';
+import { safeTimeZone } from '../core/util';
 import { useEffect, useState } from 'preact/hooks';
 import { chainApis, manualRetryIn, refreshTreasury, useApp } from '../app';
 import { fmtDate, fmtSats, t } from '../i18n';
@@ -27,8 +28,8 @@ export function Home() {
   const round = openRound(app.dao!);
   const waiting = app.dao!.proposals.filter(p => app.dao!.payments.get(p.event.id)?.status === 'waiting' && p.content.type === 'payout');
   const waitingSats = waiting.reduce((s, p) => s + (p.content.payload.outputs as { amount_sat: number }[]).reduce((a, o) => a + o.amount_sat, 0), 0);
-  const nextRoundDate = new Intl.DateTimeFormat(app.lang === 'en' ? 'en-GB' : 'it-IT', { day: 'numeric', month: 'long', timeZone: current.rules.timezone })
-    .format(new Date(roundDatesAfter(app.dao!.now, current.rules.timezone, 1, cadenceOf(current.rules.payoutRound))[0] * 1000));
+  const nextRoundDate = new Intl.DateTimeFormat(app.lang === 'en' ? 'en-GB' : 'it-IT', { day: 'numeric', month: 'long', timeZone: safeTimeZone(current.rules.timezone) })
+    .format(new Date(roundDatesAfter(app.dao!.now, safeTimeZone(current.rules.timezone), 1, cadenceOf(current.rules.payoutRound))[0] * 1000));
   const moves = movementsOf(tr);
   const paidRounds = new Map(app.dao!.rounds.filter(r => r.status === 'paid' && r.inspection).map(r => [r.inspection!.txid, r]));
   return (
