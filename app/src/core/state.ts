@@ -613,9 +613,25 @@ function rebuildOnce(site: SiteConfig, events: Event[], prefer?: string, now = n
     }
 
     // leaves
+    const proposalEvents = new Map(ofKind(KIND.proposal).map(x => [x.id, x]));
+    const voteEvents = new Map(ofKind(KIND.vote).map(x => [x.id, x]));
+    const leaveContradicted = (e: Event, p: string) => ofKind(KIND.tally).some(t => {
+      if (t.created_at <= e.created_at || !isCouncilAt(t.pubkey, t.created_at)) return false;
+      const b = parseJson<TallyContent>(t.content);
+      const pe = proposalEvents.get(tagValue(t, 'e') ?? '');
+      if (!b || !tallyShapeOk(b) || !pe) return false;
+      if (personOf(pe.pubkey) === p && pe.created_at >= e.created_at) return true;
+      const closeAt = pe.created_at + Math.round(settingsAt(pe.created_at).content.rules.votingPeriodDays * 86400);
+      if (closeAt <= e.created_at) return false;
+      return b.counted.some(id => { const v = voteEvents.get(id); return !!v && personOf(v.pubkey) === p; });
+    });
     for (const e of ofKind(KIND.leave)) {
       const p = personOf(e.pubkey);
       if (leaves.has(p)) continue;
+      // 5.3: leaving takes effect from when it is said (review R-C3). A council count made after the leave's date that
+      // still counted the person (a proposal of theirs dated after it, or their vote on a proposal still open at that
+      // date) shows the leave was dated back: it is not accepted, so it cannot erase decided proposals or votes.
+      if (leaveContradicted(e, p)) continue;
       if (memberAt(e.pubkey, e.created_at) && !isCouncilAt(e.pubkey, e.created_at)) leaves.set(p, e);
     }
 
@@ -658,28 +674,27 @@ function rebuildOnce(site: SiteConfig, events: Event[], prefer?: string, now = n
       }
       valid.push({ e, c: c! });
     }
-    // Tallied proposals fix the numbering: untallied proposals dated before the latest tallied one are backdated.
     const tallyEvents = ofKind(KIND.tally);
-    const hasTally = (id: string) => tallyEvents.some(t => tagValue(t, 'e') === id && isCouncilAt(t.pubkey, t.created_at));
-    const lastTallied = Math.max(-1, ...valid.filter(v => hasTally(v.e.id)).map(v => v.e.created_at));
-    const kept = valid.filter(v => {
-      if (v.e.created_at < lastTallied && !hasTally(v.e.id)) { proposalRejected.push({ event: v.e, reason: 'proposal: dated before the last tallied proposal' }); return false; }
-      return true;
-    });
-
     const votes = ofKind(KIND.vote);
-    const confirms = ofKind(KIND.confirm);
-    standingList = [];
-    for (const k of confirms.filter(k => tagValue(k, 'e') === undefined)) {
-      const b = parseJson<{ address?: string; standing?: boolean }>(k.content);
-      if (!b || typeof b.standing !== 'boolean') { proposalRejected.push({ event: k, reason: 'confirm: malformed' }); continue; }
-      if (!memberAt(k.pubkey, k.created_at)) { proposalRejected.push({ event: k, reason: 'standing address: signer is not a member' }); continue; }
-      if (b.standing && !validAddress(b.address, network)) { proposalRejected.push({ event: k, reason: 'standing address: invalid address' }); continue; }
-      if (b.standing && isTreasuryAddress(b.address!)) { proposalRejected.push({ event: k, reason: 'standing address: a treasury address' }); continue; }
-      standingList.push({ event: k, address: b.standing ? b.address : undefined });
+    // 4.4, decided means decided: when a proposal's result was first acted on, by a receipt for a round that pays it
+    // or a roster or settings version that names it in its basis.
+    const acted = new Map<string, number>();
+    const actedAt = (id: string, at: number) => { if (!(acted.get(id)! <= at)) acted.set(id, at); };
+    const roundEvents = new Map(ofKind(KIND.round).map(r => [r.id, r]));
+    for (const rc of ofKind(KIND.receipt)) {
+      const r = roundEvents.get(tagValue(rc, 'e') ?? '');
+      if (!r || !isCouncilAt(rc.pubkey, rc.created_at)) continue;
+      const ids = parseJson<{ proposals?: unknown }>(r.content)?.proposals;
+      if (Array.isArray(ids)) for (const id of ids) if (typeof id === 'string') actedAt(id, rc.created_at);
     }
-    return kept.map(({ e, c }, i) => {
-      const number = i + 1;
+    for (const v of [...rosters, ...settings]) {
+      const basis = (v.content as { basis?: unknown }).basis;
+      if (Array.isArray(basis)) for (const id of basis) if (typeof id === 'string') actedAt(id, v.effectiveAt);
+    }
+    const actedOn = (id: string) => acted.get(id);
+    const voteById = new Map(votes.map(v => [v.id, v]));
+    /** The count of a proposal over the given votes (protocol 4.4); `report` records malformed votes as rejected. */
+    const countOver = (e: Event, c: ProposalContent, number: number, list: Event[], report = false) => {
       const sv = settingsAt(e.created_at);
       const rules = sv.content.rules;
       const rv = rosterAt(e.created_at);
@@ -695,9 +710,9 @@ function rebuildOnce(site: SiteConfig, events: Event[], prefer?: string, now = n
       }
       const excluded: TallyContent['excluded'] = [];
       const latest = new Map<string, { event: Event; choice: Choice }>();
-      for (const v of votes.filter(v => tagValue(v, 'e') === e.id)) {
+      for (const v of list) {
         const b = parseJson<{ choice: Choice }>(v.content);
-        if (!b || !['yes', 'no', 'abstain'].includes(b.choice)) { proposalRejected.push({ event: v, reason: 'vote: malformed' }); continue; }
+        if (!b || !['yes', 'no', 'abstain'].includes(b.choice)) { if (report) proposalRejected.push({ event: v, reason: 'vote: malformed' }); continue; }
         if (v.created_at > closeAt) { excluded.push({ id: v.id, reason: 'late' }); continue; }
         const p = personOf(v.pubkey);
         if (!eligible.has(p) || !keyActive(v.pubkey, v.created_at)) { excluded.push({ id: v.id, reason: 'not_eligible' }); continue; }
@@ -718,7 +733,53 @@ function rebuildOnce(site: SiteConfig, events: Event[], prefer?: string, now = n
         excluded: excluded.sort((a, b) => (a.id < b.id ? -1 : 1)),
         result: { ...counts, quorum_met: quorumMet, passed: quorumMet && majority },
       };
+      return { sv, rules, rv, closeAt, eligible, latest, counts, quorumNeeded, twoThirds, recount };
+    };
+    /**
+     * 4.4: a tally counts only if every vote it lists is one this client holds, on this proposal, and recounting exactly
+     * those votes gives the same lists and result (review R-C2). 'wait': a listed vote has not reached this client yet.
+     */
+    const tallyCheck = (t: Event, e: Event, c: ProposalContent, b: TallyContent): 'ok' | 'wait' | 'bad' => {
+      const listed = [...b.counted, ...b.excluded.map(x => x.id)];
+      if (new Set(listed).size !== listed.length) return 'bad';
+      const list: Event[] = [];
+      for (const id of listed) {
+        const v = voteById.get(id);
+        if (!v) return 'wait';
+        if (tagValue(v, 'e') !== e.id) return 'bad';
+        list.push(v);
+      }
+      const r = countOver(e, c, b.number, list.sort(byTime)).recount;
+      return tallyKey(r) === tallyKey(b) && r.roster_version === b.roster_version && r.settings_version === b.settings_version ? 'ok' : 'bad';
+    };
+    // Tallied proposals fix the numbering: untallied proposals dated before the latest tallied one are backdated.
+    // Only a tally that checks out counts here (review R-H1: a junk tally used to reject every older open proposal).
+    const hasTally = (v: { e: Event; c: ProposalContent }) => tallyEvents.some(t => {
+      if (tagValue(t, 'e') !== v.e.id || !isCouncilAt(t.pubkey, t.created_at)) return false;
+      const b = parseJson<TallyContent>(t.content);
+      if (!b || b.proposal !== v.e.id || !tallyShapeOk(b) || t.created_at < countOver(v.e, v.c, 0, []).closeAt) return false;
+      return tallyCheck(t, v.e, v.c, b) === 'ok';
+    });
+    const tallied = new Set(valid.filter(hasTally).map(v => v.e.id));
+    const lastTallied = Math.max(-1, ...valid.filter(v => tallied.has(v.e.id)).map(v => v.e.created_at));
+    const kept = valid.filter(v => {
+      if (v.e.created_at < lastTallied && !tallied.has(v.e.id)) { proposalRejected.push({ event: v.e, reason: 'proposal: dated before the last tallied proposal' }); return false; }
+      return true;
+    });
 
+    const confirms = ofKind(KIND.confirm);
+    standingList = [];
+    for (const k of confirms.filter(k => tagValue(k, 'e') === undefined)) {
+      const b = parseJson<{ address?: string; standing?: boolean }>(k.content);
+      if (!b || typeof b.standing !== 'boolean') { proposalRejected.push({ event: k, reason: 'confirm: malformed' }); continue; }
+      if (!memberAt(k.pubkey, k.created_at)) { proposalRejected.push({ event: k, reason: 'standing address: signer is not a member' }); continue; }
+      if (b.standing && !validAddress(b.address, network)) { proposalRejected.push({ event: k, reason: 'standing address: invalid address' }); continue; }
+      if (b.standing && isTreasuryAddress(b.address!)) { proposalRejected.push({ event: k, reason: 'standing address: a treasury address' }); continue; }
+      standingList.push({ event: k, address: b.standing ? b.address : undefined });
+    }
+    return kept.map(({ e, c }, i) => {
+      const number = i + 1;
+      const { sv, rules, rv, closeAt, eligible, latest, counts, quorumNeeded, twoThirds, recount } = countOver(e, c, number, votes.filter(v => tagValue(v, 'e') === e.id), true);
       // tallies
       const groups = new Map<string, { events: Event[]; content: TallyContent }>();
       for (const t of tallyEvents.filter(t => tagValue(t, 'e') === e.id)) {
@@ -727,6 +788,12 @@ function rebuildOnce(site: SiteConfig, events: Event[], prefer?: string, now = n
           proposalRejected.push({ event: t, reason: 'tally: invalid' });
           continue;
         }
+        const check = tallyCheck(t, e, c, b);
+        if (check === 'bad') { proposalRejected.push({ event: t, reason: 'tally: does not match the votes it lists' }); continue; }
+        if (check === 'wait') continue; // a listed vote has not arrived: the tally counts once it has
+        // 4.4: decided means decided. Once the result has been acted on, a tally dated later changes nothing.
+        const settled = actedOn(e.id);
+        if (settled !== undefined && t.created_at > settled && [...groups.values()].some(g => g.events.some(o => o.created_at <= settled))) continue;
         const key = tallyKey(b);
         const g = groups.get(key) ?? { events: [], content: b };
         g.events.push(t);
@@ -746,7 +813,7 @@ function rebuildOnce(site: SiteConfig, events: Event[], prefer?: string, now = n
       else if (fullest.length > 1 || inTime.length > 1) disputed = true;
       // A council phone whose own count saw more than every count published, while counts may still change, publishes it.
       const recountKnown = knownOf(recount);
-      const fuller = now >= closeAt && now <= settleAt && inTime.length > 0 && !inTime.some(g => tallyKey(g.content) === tallyKey(recount))
+      const fuller = now >= closeAt && now <= settleAt && actedOn(e.id) === undefined && inTime.length > 0 && !inTime.some(g => tallyKey(g.content) === tallyKey(recount))
         && inTime.every(g => isSubset(knownOf(g.content), recountKnown));
       const tallyMismatch = !!tally && tallyKey(tally.content) !== tallyKey(recount);
       const untallied = tally
