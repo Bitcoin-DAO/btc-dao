@@ -74,3 +74,4 @@ Signature checks before use (relay and app); outputs of ordinary payouts must ma
 | Block | Findings | Commit | Tests |
 | --- | --- | --- | --- |
 | 1. Crash-proofing | R-C1 (every confirmed crash: round ids and tranches, key-status fingerprint, 1e999 in genesis, roster, settings, tallies and drafts, null in tallies; missing founders), R-H2 (rule names and values) | e31936f | `robust.test.ts` (15 cases; 11 fail on the old code); founding and governance end-to-end |
+| 2. Vote counts | R-C2 (a tally must check out against the votes it lists; decided means decided), R-H1 (only valid tallies fix the numbering), R-C3 (a leave contradicted by a later count is refused) | 07ed4fb | `governance.test.ts`, 6 new cases (fail on the old rules); governance, council and payouts end-to-end. Remaining limit (backdated vote and count within the settle window) until anchoring, phase B |
