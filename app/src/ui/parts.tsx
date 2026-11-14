@@ -18,6 +18,22 @@ export const go = (path: string) => {
 /** A link from the record, only if it is an ordinary web address (review I-5): never javascript: or the like. */
 export const safeHref = (url: unknown): string | undefined => (typeof url === 'string' && /^https?:\/\/[^\s]+$/i.test(url) ? url : undefined);
 
+/** "ALPHA DAO" is written alpha▪dao (the byob.zone wordmark); a name not ending in DAO stays as it is. */
+export function wordmarkParts(name: string): [string, string] | null {
+  const m = /^(.+?)\s+dao$/i.exec(name.trim());
+  return m ? [m[1].toLowerCase(), 'dao'] : null;
+}
+
+function Wordmark(props: { name: string }) {
+  const parts = wordmarkParts(props.name);
+  if (!parts) return <span class="name">{props.name}</span>;
+  return (
+    <span class="name wordmark" aria-label={props.name}>
+      <span class="wm-a" aria-hidden="true">{parts[0]}</span><span class="wm-dot" aria-hidden="true"></span><span class="wm-b" aria-hidden="true">{parts[1]}</span>
+    </span>
+  );
+}
+
 export function errText(e: unknown): string {
   const msg = String((e as Error)?.message ?? e);
   if ((e as Error)?.name === 'NotAllowedError' || msg === 'passkey-cancelled') return t('error.cancelled');
@@ -44,7 +60,7 @@ export function Header(props: { sub?: string; tabs?: ComponentChildren }) {
     <>
       <header class="top">
         <a href="#/" style="display:flex;flex-direction:column">
-          <span class="name">{site?.name ?? 'btc-dao'}</span>
+          <Wordmark name={site?.name ?? 'btc-dao'} />
           <span class="sub">{props.sub ?? t('tagline')}</span>
         </a>
         <div class="actions">

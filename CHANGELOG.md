@@ -2,6 +2,10 @@
 
 Each release is a git tag (`v0.1.1`). A DAO's copy runs one tagged release and records it in its README; a release moves to a DAO's next stage only after passing the one before ([guide, section 8](docs/guide.md#8-the-three-stages-practice-testnet-mainnet)).
 
+## v0.9.1 · 14 November 2026
+
+- **The DAO's name as a wordmark.** A DAO named "… DAO" is written in the header the byob.zone way: `alpha▪dao`, its name in bold, a small orange square, then "dao", in IBM Plex Mono. Screen readers still hear the full name. A name that doesn't end in "DAO" is shown as before.
+
 ## v0.9.0 · 14 November 2026
 
 The phase A fixes from the [14 November code review](docs/reviews/2026-11-14-code-review.md), made before the ALPHA DAO workshop. Five reviewers read the money path, the vote rules, identity and keys, the relay and gateway, and the screens; every critical and high finding marked phase A is fixed.
