@@ -68,3 +68,9 @@ Money: sweep signatures counted from keys not in the old wallet (M-F8); locktime
 ## Sound
 
 Signature checks before use (relay and app); outputs of ordinary payouts must match the approved list exactly; change verified as the treasury's own; signatures checked per member key, SIGHASH_ALL, same txid; closing, migration and sweep destinations; tranche and bounty gating; deletions and replaceable events unreachable on the relay; no gateway SSRF; no third-party scripts, a CSP with `script-src 'self'`; no `innerHTML`; secrets never in URLs or logs; key generation, PRF salt and wrapping; i18n key sets and placeholders identical in both languages.
+
+## Fixes
+
+| Block | Findings | Commit | Tests |
+| --- | --- | --- | --- |
+| 1. Crash-proofing | R-C1 (every confirmed crash: round ids and tranches, key-status fingerprint, 1e999 in genesis, roster, settings, tallies and drafts, null in tallies; missing founders), R-H2 (rule names and values) | e31936f | `robust.test.ts` (15 cases; 11 fail on the old code); founding and governance end-to-end |
