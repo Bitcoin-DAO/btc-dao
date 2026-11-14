@@ -10,7 +10,7 @@ import type { RoundView } from './core/state';
 import { prfSalt, pubkeyOf, treasuryKeyFromMnemonic, unwrapSecret, wrapSecret } from './core/identity';
 import { nowSec, offsetFromDate, parseJson, setClockOffset } from './core/util';
 import { t } from './i18n';
-import { query, publish, type PublishResult } from './lib/relays';
+import { query, queryAll, publish, type PublishResult } from './lib/relays';
 import { createPasskey, credTagOf, getPrf } from './lib/passkey';
 import { prefs, session, store, type LocalIdentity, type PendingFounder, treasuryCache } from './lib/store';
 
@@ -68,8 +68,8 @@ export const relaysOf = (site: SiteConfig) => usable(site.relays);
 
 async function fetchEvents(site: SiteConfig): Promise<Event[]> {
   const relays = relaysOf(site);
-  if (site.daoId) return query(relays, { '#D': [site.daoId], limit: 5000 });
-  const gens = await query(relays, { kinds: [KIND.genesis], limit: 500 });
+  if (site.daoId) return queryAll(relays, { '#D': [site.daoId] });
+  const gens = await queryAll(relays, { kinds: [KIND.genesis] }, 4);
   const ids = [
     ...new Set(
       gens
@@ -79,7 +79,7 @@ async function fetchEvents(site: SiteConfig): Promise<Event[]> {
     ),
   ];
   if (!ids.length) return gens;
-  const rest = await query(relays, { '#D': ids, limit: 5000 });
+  const rest = await queryAll(relays, { '#D': ids });
   return [...gens, ...rest];
 }
 
