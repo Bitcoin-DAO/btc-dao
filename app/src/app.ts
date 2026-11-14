@@ -126,7 +126,7 @@ export async function broadcastRound(r: RoundView): Promise<Broadcast> {
   return sent;
 }
 
-const roundHex = (r: RoundView) => finalizeRound(r.signEvents.map(e => parseJson<{ psbt: string }>(e.content)!.psbt)).hex;
+const roundHex = (r: RoundView) => finalizeRound(r.content.psbt, r.signEvents.map(e => parseJson<{ psbt: string }>(e.content)!.psbt)).hex;
 
 /** A minute after a broadcast, the sources that do not know the transaction yet get it once more. */
 export const FOLLOW_UP_MS = 60_000;

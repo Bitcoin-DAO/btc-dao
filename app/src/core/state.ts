@@ -924,8 +924,15 @@ function rebuildOnce(site: SiteConfig, events: Event[], prefer?: string, now = n
       for (const c of claims.get(p.event.id) ?? []) if (c.event.created_at <= t && people.has(c.person)) latest.set(c.person, c.address);
       return latest; // person → address
     };
-    for (const e of ofKind(KIND.round)) {
+    // Rounds with a receipt first, so nothing a confirmed round paid can look unpaid to a round dated before it
+    // (review M-F3: a backdated round used to pay a payout again).
+    const receiptFor = (id: string) => receipts.some(r => tagValue(r, 'e') === id && isCouncilAt(r.pubkey, r.created_at));
+    const roundEvs = ofKind(KIND.round);
+    for (const e of [...roundEvs.filter(r => receiptFor(r.id)), ...roundEvs.filter(r => !receiptFor(r.id))]) {
       const c = parseJson<RoundContent>(e.content);
+      const confirmedRound = receiptFor(e.id);
+      // A round with no receipt yet is judged against every payment known, not only those before its own date.
+      const asOf = confirmedRound ? e.created_at : Number.MAX_SAFE_INTEGER;
       const errors: string[] = [];
       const sv = settingsAt(e.created_at).content;
       const isSweep = !!c && typeof c.sweep === 'string';
@@ -936,6 +943,7 @@ function rebuildOnce(site: SiteConfig, events: Event[], prefer?: string, now = n
       }
       if (!isCouncilAt(e.pubkey, e.created_at)) errors.push('signer is not on the council');
       if (sv.closed) errors.push('the DAO is closed');
+      if (new Set(c.proposals).size !== c.proposals.length) errors.push('a proposal is listed twice'); // review M-F1
       // A sweep spends from an earlier treasury (a descriptor of an earlier settings version, not the same wallet).
       if (isSweep && (!settings.some(v => v.content.descriptor === c.sweep && v.content.version < sv.version) || sameWallet(c.sweep!, sv.descriptor))) errors.push('a sweep empties an earlier treasury');
       let ins: RoundInspection | undefined;
@@ -954,17 +962,18 @@ function rebuildOnce(site: SiteConfig, events: Event[], prefer?: string, now = n
         if (!p) { errors.push(`unknown proposal ${c.proposals[i].slice(0, 8)}`); continue; }
         if (p.status !== 'passed' || !['payout', 'close', 'change_council'].includes(p.content.type)) errors.push(`proposal ${p.number} is not a passed payout`);
         if (!p.confirmedAt(e.created_at)) errors.push(`proposal ${p.number} is not confirmed by its recipient`);
+        if (p.tally && e.created_at < Math.min(...p.tally.events.map(t => t.created_at))) errors.push(`proposal ${p.number}: the round is dated before its count`);
         if (p.status === 'passed' && isScheduled(p)) {
           // 4.6.2: the next tranche, reported before the round, not lapsed.
           const n = c.tranches?.[p.event.id];
           if (!Number.isInteger(n)) { errors.push(`proposal ${p.number}: the round names no tranche`); continue; }
-          if (n !== nextTranche(p, e.created_at)) errors.push(`proposal ${p.number}: tranche ${n} is not the next to pay`);
+          if (n !== nextTranche(p, asOf)) errors.push(`proposal ${p.number}: tranche ${n} is not the next to pay`);
           else if (trancheLapseAt(p, n!) <= e.created_at) errors.push(`proposal ${p.number}: tranche ${n} has lapsed`);
           else if (!reportsFor(p, n!, e.created_at).length) errors.push(`proposal ${p.number}: tranche ${n} has no report`);
           continue;
         }
         const paid = paidAt.get(p.event.id);
-        if (paid !== undefined && paid <= e.created_at) errors.push(`proposal ${p.number} is already paid`);
+        if (paid !== undefined && paid <= asOf) errors.push(`proposal ${p.number} is already paid`);
         const l = lapseAt(p);
         if (l !== undefined && e.created_at >= l) errors.push(`proposal ${p.number} has lapsed`);
       }
@@ -1010,7 +1019,8 @@ function rebuildOnce(site: SiteConfig, events: Event[], prefer?: string, now = n
           && o.inspection?.inputs.some(x => r.inspection?.inputs.some(y => y.txid === x.txid && y.vout === x.vout)));
         // A sweep round is exempt both ways: it spends an earlier treasury's coins, which no other round touches.
         const open = out.filter(r => r.status === 'open' && !r.isSweep && r.event.created_at <= e.created_at && !(r.receipt && r.receipt.created_at <= e.created_at) && !settled(r));
-        if (!isSweep && open.length && !open.some(r => r.inspection?.inputs.some(x => outpoints.has(`${x.txid}:${x.vout}`)))) errors.push('another round is open');
+        // A replacement must share a coin with every round still open, so no two of them can both confirm (review M-F2).
+        if (!isSweep && !confirmedRound && open.length && !open.every(r => r.inspection?.inputs.some(x => outpoints.has(`${x.txid}:${x.vout}`)))) errors.push('another round is open');
       }
 
       // A sweep needs the earlier treasury's threshold, from current council keys that are in it.
@@ -1061,11 +1071,22 @@ function rebuildOnce(site: SiteConfig, events: Event[], prefer?: string, now = n
       }
       out.push(view);
     }
-    // A round that shares a coin with a paid round can never confirm.
+    // A round that shares a coin with a paid round can never confirm, whatever else is wrong with it.
     for (const r of out) {
-      if (r.status !== 'open') continue;
+      if (r.status === 'paid' || !r.inspection) continue;
       const mine = new Set(r.inspection?.inputs.map(x => `${x.txid}:${x.vout}`));
       if (out.some(o => o !== r && o.status === 'paid' && o.inspection?.inputs.some(x => mine.has(`${x.txid}:${x.vout}`)))) r.status = 'void';
+    }
+    // 6.1: a payout is paid once. Two rounds that pay the same payout (or the same tranche) must spend a common coin,
+    // so that at most one can ever confirm, however they are dated. Otherwise the one without a receipt is not valid.
+    const itemsOf = (r: RoundView) => new Set(r.content.proposals.map(id => (r.content.tranches?.[id] !== undefined ? `${id}#${r.content.tranches[id]}` : id)));
+    const shareCoin = (a: RoundView, b: RoundView) => !!a.inspection && !!b.inspection && a.inspection.inputs.some(x => b.inspection!.inputs.some(y => y.txid === x.txid && y.vout === x.vout));
+    // A round set aside only by the one-open-round rule could still be signed and broadcast: it counts here too.
+    const couldPay = (o: RoundView) => o.status === 'open' || o.status === 'paid' || (o.status === 'invalid' && !!o.inspection && o.errors.length > 0 && o.errors.every(x => x === 'another round is open'));
+    const clashes = out.filter(r => r.status === 'open' && out.some(o => o !== r && couldPay(o) && [...itemsOf(o)].some(i => itemsOf(r).has(i)) && !shareCoin(o, r)));
+    for (const r of clashes) {
+      r.errors.push('another round pays the same payout from other coins');
+      r.status = 'invalid';
     }
     // An open round replaced by a later one on its coins: the later one is the round in hand.
     for (const r of out) {

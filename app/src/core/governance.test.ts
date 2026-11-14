@@ -1,6 +1,7 @@
 // Protocol sections 3.3, 3.4, 4 and 5: proposals, votes, tallies, rosters, settings and membership.
 import { describe, expect, it } from 'vitest';
-import { p2wpkh, TEST_NETWORK } from '@scure/btc-signer';
+import { p2wpkh, TEST_NETWORK, Transaction } from '@scure/btc-signer';
+import { base64 } from '@scure/base';
 import { secp256k1 } from '@noble/curves/secp256k1';
 import { hexToBytes } from '@noble/hashes/utils';
 import { buildGenesis, type SiteConfig } from './config';
@@ -379,7 +380,7 @@ describe('payout rounds (6.1-6.3)', () => {
   }
   function pay(d: ReturnType<typeof dao>, e: { id: string }, r: { psbt: string }, at: number, height = 101) {
     for (const i of [0, 1, 2]) d.ev(KIND.sign, { psbt: signWithMnemonicKey(r.psbt, masters[i]) }, d.c[i], at, [['e', e.id]]);
-    const fin = finalizeRound([0, 1, 2].map(i => signWithMnemonicKey(r.psbt, masters[i])));
+    const fin = finalizeRound(r.psbt, [0, 1, 2].map(i => signWithMnemonicKey(r.psbt, masters[i])));
     d.ev(KIND.receipt, { txid: fin.txid, block_height: height }, d.c[0], at + 1, [['e', e.id]]);
     return fin;
   }
@@ -490,7 +491,7 @@ describe('payout rounds (6.1-6.3)', () => {
     d.ev(KIND.sign, { psbt: signed[2] }, d.c[4], t + 5, [['e', e.id]]);
     s = d.state(t + 6);
     expect(s.rounds[0].ready).toBe(true);
-    const fin = finalizeRound(signed);
+    const fin = finalizeRound(r.psbt, signed);
     expect(fin.txid).toBe(s.rounds[0].inspection!.txid);
     d.ev(KIND.receipt, { txid: 'ff'.repeat(32), block_height: 100 }, d.c[0], t + 7, [['e', e.id]]); // wrong txid: ignored
     expect(d.state(t + 8).rounds[0].status).toBe('open');
@@ -516,9 +517,15 @@ describe('payout rounds (6.1-6.3)', () => {
     expect(errs(0)).toContain('outputs are not exactly the payouts');
     expect(errs(1)).toContain('not confirmed by its recipient');
     expect(errs(2)).toContain('fee rate above the cap');
-    expect(s.rounds.find(r => r.event.id === good.e.id)?.status).toBe('open');
     expect(s.rounds.find(r => r.event.id === other.e.id)?.errors).toContain('another round is open');
-    expect(s.rounds.find(r => r.event.id === replacement.e.id)?.status).toBe('open'); // shares a coin: allowed
+    // v0.9.0 (review M-F2): two rounds paying the same payout from different coins could both confirm, so neither
+    // is signed; nor is a replacement sharing a coin with only one of them. A round spending both coins settles it.
+    expect(s.rounds.find(r => r.event.id === good.e.id)?.errors).toContain('another round pays the same payout from other coins');
+    expect(s.rounds.find(r => r.event.id === replacement.e.id)?.status).toBe('invalid');
+    const desc = parseDescriptor(d.state(d.T).settings[0].content.descriptor, 'testnet4');
+    const rb = buildRound({ d: desc, network: 'testnet4', utxos: coins(d), outputs: [{ address: RECIPIENT, amount_sat: 120_000 }], feeRate: 3, changeIndex: 0, mustSpend: coins(d).map(u => ({ txid: u.txid, vout: u.vout })) });
+    const both = { e: d.ev(KIND.round, { round: '2026-12', proposals: [p.id], psbt: rb.psbt, fee_rate_sat_vb: 3, fee_sat: rb.fee }, d.c[0], t + 6) };
+    expect(d.state(t + 7).rounds.find(r => r.event.id === both.e.id)?.status).toBe('open');
   });
 
   it('replaces an open round (6): the new round carries a later payout on the same coins; the old one is replaced, then void', () => {
@@ -553,7 +560,7 @@ describe('payout rounds (6.1-6.3)', () => {
     // the replacement is signed and confirmed: the earlier rounds on its coin are void
     const signed = [0, 3, 4].map(i => signWithMnemonicKey(r3.psbt, masters[i]));
     [0, 3, 4].forEach((i, k) => d.ev(KIND.sign, { psbt: signed[k] }, d.c[i], t2 + 5, [['e', e3.id]]));
-    const fin = finalizeRound(signed);
+    const fin = finalizeRound(r3.psbt, signed);
     d.ev(KIND.receipt, { txid: fin.txid, block_height: 200 }, d.c[0], t2 + 6, [['e', e3.id]]);
     s = d.state(t2 + 7);
     expect(s.rounds.find(r => r.event.id === e3.id)?.status).toBe('paid');
@@ -587,7 +594,7 @@ describe('payout rounds (6.1-6.3)', () => {
     expect(s.rounds[0].errors).toEqual([]);
     expect(s.rounds[0].isClose).toBe(true);
     const signed = [0, 1, 2].map(i => signWithMnemonicKey(r.psbt, masters[i]));
-    const fin = finalizeRound(signed);
+    const fin = finalizeRound(r.psbt, signed);
     d.ev(KIND.receipt, { txid: fin.txid, block_height: 101 }, d.c[0], t + 2, [['e', e.id]]);
     s = d.state(t + 3);
     expect(s.pendingSettings).toEqual([c.id]);
@@ -637,7 +644,7 @@ describe('payout rounds (6.1-6.3)', () => {
     const mr = s.rounds.find(x => x.event.id === e.id)!;
     expect(mr.errors).toEqual([]);
     expect(mr.isMigration).toBe(true);
-    const fin = finalizeRound([0, 1, 2].map(i => signWithMnemonicKey(r.psbt, masters[i]))); // the old council signs
+    const fin = finalizeRound(r.psbt, [0, 1, 2].map(i => signWithMnemonicKey(r.psbt, masters[i]))); // the old council signs
     const rc = d.ev(KIND.receipt, { txid: fin.txid, block_height: 101 }, d.c[0], t + 4, [['e', e.id]]);
     s = d.state(t + 5);
     expect(s.pendingSettings).toEqual([p.id]);
@@ -686,6 +693,80 @@ describe('payout rounds (6.1-6.3)', () => {
     const pr = buildRound({ d: newD, network: 'testnet4', utxos: newCoin, outputs: [{ address: RECIPIENT, amount_sat: 10_000 }], feeRate: 2, changeIndex: 0 });
     const pe = d.ev(KIND.round, { round: '2026-12', proposals: [q.id], psbt: pr.psbt, fee_rate_sat_vb: 2, fee_sat: pr.fee }, d.c[0], t + 9 * DAY + 1);
     expect(d.state(t + 9 * DAY + 2).rounds.find(x => x.event.id === pe.id)!.errors).toEqual([]);
+  });
+
+  // Review of 14 November 2026, block 3: a payout is paid once, whoever publishes rounds and however they are dated.
+  function coins3(d: ReturnType<typeof dao>): Utxo[] {
+    const desc = parseDescriptor(d.state(d.T).settings[0].content.descriptor, 'testnet4');
+    return [0, 1, 2].map(i => ({ txid: String(i + 1).repeat(64), vout: 0, value: 300_000, address: treasuryAddress(desc, 'testnet4', 0, i).address, branch: 0 as const, index: i }));
+  }
+  function roundOn(d: ReturnType<typeof dao>, ids: string[], amounts: number[], at: number, coinsUsed: Utxo[], who = d.c[0], fee = 2) {
+    const desc = parseDescriptor(d.state(d.T).settings[0].content.descriptor, 'testnet4');
+    const r = buildRound({ d: desc, network: 'testnet4', utxos: coinsUsed, outputs: amounts.map(a => ({ address: RECIPIENT, amount_sat: a })), feeRate: fee, changeIndex: 0, mustSpend: coinsUsed.map(u => ({ txid: u.txid, vout: u.vout })) });
+    const e = d.ev(KIND.round, { round: '2026-12', proposals: ids, psbt: r.psbt, fee_rate_sat_vb: fee, fee_sat: r.fee }, who, at);
+    return { e, r };
+  }
+
+  it('the same proposal listed twice in one round is refused (review M-F1)', () => {
+    const d = dao();
+    const p = passedPayout(d, d.T);
+    const t = d.T + 8 * DAY + 10;
+    const { e } = roundOn(d, [p.id, p.id], [120_000, 120_000], t, coins3(d).slice(0, 1));
+    const v = d.state(t + 1).rounds.find(r => r.event.id === e.id)!;
+    expect(v.status).toBe('invalid');
+    expect(v.errors).toContain('a proposal is listed twice');
+  });
+
+  it('a third round sharing a coin with the replacement only is refused; the first round can then never be paid twice (review M-F2)', () => {
+    const d = dao();
+    const p = passedPayout(d, d.T);
+    const t = d.T + 8 * DAY + 10;
+    const cs = coins3(d);
+    roundOn(d, [p.id], [120_000], t, [cs[0]]);
+    roundOn(d, [p.id], [120_000], t + 1, [cs[0], cs[1]], d.c[0], 3);
+    const third = roundOn(d, [p.id], [120_000], t + 2, [cs[1], cs[2]], d.c[0], 4);
+    const v = d.state(t + 3).rounds.find(r => r.event.id === third.e.id)!;
+    expect(v.status).toBe('invalid');
+    expect(v.errors).toContain('another round is open');
+  });
+
+  it('a round dated before a paid one cannot pay the same payout again (review M-F3)', () => {
+    const d = dao();
+    const p = passedPayout(d, d.T);
+    const t = d.T + 8 * DAY + 10;
+    const cs = coins3(d);
+    const a = roundOn(d, [p.id], [120_000], t, [cs[0]]);
+    pay(d, a.e, a.r, t + 1);
+    expect(d.state(t + 3).payments.get(p.id)?.status).toBe('paid');
+    const back = roundOn(d, [p.id], [120_000], t - 1, [cs[1]], d.c[4]); // published days later, dated before
+    const s = d.state(t + 5 * DAY);
+    expect(s.rounds.find(r => r.event.id === a.e.id)?.status).toBe('paid');
+    expect(s.rounds.find(r => r.event.id === back.e.id)?.status).toBe('invalid');
+    expect(s.payments.get(p.id)?.status).toBe('paid');
+  });
+
+  it('a round dated before the count of its payout is refused', () => {
+    const d = dao();
+    const p = passedPayout(d, d.T); // counted at T + 8 days
+    const { e } = roundOn(d, [p.id], [120_000], d.T + 8 * DAY - 5, coins3(d).slice(0, 1));
+    const v = d.state(d.T + 9 * DAY).rounds.find(r => r.event.id === e.id)!;
+    expect(v.errors.join()).toContain('dated before its count');
+  });
+
+  it('a junk signature cannot block a round; a round published already signed is refused (review M-F6)', () => {
+    const d = dao();
+    const p = passedPayout(d, d.T);
+    const t = d.T + 8 * DAY + 10;
+    const a = roundOn(d, [p.id], [120_000], t, coins3(d).slice(0, 1));
+    const honest = [0, 1, 2].map(i => signWithMnemonicKey(a.r.psbt, masters[i]));
+    // A copy carrying @c0's key with a garbage signature, published by @c3 alongside the honest ones.
+    const [pk] = Transaction.fromPSBT(base64.decode(honest[0])).getInput(0).partialSig![0];
+    const junk = Transaction.fromPSBT(base64.decode(a.r.psbt));
+    junk.updateInput(0, { partialSig: [[pk, new Uint8Array([0x30, 0x06, 0x02, 0x01, 0x01, 0x02, 0x01, 0x01, 0x01])]] }, true);
+    const fin = finalizeRound(a.r.psbt, [base64.encode(junk.toPSBT(0)), ...honest]);
+    expect(fin.txid).toBe(d.state(t + 1).rounds.find(r => r.event.id === a.e.id)!.inspection!.txid);
+    const signedRound = d.ev(KIND.round, { round: '2026-12', proposals: [p.id], psbt: honest[0], fee_rate_sat_vb: 2, fee_sat: a.r.fee }, d.c[0], t + 2);
+    expect(d.state(t + 3).rounds.find(r => r.event.id === signedRound.id)!.errors.join()).toContain('already carries a signature');
   });
 });
 

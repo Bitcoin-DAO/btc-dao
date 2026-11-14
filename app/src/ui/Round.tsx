@@ -333,7 +333,7 @@ export function RoundDetail({ id }: { id: string }) {
   let rawHex: string | undefined;
   if (r.ready) {
     try {
-      rawHex = finalizeRound(r.signEvents.map(x => JSON.parse(x.content).psbt)).hex;
+      rawHex = finalizeRound(r.content.psbt, r.signEvents.map(x => JSON.parse(x.content).psbt)).hex;
     } catch { /* shown as the round's errors */ }
   }
   const doBroadcast = () => run(async () => {
