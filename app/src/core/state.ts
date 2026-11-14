@@ -237,7 +237,8 @@ export interface DaoState {
   /** Approved tranches neither paid nor lapsed (4.6.5). */
   committed: number;
   closed: boolean;
-  keywraps: Map<string, { pubkey: string; nonce: string; ct: string; at: number }>;
+  /** Passkey backups per credential tag, newest first. Several signers may claim one tag: sign-in tries each (review I-3). */
+  keywraps: Map<string, { pubkey: string; nonce: string; ct: string; at: number }[]>;
   /** Council treasury keys their holders have reported lost (dao.keystatus), for the keys in the current settings. */
   lostKeys: { person: string; fingerprint: string; at: number }[];
   /** Drafts and proposal threads (protocol 4.5). */
@@ -590,7 +591,10 @@ function rebuildOnce(site: SiteConfig, events: Event[], prefer?: string, now = n
     return { address: last.address, event: last.event };
   };
 
-  for (let iter = 0; iter < 50; iter++) {
+  // Each pass may add one roster or settings version; there are at most as many passes as those events, plus one
+  // (review R-H3: a fixed 50 stopped every DAO's chains after 50 versions in total).
+  const maxPasses = ofKind(KIND.roster).length + ofKind(KIND.settings).length + 2;
+  for (let iter = 0; iter < maxPasses; iter++) {
     // rekeys in effect
     for (const r of rekeys) {
       if (r.effectiveAt !== undefined) continue;
@@ -872,7 +876,7 @@ function rebuildOnce(site: SiteConfig, events: Event[], prefer?: string, now = n
       if (!p || p.content.type !== 'payout' || p.status !== 'passed') { proposalRejected.push({ event: e, reason: 'report: not a passed payout' }); continue; }
       const pl = p.content.payload;
       const count = Array.isArray(pl.schedule) ? (pl.schedule as Tranche[]).length : 1;
-      if (!b || !Number.isInteger(b.tranche) || b.tranche! < 1 || b.tranche! > count || !isStr(b.text, REPORT_MAX) || (b.link !== undefined && !isStr(b.link, 500))) { proposalRejected.push({ event: e, reason: 'report: malformed' }); continue; }
+      if (!b || !Number.isInteger(b.tranche) || b.tranche! < 1 || b.tranche! > count || !isStr(b.text, REPORT_MAX) || (b.link !== undefined && !(isStr(b.link, 500) && /^https?:\/\//.test(b.link!)))) { proposalRejected.push({ event: e, reason: 'report: malformed' }); continue; }
       if (!memberAt(e.pubkey, e.created_at)) { proposalRejected.push({ event: e, reason: 'report: signer is not a member' }); continue; }
       const person = personOf(e.pubkey);
       const allowed = person === personOf(p.event.pubkey)
@@ -1342,13 +1346,16 @@ function rebuildOnce(site: SiteConfig, events: Event[], prefer?: string, now = n
 
   // Keywraps: signed by a key that is or was on a roster, or a verified candidate.
   const known = new Set([...rosters.flatMap(r => r.content.members.map(m => m.key)), ...personByKey.keys(), ...verifies.map(v => parseJson<any>(v.content).candidate_key as string)]);
-  const keywraps = new Map<string, { pubkey: string; nonce: string; ct: string; at: number }>();
+  const keywraps = new Map<string, { pubkey: string; nonce: string; ct: string; at: number }[]>();
   for (const e of ofKind(KIND.keywrap)) {
     const c = tagValue(e, 'c');
     const body = parseJson<{ nonce: string; ct: string }>(e.content);
-    if (!c || !body?.nonce || !body?.ct) { rejected.push({ event: e, reason: 'keywrap: malformed' }); continue; }
+    if (!c || typeof body?.nonce !== 'string' || typeof body?.ct !== 'string') { rejected.push({ event: e, reason: 'keywrap: malformed' }); continue; }
     if (!known.has(e.pubkey)) { rejected.push({ event: e, reason: 'keywrap: signer is not on the roster' }); continue; }
-    keywraps.set(c, { pubkey: e.pubkey, nonce: body.nonce, ct: body.ct, at: e.created_at });
+    if (e.created_at > now + 600) { rejected.push({ event: e, reason: 'keywrap: dated in the future' }); continue; }
+    // Every backup is kept, not only the latest: another member's junk backup under the same public tag can no
+    // longer hide the real one (review I-3). Sign-in accepts the one that opens to its own key.
+    keywraps.set(c, [{ pubkey: e.pubkey, nonce: body.nonce, ct: body.ct, at: e.created_at }, ...(keywraps.get(c) ?? [])]);
   }
 
   // Key status (protocol 5.5): the holder's latest notice about the treasury key with this fingerprint counts.

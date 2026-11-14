@@ -7,7 +7,7 @@ import { KIND, tagValue, type Event } from '../core/events';
 import { proposalLabel, type Choice, type Output, type ProposalView } from '../core/state';
 import { formatShortCode, shortCode } from '../core/shortcode';
 import { parseJson } from '../core/util';
-import { Address, Footer, Header, errText, go } from './parts';
+import { Address, Footer, Header, errText, go, safeHref } from './parts';
 import { PaymentLine } from './Round';
 import { Delivery } from './Delivery';
 import { cadenceOf } from '../core/time';
@@ -170,7 +170,7 @@ export function ProposalDetail({ id }: { id: string }) {
         <section class="card">
           <h3>{t('pd.what')}</h3>
           <p style="white-space:pre-wrap">{c.summary}</p>
-          {c.link && <a href={c.link.url} target="_blank" rel="noopener noreferrer">{t('pd.link')} ↗</a>}
+          {safeHref(c.link?.url) && <a href={safeHref(c.link?.url)} target="_blank" rel="noopener noreferrer">{t('pd.link')} ↗</a>}
           <ThreadLine id={p.event.id} />
           <Payload p={p} />
           {p.status === 'passed' && <PaymentLine id={p.event.id} />}
