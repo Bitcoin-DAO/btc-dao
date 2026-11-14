@@ -5,7 +5,7 @@ import { mnemonicToSeedSync } from '@scure/bip39';
 import { broadcastRound, chainApis, receiptDepth, refreshTreasury, signAndPublish, signingKey, useApp } from '../app';
 import { fmtSats, t } from '../i18n';
 import { KIND } from '../core/events';
-import { explorerFor, feePolicyOf, pushPageOf, sourceLabel, suggestFee, txDepth, txSeenBy, txStatus, type Broadcast, type TxStatus } from '../core/chain';
+import { explorerFor, feePolicyOf, pushPageOf, sourceLabel, suggestFee, txDepth, txSeenBy, txStatus, type Broadcast, type TxStatus, coinProblems } from '../core/chain';
 import { parseDescriptor, treasuryAddress } from '../core/descriptor';
 import type { Network } from '../core/config';
 import { mergeSignatures } from '../core/hwkeys';
@@ -263,6 +263,17 @@ export function RoundDetail({ id }: { id: string }) {
   const [checked, setChecked] = useState(false); // asked the sources since the last broadcast
   const r = s.rounds.find(x => x.event.id === id);
   const apis = chainApis();
+  // Before anyone signs: the round's coins, checked against the blockchain (review M-F4).
+  const [coins, setCoins] = useState<{ round: string; problems?: string[]; error?: string }>();
+  const checkCoins = () => {
+    if (!r?.inspection) return;
+    const round = r.event.id;
+    setCoins(undefined);
+    coinProblems(chainApis(), r.inspection.inputs).then(problems => setCoins({ round, problems }), e => setCoins({ round, error: errText(e) }));
+  };
+  useEffect(() => {
+    if (r?.inspection && r.status === 'open' && !r.ready) checkCoins();
+  }, [r?.event.id, r?.status, r?.ready]);
 
   // Ask the sources whether they know the transaction; until the receipt, ask again every 20 seconds.
   useEffect(() => {
@@ -420,7 +431,17 @@ export function RoundDetail({ id }: { id: string }) {
           )}
           {r.status === 'open' && !r.replacedBy && r.ready && myEntry && !iSigned && <p class="small">{t('rd.notNeeded')}</p>}
           {r.status === 'open' && !r.replacedBy && !(r.ready && !iSigned) && app.isCouncil && app.secret && myEntry && !(kept && !iSigned) && (
-            iSigned ? <p class="ok">{t('rd.signed')}</p> : (
+            iSigned ? <p class="ok">{t('rd.signed')}</p>
+            : !(coins?.round === r.event.id && coins.problems?.length === 0) ? (
+              coins?.round === r.event.id && coins.problems?.length ? (
+                <div class="warnbox">
+                  <strong>{t('rd.coinsWrong')}</strong>
+                  <ul>{coins.problems.map(x => <li class="small">{x}</li>)}</ul>
+                </div>
+              ) : coins?.round === r.event.id && coins.error ? (
+                <p class="small">{t('rd.coinsUnchecked', { msg: coins.error })} <button type="button" class="btn link" onClick={checkCoins}>{t('retry')}</button></p>
+              ) : <p class="small">{t('rd.coinsChecking')}</p>
+            ) : (
               <>
                 {tk && !app.identity?.wordsChecked ? <p class="warn">{t('words.needed')} <a href="#/profile">{t('words.toProfile')}</a></p>
                   : tk ? <button type="button" class="btn primary" disabled={busy} onClick={signTest}>{t('rd.signTest')}</button>

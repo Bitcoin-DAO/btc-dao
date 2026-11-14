@@ -753,6 +753,19 @@ describe('payout rounds (6.1-6.3)', () => {
     expect(v.errors.join()).toContain('dated before its count');
   });
 
+  it('the same transaction published as two rounds (different claimed amounts) is signed by nobody (review M-F4)', () => {
+    const d = dao();
+    const p = passedPayout(d, d.T);
+    const t = d.T + 8 * DAY + 10;
+    const a = roundOn(d, [p.id], [120_000], t, coins3(d).slice(0, 2));
+    // The same unsigned transaction, with input 0's amount understated.
+    const lie = Transaction.fromPSBT(base64.decode(a.r.psbt));
+    lie.updateInput(0, { witnessUtxo: { script: lie.getInput(0).witnessUtxo!.script, amount: 1n } }, true);
+    const b = d.ev(KIND.round, { round: '2026-12', proposals: [p.id], psbt: base64.encode(lie.toPSBT(0)), fee_rate_sat_vb: 2, fee_sat: a.r.fee }, d.c[0], t + 1);
+    const s = d.state(t + 2);
+    for (const id of [a.e.id, b.id]) expect(s.rounds.find(r => r.event.id === id)!.status).toBe('invalid');
+  });
+
   it('a junk signature cannot block a round; a round published already signed is refused (review M-F6)', () => {
     const d = dao();
     const p = passedPayout(d, d.T);

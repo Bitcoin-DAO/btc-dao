@@ -1071,6 +1071,16 @@ function rebuildOnce(site: SiteConfig, events: Event[], prefer?: string, now = n
       }
       out.push(view);
     }
+    // The same transaction published as two rounds with different coin amounts is how false amounts are combined
+    // into a huge real fee (review M-F4): none of them is signed. (Identical copies of one round are harmless.)
+    for (const r of out) {
+      if (r.status !== 'open' || !r.inspection) continue;
+      const claims = (x: RoundView) => x.inspection!.inputs.map(i => i.value).join();
+      if (out.some(o => o !== r && o.inspection?.txid === r.inspection!.txid && claims(o) !== claims(r))) {
+        r.errors.push('the same transaction as another round, with other coin amounts');
+        r.status = 'invalid';
+      }
+    }
     // A round that shares a coin with a paid round can never confirm, whatever else is wrong with it.
     for (const r of out) {
       if (r.status === 'paid' || !r.inspection) continue;
