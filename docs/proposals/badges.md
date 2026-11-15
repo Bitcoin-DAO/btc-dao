@@ -57,7 +57,7 @@ Open questions: does Wallet stay once earned, or show only while an address is i
 | Spare key | a council where the signatures needed are fewer than the seats (2 of 3, 3 of 5): one lost key no longer locks the treasury. Reached by a council change |
 | Mainnet council | every treasury key on a SeedSigner (today: enforced by the app at founding); *proposed:* a spare key too |
 
-A council grows only by a `change_council` vote, which moves the treasury to the new council's wallet (6.6): a 2-of-2 council can vote more members onto the council later, as COUNCIL DAO did from 2 of 3 to 3 of 4.
+A council grows only by a `change_council` vote, which moves the treasury to the new council's wallet (6.6): a 2-of-2 council can vote more members onto the council later, and raise the signatures needed as it grows.
 
 ### 2.2 A portable record: link, don't log in
 
