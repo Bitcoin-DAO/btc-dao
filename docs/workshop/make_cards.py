@@ -108,6 +108,7 @@ y = section('B. A key of your own (card 3), about 30 minutes', [
 ], y)
 
 y = section(f'C. Give {NAME} your key (either A or B, as the organiser says)', [
+    ('Ask for a council seat.', 'In the founder sign-up on your phone, tick “I request a council seat”: only then does it ask for your treasury key. The DAO cannot be founded with fewer than 2 council members; a small council can vote more members onto the council later, through a council change.'),
     ('Export the public key.', f'With that key loaded: Seeds → its fingerprint → Export Xpub → Multisig → Native Segwit → Sparrow. Scan the moving QR with your phone when the {NAME} site asks for your treasury key. The phone shows the fingerprint: it must match.'),
     ('Clear the device.', 'Seeds → your fingerprint → Discard, or switch the SeedSigner off. It keeps nothing. Pass it on.'),
 ], y)
