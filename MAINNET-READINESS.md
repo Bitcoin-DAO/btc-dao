@@ -81,7 +81,8 @@
 - [ ] Site mirrored on a second host; releases signed with a published hash (S2)
 - [ ] Final tallies published at every close; late votes ignored (S3)
 - [ ] State edge cases written as test cases and passing (S4)
-- [ ] Independent code review
+- [x] Independent code review: five reviewers, 14 November 2026 ([findings](docs/reviews/2026-11-14-code-review.md)); phase A fixed in v0.9.0
+- [ ] The review's phase B findings fixed ([still open](docs/reviews/2026-11-14-code-review.md#still-open-16-november-2026-v094)), then a second review of the mainnet release
 
 ## 8. Mainnet launch conditions
 
