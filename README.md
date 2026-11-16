@@ -35,6 +35,9 @@ All 19 screens are in [`design/`](design/README.md).
 | `docs/charter-template.en.md` | The core charter template in English: purpose, members, council, treasury, decisions, public record, conduct, changes and closing. Each DAO fills it in, writes it in its binding language (`charterLanguage` in the settings) and keeps its copy in `config/` |
 | `docs/charter-modules/` | Optional charter articles a DAO can add: council handbook, council eligibility, use of funds, conduct, language, personal data, trial phase |
 | `docs/guide.md` | The step-by-step guide to founding and running a DAO, from preparation to closing, with a register of the gaps still open |
+| `docs/new-dao.md` | Checklist for starting a new DAO, in order: decisions, a web address of its own, chain gateway, chat group, wallets, printer, council keys, the founding meeting, and the relay pin after it |
+| `docs/workshop/` | The council key workshop: card maker, steps and a sample |
+| `docs/proposals/` | Proposals under discussion, such as tiers, stages and badges |
 | `docs/spec.md` | The full specification v0.2: roles, keys, onboarding (in person and remote), treasury, governance, proposal fields, payout rounds, event formats, threat model, security requirements, build plan |
 | `docs/protocol.md` | The protocol draft v1: every event's exact format, its validity rules, PSBT requirements and how a client rebuilds the DAO's state |
 | `docs/funding-models.md` | The four funding models (grant, production, mutual, revolving): each DAO reads it, discusses it and records its primary model in the settings before drafting its mainnet charter |

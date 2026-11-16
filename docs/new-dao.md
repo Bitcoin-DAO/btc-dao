@@ -1,0 +1,54 @@
+# Starting a new DAO: checklist
+
+Everything a new DAO needs, from the first decisions to the days after its founding, in order. Each step links to where the guide explains it. Worked out on ALPHA DAO (November 2026); until the fork kit (spec, phase 4) turns it into a guided setup, an organiser with GitHub and DNS access works through it.
+
+Tick each box in a copy of this list for your DAO.
+
+## A. Decide
+
+- [ ] **Name and purpose,** and the stage: practice, testnet or mainnet ([guide 8](guide.md#8-the-three-stages-practice-testnet-mainnet)).
+- [ ] **Council and threshold.** At least **2 council members**, the hard minimum to found; a spare key (fewer signatures needed than seats, such as 3 of 5) is safer, and a smaller council can grow later by a council change ([guide 2.2](guide.md#22-choose-the-council-and-the-founders), [7.3](guide.md#73-changing-the-council)).
+- [ ] **Languages and charter** ([guide 2.1](guide.md#21-agree-the-purpose-and-the-charter)). For mainnet also the **funding model** ([funding models](funding-models.md)).
+
+## B. A web address of its own
+
+Every DAO, trial stages included, gets its **own origin** (a host name of its own), so its members' keys and passkeys are kept apart from every other DAO's ([code review I-1](reviews/2026-11-14-code-review.md)). Never put two DAOs on paths of one host.
+
+- [ ] **Address:** a subdomain of a domain you control (ALPHA: `alpha.byob.zone`), or, for mainnet, the DAO's own domain ([guide 2.3](guide.md#23-choose-the-addresses-and-hosting)).
+- [ ] **GitHub organisation** for the DAO's site (ALPHA: `byob-zone`), and in its Settings → Pages, **verify the domain** (a TXT record), so no one else can claim its subdomains.
+- [ ] **DNS:** a CNAME from the subdomain to `<organisation>.github.io`. No wildcard (`*`) records on the domain.
+- [ ] **Repository:** an empty public repository, filled from btc-dao at a released version (`git archive` of the release), with a README note saying which version it runs ([guide 2.5](guide.md#25-set-up-the-software)).
+- [ ] **`config/dao.json`:** stage, name, purpose, network; `site` and `passkeyDomain` set to the DAO's own host; relays and chain sources; the starting rules; the testnet treasury's return address (trial stages); `branding`; and `group` (step C). Council, founders and descriptor stay placeholders: the founding fills them in.
+- [ ] **Pages:** Settings → Pages → Source: **GitHub Actions**; Custom domain: the DAO's host; once the certificate is issued, **Enforce HTTPS**.
+- [ ] **Chain gateway:** add the DAO's origin (`https://alpha.byob.zone`) to `ALLOWED_ORIGINS` in btc-dao's `gateway/wrangler.toml` and push to btc-dao's main branch; Cloudflare redeploys the gateway ([chain gateway](chain-gateway.md)). Without it the site cannot read the treasury.
+- [ ] **Listing on byob.zone** (optional): add the DAO to `src/daos.ts` in the byob.zone site (its site, network, and its relays and chain sources for the page's policy), and a news post in `content/news.json`.
+
+## C. People and communication
+
+- [ ] **A chat group** (WhatsApp, Signal…) for the DAO's members: remote founders and candidates post their codes there, and the video calls in which a short code is read happen there. **Turn on admin approval** for new members: the link is public on the site. Give it a picture (ALPHA: `a▪`). Name it in `config/dao.json` as `"group": {"name": "…", "url": "…"}`; it is a site setting, never part of the record ([guide 4](guide.md#4-the-founding-meeting)).
+- [ ] **A testnet wallet on every member's phone** for the trial stages (Mycelium Testnet Wallet): the DAO's payouts arrive there. Real wallets come with the mainnet stage.
+- [ ] **A printer the phones can reach** for identity cards: AirPrint (iPhone) or Mopria (Android), on the same WiFi, A4, ink or toner (not thermal paper, which fades). Test one iPhone and one Android before the day.
+
+## D. Council keys
+
+- [ ] **SeedSigners:** one per table, firmware checked, network set, persistent settings on ([guide 2.4](guide.md#24-get-the-equipment), [seedsigner.md](seedsigner.md)).
+- [ ] **Workshop cards:** `python3 docs/workshop/make_cards.py --name "<DAO name>" --keys <n>`; print single-sided at 100% and **delete the PDF**: it holds secret keys ([workshop](workshop/README.md)). Dice for keys of the members' own.
+
+## E. The founding meeting
+
+- [ ] **Founders sign up** on their own phones. **Council members tick "I request a council seat"**, then scan their treasury key from the SeedSigner.
+- [ ] **Codes:** in person, the organiser scans the QR and both read the short code aloud. Remote founders tap **Share**, post the message in the group, and read their short code on a **video call**. A council member's code is never added without the call.
+- [ ] **Before publishing,** the setup page shows the council you planned (for example **3 of 5**). If fewer council members signed up with the box ticked, stop: they sign up again.
+- [ ] **Council approvals:** each council member's phone checks that the treasury key listed for them is their own before it lets them approve.
+- [ ] **Identity cards:** every member prints theirs, and keeps it apart from any SeedQR card.
+
+## F. After the founding
+
+- [ ] **The DAO id** into `config/dao.json` (`daoId`), from the founding's summary. This also switches the DAO's pulse on byob.zone from "founding" to live.
+- [ ] **Pin the relay:** add the DAO id to `ALLOWED_DAO_IDS` in btc-dao's `relay/src/config.ts`, build and push to main; Cloudflare redeploys the relay ([relay README](../relay/README.md)).
+- [ ] **Fund the treasury** (trial stages: from the [testnet treasury](testnet-treasury.md)), and run the first rounds ([guide 5](guide.md#5-funding-the-treasury), [6.4](guide.md#64-payout-rounds-and-signing-sessions)).
+- [ ] **Badges:** the members' four (Wallet, Voice, Proposer, Builder) come by doing; a "badge bounties" payout, if the DAO wants one, is an ordinary vote ([proposal](proposals/badges.md)).
+
+## Later: the next stage
+
+A DAO moves to the next stage by being **founded again**, with every member listed as a founder: new keys, new site, new record; then the earlier one is closed ([guide 8](guide.md#8-the-three-stages-practice-testnet-mainnet)). Mainnet adds new seeds from a new key ceremony, SeedSigner keys only, and the DAO's own domain and relay.
