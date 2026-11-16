@@ -36,16 +36,20 @@ Every DAO, trial stages included, gets its **own origin** (a host name of its ow
 
 ## E. The founding meeting
 
+On the day, the organiser works from the [run sheet](workshop/run-sheet.md).
+
 - [ ] **Founders sign up** on their own phones. **Council members tick "I request a council seat"**, then scan their treasury key from the SeedSigner.
 - [ ] **Codes:** in person, the organiser scans the QR and both read the short code aloud. Remote founders tap **Share**, post the message in the group, and read their short code on a **video call**. A council member's code is never added without the call.
-- [ ] **Before publishing,** the setup page shows the council you planned (for example **3 of 5**). If fewer council members signed up with the box ticked, stop: they sign up again.
+- [ ] **Before publishing,** the setup page shows the council planned in the site file beside the one added (for example **3 of 5**), and asks before publishing a different one. If fewer council members signed up with the box ticked, stop: they sign up again.
 - [ ] **Council approvals:** each council member's phone checks that the treasury key listed for them is their own before it lets them approve.
 - [ ] **Identity cards:** every member prints theirs, and keeps it apart from any SeedQR card.
+- [ ] **Wallets:** every member adds their address from the **Add your bitcoin address** card on the home page (Mycelium Testnet on a trial DAO).
 
 ## F. After the founding
 
 - [ ] **The DAO id** into `config/dao.json` (`daoId`), from the founding's summary. This also switches the DAO's pulse on byob.zone from "founding" to live.
 - [ ] **Pin the relay:** add the DAO id to `ALLOWED_DAO_IDS` in btc-dao's `relay/src/config.ts`, build and push to main; Cloudflare redeploys the relay ([relay README](../relay/README.md)).
+- [ ] **The group as the DAO's notice board:** on an open vote, and on a round waiting for council signatures, **Share in the group** sends a ready message with the link.
 - [ ] **Fund the treasury** (trial stages: from the [testnet treasury](testnet-treasury.md)), and run the first rounds ([guide 5](guide.md#5-funding-the-treasury), [6.4](guide.md#64-payout-rounds-and-signing-sessions)).
 - [ ] **Badges:** the members' four (Wallet, Voice, Proposer, Builder) come by doing; a "badge bounties" payout, if the DAO wants one, is an ordinary vote ([proposal](proposals/badges.md)).
 

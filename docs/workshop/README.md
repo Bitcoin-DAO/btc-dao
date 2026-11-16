@@ -1,5 +1,7 @@
 # Council key workshop
 
+For the founding day itself, see the [run sheet](run-sheet.md): roles, timings and the three checks.
+
 How a DAO's council makes its keys together, at a workshop, before the founding meeting. First run for ALPHA DAO (November 2026).
 
 ## The cards

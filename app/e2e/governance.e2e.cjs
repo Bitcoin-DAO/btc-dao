@@ -99,6 +99,8 @@ async function councilAction(page, buttonName) {
   }
   await a.getByRole('button', { name: '4 · Pubblica' }).click();
   await a.getByRole('button', { name: 'Firma e pubblica' }).click();
+  // A council other than the one planned (the test file plans 5 seats, 3 signatures) is published on purpose.
+  await a.getByRole('button', { name: 'Pubblica lo stesso' }).click({ timeout: 3000 }).catch(() => {});
   await a.getByText('Pubblicate ✓').waitFor({ timeout: 20000 });
   for (const p of [B, C]) {
     await open(p.page, '#/founder');
@@ -192,6 +194,7 @@ async function councilAction(page, buttonName) {
   await open(f2, `#/p/${payoutId}`);
   // Votes arrive from the relays over a few seconds: wait for the count rather than reading it once.
   check(await seen(f2.locator('.kv').filter({ hasText: /^Sì\s*5$/ })), 'changed vote counted once: 5 yes');
+  check(await f2.getByRole('button', { name: 'Condividi', exact: true }).isVisible(), 'an open vote can be shared to the group');
   await shot(f2, '05-voting');
   check(!(await n.getByText('Sì', { exact: true }).isVisible()), 'candidate cannot vote');
 

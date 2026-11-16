@@ -36,6 +36,14 @@ export function Home() {
     <>
       <Header />
       <main>
+        {app.me && app.secret && !app.dao!.closed && !app.dao!.standingAt(app.me.key, app.dao!.now) && (
+          <section class="card flag">
+            <h2>{t('home.walletTitle')}</h2>
+            <p>{t('home.walletText')}</p>
+            {cfg.network !== 'mainnet' && <p class="small">{t('home.walletTest')}</p>}
+            <button type="button" class="btn primary" onClick={() => go('/profile')}>{t('home.walletGo')}</button>
+          </section>
+        )}
         <section class="card">
           <span class="small" style="font-size:15px">{t('home.balance')}</span>
           {tr ? (

@@ -2,6 +2,13 @@
 
 Each release is a git tag (`v0.1.1`). A DAO's copy runs one tagged release and records it in its README; a release moves to a DAO's next stage only after passing the one before ([guide, section 8](docs/guide.md#8-the-three-stages-practice-testnet-mainnet)).
 
+## v0.9.4 · 16 November 2026
+
+- **The setup page shows the council planned.** The site file's council (for example 3 of 5) is shown beside the council added so far, and publishing a different one asks first: a council member who forgot to tick "I request a council seat" is caught before the founding, not after.
+- **Add your bitcoin address, first.** A member with no payout address in force sees a highlighted card at the top of the home page, and the address card comes first on their Profile, highlighted, until they add one. On a trial DAO it names a testnet wallet. It is also the members' first badge (Wallet).
+- **Share in the group.** On an open vote, and on a payout round waiting for council signatures, a **Share in the group** button sends a ready message with the link, to the DAO's chat group when the site names one: the group is the DAO's notice board, with no notification service to run.
+- **Founding day run sheet** ([docs/workshop/run-sheet.md](docs/workshop/run-sheet.md)): roles, timings, and three checks for the room, linked from the new-DAO checklist.
+
 ## v0.9.3 · 16 November 2026
 
 - **A council member's own phone checks their treasury key before they approve the founding.** A council member's code carries their treasury key beside the identity key the short code protects; a code sent by message could have its treasury key swapped without the short code changing. The phone that made the key now compares it with the one the founding lists, and refuses the approval if they differ.

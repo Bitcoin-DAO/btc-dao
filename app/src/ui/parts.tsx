@@ -1,6 +1,6 @@
 import { render, type ComponentChildren } from 'preact';
 import { useEffect, useRef, useState } from 'preact/hooks';
-import { completeFounding, setLang, useApp } from '../app';
+import { completeFounding, getState, setLang, useApp } from '../app';
 import { newCount } from './Discussion';
 import { t } from '../i18n';
 import { qrMatrix, startScanner, type Scanner } from '../lib/qr';
@@ -388,7 +388,7 @@ export function WordsCheck({ mnemonic, onDone }: { mnemonic: string; onDone: () 
 }
 
 /** Shares a code as a message (the phone's share sheet), or copies it where sharing is not available. */
-export function ShareButton({ text }: { text: string }) {
+export function ShareButton({ text, label }: { text: string; label?: string }) {
   const [ok, setOk] = useState(false);
   return (
     <button
@@ -405,7 +405,19 @@ export function ShareButton({ text }: { text: string }) {
         }
       }}
     >
-      {ok ? t('fs.shared') : t('fs.share')}
+      {ok ? t('fs.shared') : (label ?? t('fs.share'))}
     </button>
   );
+}
+
+/** A link to one of the DAO's own pages, for a message. */
+export const pageLink = (path: string) => `${getState().site!.site.replace(/\/$/, '')}/#${path}`;
+
+/**
+ * "Share in the group": the DAO's chat group is its notification channel. The phone's share sheet opens with a
+ * message ready (WhatsApp or any other app); nothing is sent by the app itself, and no one's number is in it.
+ */
+export function ShareToGroup({ text }: { text: string }) {
+  const group = useApp().site?.group;
+  return <ShareButton text={text} label={group ? t('share.toGroup', { group: group.name }) : t('share.plain')} />;
 }

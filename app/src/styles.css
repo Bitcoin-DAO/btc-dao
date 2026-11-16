@@ -144,6 +144,7 @@ label.check input { width: 24px; height: 24px; margin: 0; flex: none; accent-col
 .words { columns: 2; column-gap: 24px; margin: 4px 0; padding-left: 28px; font-size: 16px; line-height: 2; }
 .words li { break-inside: avoid; }
 
+.card.flag { border: 2px solid var(--accent); box-shadow: 0 0 0 4px var(--accent-tint); }
 .chip.new { background: var(--accent); color: var(--accent-ink); }
 .version.pinned { border: 2px solid var(--teal); }
 .post { background: var(--card); border: 1px solid var(--line-2); border-radius: 12px; padding: 10px 14px; }
