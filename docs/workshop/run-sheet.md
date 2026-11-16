@@ -18,7 +18,7 @@ One page for the room, for the organiser. The [checklist](../new-dao.md) is for 
 
 ## 1. Welcome (10 min)
 
-What the DAO is for, what happens today, and what nobody will ever ask anyone for: words, a SeedQR photo, a private key.
+What the DAO is for, what happens today, and what nobody will ever ask anyone for: 12 words, a SeedQR photo, a private key.
 
 ## 2. Council keys (30–45 min)
 
