@@ -43,7 +43,7 @@ Each badge is one task done for real in the DAO; a member who has all four has u
 - **Counted, not just cast:** Voice needs a vote a valid tally counted (4.4); a vote after the close, or from a non-member, earns nothing.
 - **Per person,** not per key: a member whose key was replaced (5.2) keeps what they earned.
 - **Privacy:** shown inside the DAO beside the member's DAO name; outside it (byob.zone) only totals, such as "12 of 15 members have a wallet", never who.
-- **Rewards** are an ordinary bounty: the DAO votes a "badge bounties" payout once, with an amount per badge; a member who holds a badge claims it; the council pays it in a round. No new money rules.
+- **Rewards** are an ordinary bounty: the DAO votes a "badge bounties" payout once, with an amount per badge; a member who holds a badge claims it; the council pays it in a round, **once per member and badge**.
 
 **Built in v0.9.5** (`core/badges.ts`, `ui/Badges.tsx`), decided 16 November 2026:
 
@@ -52,7 +52,7 @@ Each badge is one task done for real in the DAO; a member who has all four has u
 - **Wallet stays once earned.** If the address later lapses, the Profile says so and the Home card asks again.
 - **The moment it's earned:** a note on Home, once per phone, with **Share in the group** ("@anna: Voice ✓ Learning by doing").
 
-Still open: is the badge bounty paid once per member and badge, enforced by the app, or left to the council on each claim? To decide when a DAO first votes one.
+**Badge bounties are paid once per member and badge** (decided 16 November 2026). To build when a DAO first votes one: the bounty proposal names the badge it rewards, a claim counts only from a member who holds that badge, and the app refuses a round that pays the same person for the same badge twice, as it refuses any payout paid twice.
 
 ## 2. Council
 
