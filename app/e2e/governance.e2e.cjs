@@ -211,6 +211,18 @@ async function councilAction(page, buttonName) {
   check(true, 'payout passed after the automatic count');
   check(await f1.getByText(/Conteggio finale firmato da @anna/).isVisible(), 'count signed by a council member');
   await shot(f1, '06-passed');
+
+  log('Badges: learning by doing');
+  await open(f2, '#/');
+  check(await seen(f2.locator('#badge-earned').getByText(/Voce/)), 'a counted vote earns Voice, with a note on Home');
+  check(await f2.locator('#badge-earned').getByRole('button', { name: 'Condividi', exact: true }).isVisible(), 'the badge note can be shared to the group');
+  await f2.locator('#badge-earned').getByRole('button', { name: 'OK' }).click();
+  check(!(await f2.locator('#badge-earned').count()), 'the note goes once seen');
+  await open(f2, '#/profile');
+  check(await seen(f2.locator('#badges').getByText(/Voto contato su #\d+/)), 'Profile says what earned Voice');
+  await open(f1, '#/profile');
+  check(await seen(f1.locator('#badges .badge.earned').filter({ hasText: 'Proponente' })), 'the proposer holds Proposer');
+  await shot(f1, '06b-badges');
   await open(f1, `#/p/${rulesId}`);
   check(await f1.getByText('Approvata ✓').first().waitFor({ timeout: 30000 }).then(() => true, () => false), 'rules change passed (two-thirds)');
   check(await seen(f1.getByText(/Approvata, ma non ancora in vigore/)), 'passed rules change says it waits for the council');

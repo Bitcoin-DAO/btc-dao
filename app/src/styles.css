@@ -154,3 +154,11 @@ label.check input { width: 24px; height: 24px; margin: 0; flex: none; accent-col
 .hwsteps li { color: var(--muted); }
 .hwsteps li.on { color: inherit; }
 .hwsteps li > .btn, .hwsteps li > p, .hwsteps li > div { margin-top: 8px; }
+
+/* Badges: "learning by doing" (docs/proposals/badges.md 1.2). The wordmark's square, filled once earned. */
+.sq { display: inline-block; width: 0.55em; height: 0.55em; background: var(--accent); margin-right: 0.45em; vertical-align: 0.08em; }
+ul.badges { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.badge { display: flex; flex-direction: column; gap: 2px; padding-left: 22px; position: relative; }
+.badge::before { content: ''; position: absolute; left: 0; top: 0.3em; width: 12px; height: 12px; border: 2px solid var(--accent); box-sizing: border-box; }
+.badge.earned::before { background: var(--accent); }
+.badge .btn.link { align-self: flex-start; width: auto; padding-left: 0; text-align: left; }

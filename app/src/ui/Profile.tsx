@@ -5,6 +5,7 @@ import { markWordsChecked, restoreTreasuryKey, signAndPublish, signOut, useApp }
 import { KIND } from '../core/events';
 import { fmtDate, t } from '../i18n';
 import { validAddress } from '../core/state';
+import { BadgesCard } from './Badges';
 import { Address, Footer, Header, PrintCard, ShortCode, WordsCheck, errText, go, askConfirm } from './parts';
 
 export function Profile() {
@@ -120,6 +121,7 @@ export function Profile() {
           <ShortCode pubkey={me.key} />
         </div>
         {!standing && payoutCard}
+        {!former && <BadgesCard />}
         {former && (
           <div class="card">
             <p class="ok">{t('profile.left', { dao })}</p>

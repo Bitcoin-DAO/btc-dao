@@ -51,16 +51,15 @@ On the day, the organiser works from the [run sheet](workshop/run-sheet.md).
 - [ ] **Pin the relay:** add the DAO id to `ALLOWED_DAO_IDS` in btc-dao's `relay/src/config.ts`, build and push to main; Cloudflare redeploys the relay ([relay README](../relay/README.md)).
 - [ ] **The group as the DAO's notice board:** on an open vote, and on a round waiting for council signatures, **Share in the group** sends a ready message with the link.
 - [ ] **Fund the treasury** (trial stages: from the [testnet treasury](testnet-treasury.md)), and run the first rounds ([guide 5](guide.md#5-funding-the-treasury), [6.4](guide.md#64-payout-rounds-and-signing-sessions)).
-- [ ] **Badges:** the members' four (Wallet, Voice, Proposer, Builder) come by doing; a "badge bounties" payout, if the DAO wants one, is an ordinary vote ([proposal](proposals/badges.md)).
+- [ ] **Badges:** the members' four (Wallet, Voice, Proposer, Builder) come by doing, shown on each member's Profile; a "badge bounties" payout, if the DAO wants one, is an ordinary vote ([proposal](proposals/badges.md)).
 
 ## Planned: making this list shorter
 
-From the review of this checklist against what was built (16 November 2026). Done in v0.9.4: the planned council shown at setup, the wallet prompt, **Share in the group**, and the [run sheet](workshop/run-sheet.md). Agreed for after ALPHA DAO's founding:
+From the review of this checklist against what was built (16 November 2026). Done in v0.9.4: the planned council shown at setup, the wallet prompt, **Share in the group**, and the [run sheet](workshop/run-sheet.md); in v0.9.5, the members' badges on their Profile. Agreed for after ALPHA DAO's founding:
 
 - [ ] **Config-only DAO repositories:** a DAO's repository holds only `config/dao.json` and its README; its build takes the app from a btc-dao release, so updating a DAO is changing one version number (replaces the `git archive` step in B).
 - [ ] **Gateway by pattern:** the chain gateway accepts any DAO host under a verified domain (`https://*.byob.zone`), so a new DAO needs no gateway push (B).
 - [ ] **Config check:** a command that checks `config/dao.json` before the first deploy: hosts match, relays and chain sources reachable, council and threshold within the minimums, `group` a link.
-- [ ] **Badges in the app:** the members' four badges on each member's Profile ([proposal](proposals/badges.md)).
 - [ ] **Record export for the council:** a council member can save the DAO's whole record as a file, a copy that needs no relay.
 
 Notifications stay with the chat group (**Share in the group**) until there is a reason to build more.

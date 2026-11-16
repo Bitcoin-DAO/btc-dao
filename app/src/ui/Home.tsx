@@ -5,6 +5,7 @@ import { chainApis, manualRetryIn, refreshTreasury, useApp } from '../app';
 import { fmtDate, fmtSats, t } from '../i18n';
 import { Address, Footer, Header, Qr, go } from './parts';
 import { Join } from './Join';
+import { BadgesHome } from './Badges';
 import { ProposalCard } from './Proposals';
 import { councilTodo } from './Council';
 import { cadenceOf, roundDatesAfter } from '../core/time';
@@ -44,6 +45,7 @@ export function Home() {
             <button type="button" class="btn primary" onClick={() => go('/profile')}>{t('home.walletGo')}</button>
           </section>
         )}
+        {app.me && <BadgesHome />}
         <section class="card">
           <span class="small" style="font-size:15px">{t('home.balance')}</span>
           {tr ? (

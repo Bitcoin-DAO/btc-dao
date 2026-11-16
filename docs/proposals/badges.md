@@ -30,7 +30,7 @@ Badges mark the steps. Every badge is **computed from a DAO's own record** by th
 
 ### 1.2 Badges: learning by doing
 
-Each badge is one task done for real in the DAO; a member who has all four has used every part of the DAO a member uses. Shown on byob.zone as "Learning by doing", and planned for the member's Profile page in the app.
+Each badge is one task done for real in the DAO; a member who has all four has used every part of the DAO a member uses. Shown on byob.zone as "Learning by doing", and on the member's own Profile in the app.
 
 | Badge | Task | Earned when the record shows | Protocol |
 | --- | --- | --- | --- |
@@ -45,7 +45,14 @@ Each badge is one task done for real in the DAO; a member who has all four has u
 - **Privacy:** shown inside the DAO beside the member's DAO name; outside it (byob.zone) only totals, such as "12 of 15 members have a wallet", never who.
 - **Rewards** are an ordinary bounty: the DAO votes a "badge bounties" payout once, with an amount per badge; a member who holds a badge claims it; the council pays it in a round. No new money rules.
 
-Open questions: does Wallet stay once earned, or show only while an address is in force (it ends when withdrawn, on leaving or with a new key, 4.2)? Is the badge bounty paid once per member and badge, enforced by the app, or left to the council on each claim?
+**Built in v0.9.5** (`core/badges.ts`, `ui/Badges.tsx`), decided 16 November 2026:
+
+- **An onboarding tool, shown only to the member:** a "Learning by doing" card on their own Profile, with how to earn each badge or what earned it. Not on the Members page.
+- **Home suggests the next step:** after the Wallet card, the first badge there is something to do for now (an open vote, a proposal, an open bounty), with "Not now".
+- **Wallet stays once earned.** If the address later lapses, the Profile says so and the Home card asks again.
+- **The moment it's earned:** a note on Home, once per phone, with **Share in the group** ("@anna: Voice ✓ Learning by doing").
+
+Still open: is the badge bounty paid once per member and badge, enforced by the app, or left to the council on each claim? To decide when a DAO first votes one.
 
 ## 2. Council
 
