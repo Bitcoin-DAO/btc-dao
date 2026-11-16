@@ -2,6 +2,10 @@
 
 Each release is a git tag (`v0.1.1`). A DAO's copy runs one tagged release and records it in its README; a release moves to a DAO's next stage only after passing the one before ([guide, section 8](docs/guide.md#8-the-three-stages-practice-testnet-mainnet)).
 
+## v0.9.2 · 16 November 2026
+
+- **The byob.zone orange.** Buttons, tab markers and the "new" chip use the orange of the wordmark's square (#E8834A), with dark text on it, matching byob.zone. That orange is too light for text on white, so the highlighted characters of addresses are now dark on a light orange tint, and outgoing amounts are dark.
+
 ## v0.9.1 · 14 November 2026
 
 - **The DAO's name as a wordmark.** A DAO named "… DAO" is written in the header the byob.zone way: `alpha▪dao`, its name in bold, a small orange square, then "dao", in IBM Plex Mono. Screen readers still hear the full name. A name that doesn't end in "DAO" is shown as before.

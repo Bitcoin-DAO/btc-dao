@@ -7,8 +7,10 @@
   --line: #d5dddc;
   --line-2: #e3e8e7;
   --field: #9aaaad;
-  --accent: #b54d0a;
-  --accent-ink: #ffffff;
+  /* The byob.zone orange (the wordmark's square). Too light for text on white: it colours shapes, with ink on them. */
+  --accent: #e8834a;
+  --accent-ink: #10292e;
+  --accent-tint: #fbe3d3;
   --teal: #1f6b70;
   --teal-ink: #1f4f53;
   --teal-bg: #e3f0f0;
@@ -96,7 +98,7 @@ label.check input { width: 24px; height: 24px; margin: 0; flex: none; accent-col
 .dots i.on { background: var(--teal); }
 
 .addr { font-family: var(--mono); font-size: 15px; line-height: 1.6; overflow-wrap: anywhere; }
-.addr b { color: var(--accent); font-weight: 600; }
+.addr b { color: var(--ink); font-weight: 700; background: var(--accent-tint); border-radius: 2px; }
 .qr { background: #fff; display: block; max-width: 100%; height: auto; }
 .qr-wrap { display: flex; justify-content: center; }
 
@@ -107,7 +109,7 @@ label.check input { width: 24px; height: 24px; margin: 0; flex: none; accent-col
 .chip { display: inline-block; font-size: 12px; padding: 2px 8px; border-radius: 6px; background: var(--line-2); color: var(--ink-2); }
 .chip.teal { background: var(--teal-bg); color: var(--teal-ink); }
 .amount-in { color: var(--teal); font-family: var(--mono); font-weight: 600; }
-.amount-out { color: var(--accent); font-family: var(--mono); font-weight: 600; }
+.amount-out { color: var(--ink); font-family: var(--mono); font-weight: 700; }
 .ok { color: var(--teal); font-weight: 600; }
 
 .scanner { position: fixed; inset: 0; background: rgba(16, 41, 46, 0.96); color: #fff; z-index: 10; display: flex; flex-direction: column; gap: 14px; padding: 20px; overflow-y: auto; }
