@@ -52,6 +52,8 @@ Each badge is one task done for real in the DAO; a member who has all four has u
 - **Wallet stays once earned.** If the address later lapses, the Profile says so and the Home card asks again.
 - **Share in the group** from the Profile's badges card ("@anna: Voice, Proposer ✓ Learning by doing").
 
+**Next round of changes** (decided 16 November 2026): the Profile's badge tiles lose their links ("See the bounty", and likewise "Go to the votes" and "New proposal"), with no text in their place: learning to find the Proposals page from the footer is part of learning by doing.
+
 **Badge bounties are paid once per member and badge** (decided 16 November 2026). To build when a DAO first votes one: the bounty proposal names the badge it rewards, a claim counts only from a member who holds that badge, and the app refuses a round that pays the same person for the same badge twice, as it refuses any payout paid twice.
 
 ## 2. Council
