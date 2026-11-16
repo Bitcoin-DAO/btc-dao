@@ -16,6 +16,18 @@ export const go = (path: string) => {
 };
 
 /** A link from the record, only if it is an ordinary web address (review I-5): never javascript: or the like. */
+/**
+ * A translated sentence naming the DAO's group: with a group in the site config, `withKey` is used and its {group}
+ * becomes a link to it; without one, `withoutKey`.
+ */
+export function GroupText(props: { withKey: Parameters<typeof t>[0]; withoutKey: Parameters<typeof t>[0]; vars?: Record<string, string | number> }) {
+  const group = useApp().site?.group;
+  const url = group ? safeHref(group.url) : undefined;
+  if (!group || !url) return <>{t(props.withoutKey, props.vars)}</>;
+  const [before, after = ''] = t(props.withKey, props.vars).split('{group}');
+  return <>{before}<a href={url} target="_blank" rel="noopener noreferrer">{group.name}</a>{after}</>;
+}
+
 export const safeHref = (url: unknown): string | undefined => (typeof url === 'string' && /^https?:\/\/[^\s]+$/i.test(url) ? url : undefined);
 
 /** "ALPHA DAO" is written alpha▪dao (the byob.zone wordmark); a name not ending in DAO stays as it is. */
@@ -372,5 +384,28 @@ export function WordsCheck({ mnemonic, onDone }: { mnemonic: string; onDone: () 
         </>
       )}
     </div>
+  );
+}
+
+/** Shares a code as a message (the phone's share sheet), or copies it where sharing is not available. */
+export function ShareButton({ text }: { text: string }) {
+  const [ok, setOk] = useState(false);
+  return (
+    <button
+      type="button"
+      class="btn secondary"
+      onClick={async () => {
+        try {
+          if (navigator.share) await navigator.share({ text });
+          else await navigator.clipboard.writeText(text);
+          setOk(true);
+          setTimeout(() => setOk(false), 2000);
+        } catch {
+          /* cancelled or not allowed */
+        }
+      }}
+    >
+      {ok ? t('fs.shared') : t('fs.share')}
+    </button>
   );
 }

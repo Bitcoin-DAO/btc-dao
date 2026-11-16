@@ -2,6 +2,12 @@
 
 Each release is a git tag (`v0.1.1`). A DAO's copy runs one tagged release and records it in its README; a release moves to a DAO's next stage only after passing the one before ([guide, section 8](docs/guide.md#8-the-three-stages-practice-testnet-mainnet)).
 
+## v0.9.3 · 16 November 2026
+
+- **A council member's own phone checks their treasury key before they approve the founding.** A council member's code carries their treasury key beside the identity key the short code protects; a code sent by message could have its treasury key swapped without the short code changing. The phone that made the key now compares it with the one the founding lists, and refuses the approval if they differ.
+- **The DAO's chat group, named.** A new optional site setting, `group` (`{"name", "url"}` in `config/dao.json`), names the DAO's chat group (WhatsApp, Signal…). Where the app tells remote founders and candidates what to do, the group becomes a link: post your code there, and read your short code to the council on a video call. Without a group the texts say to send the code by message. The group is a site setting only: it is never copied into the founding record, so changing it changes nothing about the DAO.
+- **Candidates can share their code** with a Share button, as founders already could, and the candidate page says how remote checks work (two council members, each on a video call).
+
 ## v0.9.2 · 16 November 2026
 
 - **The byob.zone orange.** Buttons, tab markers and the "new" chip use the orange of the wordmark's square (#E8834A), with dark text on it, matching byob.zone. That orange is too light for text on white, so the highlighted characters of addresses are now dark on a light orange tint, and outgoing amounts are dark.
