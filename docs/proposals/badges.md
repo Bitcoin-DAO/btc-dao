@@ -45,12 +45,12 @@ Each badge is one task done for real in the DAO; a member who has all four has u
 - **Privacy:** shown inside the DAO beside the member's DAO name; outside it (byob.zone) only totals, such as "12 of 15 members have a wallet", never who.
 - **Rewards** are an ordinary bounty: the DAO votes a "badge bounties" payout once, with an amount per badge; a member who holds a badge claims it; the council pays it in a round, **once per member and badge**.
 
-**Built in v0.9.5** (`core/badges.ts`, `ui/Badges.tsx`), decided 16 November 2026:
+**Built in v0.9.5, Home card as in v0.9.7** (`core/badges.ts`, `ui/Badges.tsx`), decided 16 November 2026:
 
 - **An onboarding tool, shown only to the member:** a "Learning by doing" card on their own Profile, with how to earn each badge or what earned it. Not on the Members page.
-- **Home suggests the next step:** after the Wallet card, the first badge there is something to do for now (an open vote, a proposal, an open bounty), with "Not now".
+- **On Home, for information:** below the donation card, the four badges and the next step, worked out at every load, until all four are earned. No buttons; the Wallet card at the top is the one thing flagged.
 - **Wallet stays once earned.** If the address later lapses, the Profile says so and the Home card asks again.
-- **The moment it's earned:** a note on Home, once per phone, with **Share in the group** ("@anna: Voice ✓ Learning by doing").
+- **Share in the group** from the Profile's badges card ("@anna: Voice, Proposer ✓ Learning by doing").
 
 **Badge bounties are paid once per member and badge** (decided 16 November 2026). To build when a DAO first votes one: the bounty proposal names the badge it rewards, a claim counts only from a member who holds that badge, and the app refuses a round that pays the same person for the same badge twice, as it refuses any payout paid twice.
 
