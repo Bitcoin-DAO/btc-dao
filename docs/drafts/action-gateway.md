@@ -64,7 +64,7 @@ The DAO works like a community **notice board**: jobs and needs are listed; a tr
 - **Payment:** staged, or on completion, as the Agent agrees.
 - **Goods are paid directly** to the merchant; **services directly where possible**.
 - **Nothing is paid if the task is not completed.** That is part of the Agent's risk.
-- **Reputation:** the number and type of tasks completed, shown as badges and on the profile.
+- **Reputation:** the number and type of tasks completed, shown as badges and on the profile (Agent, Local Agent and Operator badges: [`proposals/badges.md`](../proposals/badges.md) 1.3).
 - **Exposure:** the Agent is the one part of the DAO that cannot be anonymous to the outside world, and carries any personal liability, with no legal wrapper. Stated plainly when a task is accepted; first tasks small and low-stakes.
 
 **Fit with the protocol.** An Agent task is close to a bounty (4.6): the mandate is the bounty proposal, acceptance is `dao.claim`, evidence is `dao.report`, settlement is the council's round, and "nothing paid if not completed" is lapse. To add: the Agent badge and region; council members barred from claiming; payout outputs that pay a merchant directly beside the Agent's fee; the Agent's choice of staged or on completion before the vote fixes the schedule (in the draft's discussion).

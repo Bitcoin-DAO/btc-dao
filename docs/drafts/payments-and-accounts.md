@@ -77,7 +77,20 @@ A section of the app, computed from the record and the chain, with no data entry
 
 Statements are for members, their accountants, and counterparties checking the DAO.
 
-## 6. Open questions
+## 6. Payment Request #0001: DAO to DAO
+
+Decided 17 November 2026: the first payment request is **DAO to DAO**. A parent DAO (ALPHA DAO, say) sells **setup support** to a DAO forked from it: forking, deploying, the founding workshop, Operator setup.
+
+- **Why services, and why another DAO:** no physical goods; a digital, recordable delivery; neither side needs a fiscal invoice, both being unincorporated and bitcoin-only; a real need every new DAO has.
+- **It runs every part:** fork → founding → Enable email → correspondence vote → payment request #0001 (PDF, verification link) → the buyer's vote → a round signed on SeedSigners → payment matched on-chain → receipt → the Agent's tranches paid → both DAOs' accounts.
+- **Proved from both records:** the buyer's treasury pays an address of the seller's treasury, both descriptors public; the request on one record, the vote to pay on the other.
+- **Badges:** First sale, First purchase, Trading partner, Mentor ([`proposals/badges.md`](../proposals/badges.md) 3.3), and Agent for whoever delivers (1.3).
+- **Like the pizza:** the Bitcoin pizza (22 May 2010) proved bitcoin could buy something real; #0001 would show a group with no legal existence can sell something real. Kept small and ordinary, and marked: #0001, its receipt and txid, its hash timestamped (OpenTimestamps).
+- **Later:** corporate clients from #0002 on: technical support with a fixed scope rather than open-ended consultancy (less professional liability), first to bitcoin-native companies, since a registered company usually needs a fiscal invoice.
+
+**To decide before #0001:** the scope and deliverables; the price in sats and its tranches; the delivering Agent; who accepts delivery on the buyer's side.
+
+## 7. Open questions
 
 - [ ] **Does every payment request need its own vote?** All comms go through proposals; voting each sale could slow selling. Alternative: one vote on a price list or an agreement, within which requests are issued without a further vote
 - [ ] The name: payment request / receipt (3.1)

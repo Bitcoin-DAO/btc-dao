@@ -56,6 +56,18 @@ Each badge is one task done for real in the DAO; a member who has all four has u
 
 **Badge bounties are paid once per member and badge** (decided 16 November 2026). To build when a DAO first votes one: the bounty proposal names the badge it rewards, a claim counts only from a member who holds that badge, and the app refuses a round that pays the same person for the same badge twice, as it refuses any payout paid twice.
 
+### 1.3 Agent and Operator badges (17 November 2026)
+
+*Proposed,* for the roles in [`drafts/action-gateway.md`](../drafts/action-gateway.md) section 3. Earned by doing, like the four above; counted, so a profile reads "Agent: 7 tasks (4 reporting, 2 physical, 1 digital)".
+
+| Badge | Earned when the record shows |
+| --- | --- |
+| Agent | a task claimed, reported and paid in a round (4.6) |
+| Local Agent | the same, for a task with a region |
+| Operator | voted in as an Operator, and a handover ceremony completed with its closing receipt |
+
+Council members are not Agents, so a council member never earns Agent badges in the DAO where they hold a seat.
+
 ## 2. Council
 
 ### 2.1 Stages and minimums
@@ -120,6 +132,8 @@ A DAO moves up a stage by being **founded again** at the next stage, as UNO did:
 - a DAO founded **by members of another** names it (a group from ALPHA DAO founds BOSA DAO);
 - byob.zone shows the family: each DAO with its stage, its parent and the DAOs forked from it.
 
+**The tree** (17 November 2026). Bitcoin itself began as one code version, cloned and forked. btc-dao grows the same way: one kit, each DAO a fork of another, and the lineage drawn on byob.zone as a tree. With payment requests ([`drafts/payments-and-accounts.md`](../drafts/payments-and-accounts.md)), the tree also becomes a trade network: a parent DAO sells setup support to the DAO it helps into being, and the child pays it, both on the record (3.3, Mentor).
+
 Forking is also the exit: members who disagree with their DAO can found their own, taking their record with them (their council badges are portable, 2.2), without asking anyone.
 
 ### 3.3 DAO badges
@@ -136,8 +150,24 @@ Shown on byob.zone beside each DAO's pulse, computed from its record:
 | Parent | another DAO names it as parent (3.2) |
 | Mainnet | a mainnet DAO meeting the minimums in 3.1 |
 
+*Proposed* (17 November 2026), trade between DAOs and with the outside world:
+
+| Badge | Earned when the record shows |
+| --- | --- |
+| First sale | a payment request paid in full |
+| First purchase | a payout round paid to an address of another btc-dao treasury, matching that DAO's payment request |
+| Trading partner | a first sale and a first purchase with the same DAO |
+| Mentor | a paid sale of setup support to a DAO that names it as parent (3.2) |
+| Correspondent | an email sent after a passed correspondence proposal |
+| Open books | a statement published, every payment request matched or closed |
+
+**Proof from public descriptors.** Both treasuries' descriptors are public (protocol 6.5, 6.6), so a DAO-to-DAO payment is proved from the two descriptors alone: the buyer's treasury spent to an address of the seller's treasury, matching the request's reference. No one declares it, and no one can fake it.
+
+**Context against gaming.** Two DAOs run by the same people could trade to collect badges. As for council badges, each is shown with its context: both DAOs' ages, members, and the number of distinct people who signed each side.
+
 ### 3.4 To build
 
 - protocol: `parent` in the genesis config; the two link events (2.2); the badge definitions above;
 - the app: the mainnet checks (3.1) before a mainnet founding; "Link your record" on a council member's Profile, signing the personal half through an outside signer (Amber, a browser extension or a remote signer);
 - byob.zone: members' badge totals and DAO badges in each DAO's pulse; the family of DAOs; a reader for linked council records.
+- with the action gateway and payment requests: Agent, Local Agent and Operator badges (1.3); the trade badges and the descriptor check for DAO-to-DAO payments (3.3); the family tree on byob.zone showing trade between DAOs as well as lineage.
