@@ -134,7 +134,7 @@ Held in the DAO's settings:
 
 ### 5.2 Security email
 
-Password resets arrive at the DAO's address. Readable by any single member, they would get round the root split. So the inbox **holds security emails back** and releases them only when a Recovery proposal passes.
+Password resets arrive at the DAO's email. Readable by any single member, they would get round the root split. So accounts are registered to a separate address, `accounts@`, whose mail is **held back** and released only when a Recovery proposal passes (9.1). Sorting by address is more reliable than spotting security mail by its content.
 
 ### 5.3 Handover ceremony
 
@@ -182,15 +182,77 @@ On the free tier, under the admission tests:
 | --- | --- | --- |
 | 0 | This document | now |
 | 1 | Operator role in the app: badge, founding minimum, 1 → 3 vote, dashboard | beside the council-change work |
-| 2 | Cloudflare base module: account (setup, handover, rotation, watcher); **inbound email** routed to a Worker and published to the relay as inbox events, security mail held; the DAO website via Pages ("Publish site update" proposals) | text only first; attachments later via Blossom. Any member can turn an email into a draft |
+| 2 | Cloudflare base module: account (setup, handover, rotation, watcher); **inbound email** as in section 9; the DAO website via Pages ("Publish site update" proposals) | text only first; attachments later (9.6). Any member can turn an email into a draft |
 | 3 | **Free outbound to verified addresses:** member notifications (new proposals, votes closing, to-dos) to members who opt in by verifying their address | alongside the Nostr notification layer |
 | 4 | Outbound email to the world | blocked: Cloudflare's sending needs a paid plan by card, which fails the payment test. Waits for a provider that passes |
 
 The Announcement proposal and the DAO npub ([`discussion-and-comms.md`](discussion-and-comms.md) 4) follow the same pattern: an approved proposal, executed by code holding a credential, with a public result.
 
-## 9. Open questions
+## 9. The email module
 
-- [ ] **Inbox privacy.** Inbound email carries outsiders' personal data. Proposed: the inbox is encrypted to members only, the first explicit exception to "all DAO data is public"; actions taken in response stay public
+Decided 17 November 2026, unless marked otherwise. The aim: an easy way for members to run the DAO's email themselves, so the DAO can deal with traditional companies and individuals as well as with Nostr users.
+
+### 9.1 Addresses
+
+| Address | For | Who reads it |
+| --- | --- | --- |
+| `admin@<dao>.byob.zone` | the world: companies, individuals, counterparties | all members, in the app |
+| `accounts@<dao>.byob.zone` | registering Tier 2 accounts only | nobody, until a Recovery proposal passes |
+
+Sub-addresses (`admin+printer@…`) arrive at `admin@`. Each counterparty gets its own tag; a leaked tag is blocked alone. Named after the DAO, not the council: the inbox belongs to all members.
+
+### 9.2 Reading: members only, no reply button
+
+- Every email is readable by **all members** on the DAO website. There is **no reply button**: every reply is drafted as a proposal.
+- **Why encrypted:** the relay is public by design. In plain text an email would be readable by anyone, including the private details of a sender who wrote to an ordinary-looking inbox. Encrypted, members read it as if the inbox were open to them, and nobody else can.
+- **One inbox key:** the DAO has an inbox keypair. The executor encrypts each email to its public half and needs no secret to do so. The private half is wrapped to each member's identity key (like `dao.keywrap`, 5.4). A new member's key is wrapped by an existing member's app once they are voted in, so they read the full history; when a member leaves, the inbox key is changed for future mail.
+
+### 9.3 Body and record kept apart
+
+- **Email bodies** are kept encrypted in the module's own storage, with a **retention period** set when email is enabled. They are not kept forever.
+- **On the relay** (permanent): the email's hash, an encrypted summary, and its links to proposals and replies.
+- So the DAO's record shows what happened without keeping private individuals' messages for ever.
+
+### 9.4 Replies: all comms through proposals
+
+- **Correspondence** is a proposal category with a **3-day voting period**. Every outgoing message, to anyone, goes through it: idea → draft → discuss → proposal → vote → sent. No standing mandates or pre-approved templates.
+- A passed reply is sent by the executor, word for word, threaded into the counterparty's conversation (reply headers), and its receipt published.
+- **Comms transparency:** every outgoing email's hash goes into its receipt, with a footer link to the public record. The recipient can verify the message is the DAO's and was voted, and can follow the **current status** of the DAO's processing of their matter (draft, discussion, vote, result).
+- Outbound to the world waits for a provider that passes the payment test (section 8, stage 4).
+
+### 9.5 Payment fraud
+
+A payout address taken from an email ("our address has changed") must be **confirmed through a second channel** (a call, an Agent's visit, or the counterparty's own website) before its proposal can pass. The app flags any proposal whose address arrived by email.
+
+### 9.6 Attachments (later)
+
+Quotes and invoices as PDFs: stored encrypted (Blossom), offered as downloads only, never opened inside the app, with a size cap. One click turns an invoice email into a draft payout proposal with the attachment linked (and 9.5 applies to its address).
+
+### 9.7 Delivery
+
+The sender records (SPF, DKIM, DMARC) are set in the DAO's DNS by the DNS module, together with the email module; without them replies land in spam.
+
+### 9.8 Spam
+
+Spam is stopped **before** the relay, since the relay keeps everything.
+
+1. **Sender checks:** mail failing SPF, DKIM or DMARC is dropped by the Worker.
+2. **Known and new senders:** known senders (addresses the DAO has written to, or a member has added) go straight to the inbox. New senders wait in the module's storage, not on the relay, for a fixed time (say 30 days); members see sender and subject only, any member can let a sender in (logged), and the rest expire unrecorded.
+3. **Sub-addresses** per counterparty (9.1).
+4. **Contact form** on the DAO website instead of the bare address, with a proof-of-work check (ALTCHA, open source, self-hostable). The bare address goes only to counterparties the DAO deals with.
+5. **Limits:** messages per sender per day, size, text only at first.
+6. *Later:* Lightning postage (a few sats puts an unknown sender straight in the inbox), once the Purse exists.
+
+Never auto-reply to unknown senders with a challenge: spam forges senders, so the replies hit innocent people and get the DAO's domain blocklisted.
+
+### 9.9 Enabling email
+
+An **"Enable email"** proposal, guided in the app: addresses, retention period, spam settings. Once passed, it creates the Setup task for the Operator (4.4) and the DNS records (9.7).
+
+## 10. Open questions
+
+- [ ] Email retention period default; how the encrypted summary is written (automatic, or by the member who files the email)
+- [ ] Inbox events in the protocol: kinds for received email, inbox-key wrapping, sender admission, correspondence receipts
 - [ ] **Single-Operator backup.** A sealed copy of the root split among the council, opened only by a Recovery proposal if the only Operator is gone, retired at three Operators? Blurs council/Operator separation in an emergency only
 - [ ] **Executor and chain gateway:** one Worker or two? The chain gateway holds no secrets today, and the comms draft puts the DAO npub's nsec there
 - [ ] Digital deliverables: hash and preview before payment; delivery accepted by the council's round (as 4.6 today) or a members' step for larger work; default licence (open, or per task)
