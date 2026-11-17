@@ -237,3 +237,12 @@ Solid arrows are lineage (`parent` in each child's genesis, 3.2); dotted arrows 
 | Child 1, later | Parent, First sale and Mentor of its own, once the grandchild is founded (4.2) |
 
 The Agents who deliver the setup support earn Agent badges (1.3); the Operators who run each child's handover ceremony earn Operator.
+
+### 4.4 Gaps in the growth loop (open)
+
+Recorded 17 November 2026. The loop above is complete as a design; these four questions remain before it runs on its own.
+
+- [ ] **Kit updates across the tree.** Every DAO is a fork; a security fix or a v2 of the kit must reach DAOs on different versions. Bitcoin's own upstream problem: someone maintains the original, each DAO chooses to upgrade. Needed: the kit version shown on the dashboard, an upgrade proposal, and a way to fund kit maintenance (for example, a voluntary share of mentoring income sent upstream)
+- [ ] **Two-sided lineage.** Today a child names its parent in its genesis alone (3.2), so anyone could claim ALPHA DAO as parent. Mentor is safe (it needs a paid sale), but the tree on byob.zone should need the parent's acknowledgement too, two-sided like `dao.link` (2.2)
+- [ ] **Mentoring capacity.** Early on, the first DAO mentors every child until its children reach stage 6 (4.2): growth is paced by how many mentoring tasks its Agents can take. Probably healthy; to watch, and to show on byob.zone
+- [ ] **Failure and closure.** DAOs will close. The tree shows closed branches honestly (closing exists in the protocol; this is a display rule), with what each achieved before it closed

@@ -70,6 +70,7 @@
 
 ## Open questions
 
+- [ ] Growth loop gaps: kit updates across the tree, two-sided lineage, mentoring capacity, failure and closure ([`proposals/badges.md`](proposals/badges.md) 4.4)
 - [ ] Payment requests and accounts: open questions in [`drafts/payments-and-accounts.md`](drafts/payments-and-accounts.md) section 7 (a vote per request or a price list, naming, supplier payment window, price source)
 - [ ] Action gateway: open questions in [`drafts/action-gateway.md`](drafts/action-gateway.md) section 10 (single-Operator backup, executor vs chain gateway, digital deliverables, protocol changes for Operators and Agents)
 
