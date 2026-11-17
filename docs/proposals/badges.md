@@ -157,7 +157,7 @@ Shown on byob.zone beside each DAO's pulse, computed from its record:
 | First sale | a payment request paid in full |
 | First purchase | a payout round paid to an address of another btc-dao treasury, matching that DAO's payment request |
 | Trading partner | a first sale and a first purchase with the same DAO |
-| Mentor | a paid sale of setup support to a DAO that names it as parent (3.2) |
+| Mentor | a paid sale of setup support to a DAO that names it as parent (3.2), by a DAO holding the competence path's earlier stages (4.2) |
 | Correspondent | an email sent after a passed correspondence proposal |
 | Open books | a statement published, every payment request matched or closed |
 
@@ -170,4 +170,70 @@ Shown on byob.zone beside each DAO's pulse, computed from its record:
 - protocol: `parent` in the genesis config; the two link events (2.2); the badge definitions above;
 - the app: the mainnet checks (3.1) before a mainnet founding; "Link your record" on a council member's Profile, signing the personal half through an outside signer (Amber, a browser extension or a remote signer);
 - byob.zone: members' badge totals and DAO badges in each DAO's pulse; the family of DAOs; a reader for linked council records.
+- the competence path (4): the progress line per DAO on byob.zone, and the 4.2 check before a sale of setup support counts for Mentor;
 - with the action gateway and payment requests: Agent, Local Agent and Operator badges (1.3); the trade badges and the descriptor check for DAO-to-DAO payments (3.3); the family tree on byob.zone showing trade between DAOs as well as lineage.
+
+## 4. The competence path
+
+*Proposed,* 17 November 2026. Every DAO aims to build competence across **all** stages: from the first council of two, through the four member badges, to supporting the founding of child DAOs. The badges in sections 1 to 3 are one path, and it ends where a DAO can teach the next one.
+
+### 4.1 The stages
+
+| Stage | The DAO can… | Badges |
+| --- | --- | --- |
+| 1. Found | start with a council of 2 and a record | Founded (3.3), Founding council (2.3) |
+| 2. Learn | have every member use every part of the DAO | Wallet, Voice, Proposer, Builder (1.2) → Learning (3.3) |
+| 3. Pay | run a payout round signed by its council | First payout (3.3), Keyholder (2.3) |
+| 4. Endure | lose a key, grow the council, move the treasury | Spare key, Grown (3.3), Handover, Recovery (2.3) |
+| 5. Operate | run its infrastructure and act in the world | Operator, Agent, Local Agent (1.3), Correspondent (3.3) |
+| 6. Trade | sell, buy, and keep honest accounts | First sale, First purchase, Open books (3.3) |
+| 7. Mature | go live on mainnet | Mainnet (3.3) |
+| 8. Reproduce | support the founding of a child DAO, paid for it | Parent, Mentor, Trading partner (3.3) |
+
+- **A guide, not a gate.** Stages overlap in practice (a DAO may earn Correspondent before Grown). The order is for learning; the one gate is 4.2.
+- **The child repeats the path.** A forked DAO starts at stage 1. From its parent it gets help, not badges: competence is earned, never inherited (as council badges are portable for people, 2.2, but each DAO earns its own).
+- **On byob.zone:** a progress line beside each DAO in the tree, so the family shows how far each has grown.
+
+### 4.2 Teach only what you have done
+
+A DAO sells setup support only up to the stage it has reached itself: to support a **testnet** founding, it holds stages 1 to 6; to support a **mainnet** founding, it also holds stage 7. Mentor (3.3) counts only a sale made within this rule. A buyer can check it on the record: the seller has done every step it offers to teach.
+
+*To confirm:* this lets ALPHA DAO, a testnet DAO, make Payment Request #0001 ([`drafts/payments-and-accounts.md`](../drafts/payments-and-accounts.md) 6) for a testnet child once it holds stages 1 to 6, and support mainnet foundings only after its own.
+
+### 4.3 The tree: a first and a second child
+
+The kit is the root; ALPHA DAO is the first DAO; its first two children are founded with its paid setup support. A child becomes a parent in turn only once it has walked the path itself (4.2), so early on the first DAO supports both.
+
+```mermaid
+flowchart TD
+    KIT["btc-dao kit<br/>Bitcoin-DAO/btc-dao<br/><i>one original code version</i>"]
+    ALPHA["<b>ALPHA DAO</b><br/>alpha.byob.zone<br/>stages 1–6 · Parent · Mentor"]
+    C1["<b>Child 1</b><br/>parent: ALPHA DAO<br/>stage 1: Found → walks the path"]
+    C2["<b>Child 2</b><br/>parent: ALPHA DAO<br/>stage 1: Found → walks the path"]
+    GC["<b>Grandchild</b><br/>parent: Child 1<br/><i>later</i>"]
+
+    KIT -->|fork| ALPHA
+    ALPHA -->|"fork + setup support (Agent tranches)"| C1
+    ALPHA -->|"fork + setup support (Agent tranches)"| C2
+    C1 -.->|"pays Payment Request #0001 (sats, on-chain)"| ALPHA
+    C2 -.->|"pays Payment Request #0002 (sats, on-chain)"| ALPHA
+    C1 -->|"once Child 1 holds stages 1–6 (4.2)"| GC
+    GC -.->|"pays Child 1's first payment request"| C1
+
+    classDef kit fill:#f2f2f2,stroke:#888,color:#222
+    classDef dao fill:#fff4e0,stroke:#f7931a,color:#222
+    classDef later fill:#ffffff,stroke:#bbb,stroke-dasharray:4 3,color:#666
+    class KIT kit
+    class ALPHA,C1,C2 dao
+    class GC later
+```
+
+Solid arrows are lineage (`parent` in each child's genesis, 3.2); dotted arrows are payments, each proved from the two public descriptors (3.3). What each DAO earns from the picture:
+
+| DAO | Earns |
+| --- | --- |
+| ALPHA DAO | Parent, First sale, Mentor (after #0001), Trading partner (if it also buys from a child) |
+| Child 1, Child 2 | Founded, First purchase; then the path from stage 2 |
+| Child 1, later | Parent, First sale and Mentor of its own, once the grandchild is founded (4.2) |
+
+The Agents who deliver the setup support earn Agent badges (1.3); the Operators who run each child's handover ceremony earn Operator.
