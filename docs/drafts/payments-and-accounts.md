@@ -88,6 +88,25 @@ Decided 17 November 2026: the first payment request is **DAO to DAO**. A parent 
 - **Like the pizza:** the Bitcoin pizza (22 May 2010) proved bitcoin could buy something real; #0001 would show a group with no legal existence can sell something real. Kept small and ordinary, and marked: #0001, its receipt and txid, its hash timestamped (OpenTimestamps).
 - **Later:** corporate clients from #0002 on: technical support with a fixed scope rather than open-ended consultancy (less professional liability), first to bitcoin-native companies, since a registered company usually needs a fiscal invoice.
 
+### 6.1 The mentoring package
+
+Decided 17 November 2026. How the setup support behind #0001 works in practice.
+
+- **Who mentors:** the parent DAO's **Agents**, not its council. Mentoring is an Agent task in the parent (claimed, delivered in tranches, reported, paid); the parent's council stays home and signs the parent's treasury, including the round that pays the mentoring Agents.
+- **From outside:** the mentor does not join the child as a member. The child's record is public, so the mentor can follow it without membership, and the child's competence stays its own ([`proposals/badges.md`](../proposals/badges.md) 4.2).
+- **Never the child's keys:** no council seat, no Operator role, never a seed seen. In the key ceremony the mentor runs the workshop; the child's members cut their own keys.
+- **The channel:** the parent DAO creates a **Mentoring WhatsApp group** and invites the new DAO's council. When the support period ends they are removed from the group, and the process repeats for the next child.
+
+| Tranche | Milestone | Done by |
+| --- | --- | --- |
+| 1 | **Plan:** purpose, funding model, charter choices; the child decides, the mentor explains | call, in the Mentoring group |
+| 2 | **Fork and deploy:** repo, domain or subdomain, site live; if the mentor's Agent does it, a handover ceremony ([`action-gateway.md`](action-gateway.md) 5.3) passes it to the child's Operator, so the child owns everything | Agent, then the child's Operator |
+| 3 | **Founding workshop:** the key ceremony on the child's SeedSigners; the genesis names its parent | the child's founders, the mentor guiding |
+| 4 | **First round:** a proposal, a vote and a payout round signed, the mentor watching | the child's council |
+| 5 | **Modules:** Enable email and the rest | the child's Operator |
+
+**Paying for it closes the loop.** The child's first payout can be the one that pays the parent's payment request: its first real act pays for its own founding, and earns it **First payout** and **First purchase** together (stage 3 of the path). The parent issues one payment request per tranche, or one for the package with the tranches as its terms; until the child has an email module, the request reaches it as a link in the Mentoring group.
+
 **To decide before #0001:** the scope and deliverables; the price in sats and its tranches; the delivering Agent; who accepts delivery on the buyer's side.
 
 ## 7. Open questions
@@ -98,4 +117,5 @@ Decided 17 November 2026: the first payment request is **DAO to DAO**. A parent 
 - [ ] Confirmations counted as paid; underpayment and overpayment handling; default due date
 - [ ] Price source for fiat values, and how it is named
 - [ ] Protocol: event kind(s) for payment requests and their status; new spending categories
+- [ ] Optional: the child votes the mentor in as a plain member for the mentoring period (barred from council and Operator, marked "mentor", planned exit), so the mentor can post in its discussion threads; default is the Mentoring group only
 - [ ] Legal check (Italy, UK): an unincorporated DAO selling for bitcoin, and what the counterparty's accountant needs
