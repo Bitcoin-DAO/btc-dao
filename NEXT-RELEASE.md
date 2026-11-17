@@ -94,6 +94,17 @@ Design: `docs/protocol.md` 6.5 and 6.6, `docs/dashboard-spec.md` sections 2 and 
 - [ ] Tests: unit tests for cases B-01 to B-22, H-01 to H-06, C-R01 to C-R03, N-08, N-09; end-to-end: a council change that weakens the treasury shows the red notice on every screen
 - [ ] In the wild: a council change on a testnet4 DAO that breaks a floor line, then one that restores it, both shown in the history
 
+## E. Action gateway (design; after the mainnet path)
+
+Design in `docs/drafts/action-gateway.md`, decided 17 November 2026. Built and tried on UNO DAO (testnet4), not ALPHA DAO.
+
+- [x] Stage 0: design written down (roles, modules, admission tests, credentials, handover ceremony, domain as anchor asset)
+- [ ] Stage 1: Operator role: badge, founding minimum 2 council + 1 Operator, the 1 → 3 (2-of-3) vote, dashboard display
+- [ ] Stage 2: Cloudflare base module on the free tier: account setup and handover ceremony, inbound email to the relay (security mail held for a Recovery proposal), website via Pages, watcher
+- [ ] Stage 3: member notifications by email to verified addresses (free)
+- [ ] Stage 4: outbound email to the world, once a provider passes the payment test
+- [ ] Second providers: deSEC for DNS first; nsite for the website later
+
 ## Open items
 
 - [x] **Paid on delivery** (protocol 4.6): staged payouts and bounties, v0.8.0. Built: staged payouts (schedule in the form, reports as thread cards, a tranche joins a round only after its report, lapse, the committed line on the treasury page), then bounties (claims; the council's round picks the claimant). Reports are read in Discussion (a chip on the thread and a Reports filter) and on the proposal page (the schedule with each tranche's status); not on Home or in the footer
