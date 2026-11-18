@@ -117,6 +117,28 @@ Design in `docs/drafts/meeting-scheduler.md`, idea agreed 18 November 2026. A no
 - [ ] Tests: unit tests for the suggested slot and latest-answer-counts; end-to-end: a poll opened, ticked by three members, fixed, shown on Home
 - [ ] In the wild: used to schedule a real call on a testnet4 DAO
 
+## G. Member loans to the DAO (design)
+
+Design in `docs/drafts/member-loans.md`, idea agreed 18 November 2026. Interest-free loans from members to the DAO, repaid before ordinary payouts. The DAO does not lend to members.
+
+- [x] Stage 0: idea written down (flow, rules, where it touches rounds, cap, closing, Accounts)
+- [ ] Design settled: open questions answered, protocol sections drafted
+- [ ] `member_loan` proposal type and `loan_repayment` payout category
+- [ ] Treasury page and Accounts: owed to members, free balance
+- [ ] Rounds: due repayments first; closing repays every lender first
+- [ ] Tests, then in the wild on a testnet4 DAO
+
+## H. GRANTS DAO (design)
+
+Design in `docs/drafts/grants-dao.md`, idea agreed 18 November 2026. Donations in from people (P2DAO), grants out to other DAOs' treasuries (DAO2DAO). First instance: the SeedSigner DAO.
+
+- [x] Stage 0: idea written down (flow, applicant checks, additions to the core)
+- [ ] Design settled: open questions answered
+- [ ] Application event signed by the applicant DAO's npub (needs the DAO npub from section C)
+- [ ] Labelled inflows on the treasury page and in Accounts
+- [ ] Applicant record shown beside the proposal; payout address checked against the applicant's descriptor
+- [ ] In the wild: a testnet4 GRANTS DAO funds a testnet4 DAO in tranches
+
 ## Open items
 
 - [x] **Paid on delivery** (protocol 4.6): staged payouts and bounties, v0.8.0. Built: staged payouts (schedule in the form, reports as thread cards, a tranche joins a round only after its report, lapse, the committed line on the treasury page), then bounties (claims; the council's round picks the claimant). Reports are read in Discussion (a chip on the thread and a Reports filter) and on the proposal page (the schedule with each tranche's status); not on Home or in the footer
