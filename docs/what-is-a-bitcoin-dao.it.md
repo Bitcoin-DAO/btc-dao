@@ -110,8 +110,8 @@ Ciò che una cooperativa ha e una DAO no è la personalità giuridica. Una DAO n
 - **Non è un investimento.** Non ci sono token, quote o rendimenti. Entrare non costa nulla e non fa guadagnare nulla; dà un voto.
 - **Non è una società né un ente giuridico.** Una DAO è un modo di organizzarsi, non un soggetto registrato. Che cosa significhi per legge, per le tasse o per le responsabilità dipende dal paese e da che cosa fa il gruppo: chiedi un parere prima di gestire somme importanti.
 - **Non è anonima.** I membri possono usare uno pseudonimo, ma ogni voto è pubblico e permanente, e i membri del Consiglio si conoscono tra loro.
-- **Non è istantanea.** Un voto dura una settimana e i pagamenti partono una volta al mese. È un ritmo voluto: dà tempo di leggere, discutere e controllare.
-- **Non è un luogo di discussione.** Le proposte rimandano a dove il gruppo già si parla: un incontro, una chat, un forum. La DAO registra la decisione.
+- **Non è istantanea.** Ogni DAO sceglie il proprio ritmo: un voto dura di solito qualche giorno, e i pagamenti partono a turni regolari, settimanali o mensili. È un ritmo voluto: dà tempo di leggere, discutere e controllare.
+- **Non è una chat di gruppo.** Ogni proposta ha la sua discussione nell'app, dalla prima idea al risultato, conservata nel registro. Le chiacchiere e le chiamate di ogni giorno restano dove il gruppo già si parla.
 - **Non è finita.** Il software è in prova sulla rete di test di Bitcoin. Niente qui è ancora pronto per denaro vero.
 
 ## Fondarne una

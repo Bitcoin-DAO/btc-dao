@@ -110,8 +110,8 @@ What a co-op has and a DAO does not is legal personality. A DAO cannot sign cont
 - **Not an investment.** There is no token, no share and no return. Joining costs nothing and earns nothing; it gives you a vote.
 - **Not a company or legal body.** A DAO is a way of organising, not a registered entity. What it means legally, for tax or for liability, depends on the country and on what the group does; take local advice before holding significant sums.
 - **Not anonymous.** Members can use nicknames, but every vote is public and permanent, and council members are known to each other.
-- **Not instant.** Votes take a week and payments go out once a month. That pace is deliberate: it gives people time to read, discuss and check.
-- **Not a place for discussion.** Proposals link to wherever the group already talks: a meeting, a chat group, a forum. The DAO records the decision.
+- **Not instant.** Each DAO sets its own pace: votes typically run for a few days, and payments go out in regular rounds, weekly or monthly. That pace is deliberate: it gives people time to read, discuss and check.
+- **Not a chat group.** Each proposal has its own discussion thread in the app, from the first idea to the result, kept as part of the record. Everyday chat and calls still happen wherever the group already talks.
 - **Not finished.** The software is being tested on Bitcoin's test network. Nothing here is ready for real funds yet.
 
 ## Starting your own
