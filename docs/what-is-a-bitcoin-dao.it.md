@@ -74,6 +74,37 @@ Una DAO bitcoin va bene per qualsiasi gruppo che condivide del denaro, vuole che
 - **Gruppi sparsi in più paesi.** Un'associazione di emigrati, una comunità online o un progetto open source, dove i membri si incontrano in video e il denaro deve passare i confini senza una banca.
 - **Premi e concorsi.** Un montepremi comune, pagato quando il voto dei membri sceglie un vincitore.
 
+## A confronto con una cooperativa
+
+Tutto ciò che serve per gestire una piccola cooperativa, senza le carte. Una DAO bitcoin svolge gli stessi compiti quotidiani di una piccola cooperativa, ma il software fa il lavoro che fanno notai, registri, banche e commercialisti. La colonna della cooperativa segue le regole italiane.
+
+| | Piccola cooperativa | DAO bitcoin |
+| --- | --- | --- |
+| Persone minime | 3 (*piccola cooperativa*), altrimenti 9 | 3 |
+| Costituzione | Atto notarile e statuto, Registro delle Imprese entro 10 giorni, Albo delle Cooperative entro 30 giorni | Un incontro di fondazione, di persona o in video; chiavi create e statuto adottato nello stesso giorno |
+| Tempo per partire | Settimane | Un giorno |
+| Cambiare le regole | Le modifiche allo statuto tornano dal notaio | Votano i membri |
+| Denaro | Conto corrente aziendale | Un portafoglio bitcoin comune; le chiavi le tiene il Consiglio |
+| Decisioni | Assemblee, consigli di amministrazione, libri sociali | Proposte e voti nell'app |
+| Conti | Bilancio annuale, preparato da un commercialista | Ogni pagamento visibile nel registro pubblico mentre avviene |
+| Controlli | Revisione cooperativa biennale | Chiunque può controllare il registro in ogni momento |
+| Forma giuridica | Ente con responsabilità limitata | Nessun ente giuridico |
+
+### Costi di gestione
+
+| Costo | Piccola cooperativa | DAO bitcoin |
+| --- | --- | --- |
+| Costituzione | Circa 2.500 € (notaio, iscrizioni) | Circa 60–90 € per un dispositivo di firma condiviso (un SeedSigner); qualche euro in più per carte delle chiavi e piastre d'acciaio |
+| Minimo di legge ogni anno | 1.000–2.000 € (diritto camerale, revisione biennale, deposito del bilancio, quota associativa) | 0 € |
+| Commercialista ogni anno | Circa 1.800–2.500 € | 0 € |
+| Sito e app ogni anno | Non compreso | 0 € con hosting gratuito; un dominio proprio è facoltativo, circa 10–15 € |
+| Per pagamento | Commissioni bancarie | Una commissione di rete, di solito da pochi centesimi a qualche euro |
+| **Totale annuo** | **Circa 2.800–4.500 €** | **Circa 0–15 €, più le commissioni** |
+
+Le cifre della cooperativa sono stime pubblicate (novembre 2026) e variano per tipo e regione; quelle della DAO sono approssimative. Fonti: [NotaiOnline, documenti per costituire una cooperativa](https://notaionline.it/documenti/costituzione-societa/cooperativa/); [Emilia-Romagna Startup, costi di costituzione e gestione](https://www.emiliaromagnastartup.it/it/node/5192); [BusinessOnline, costo del commercialista per una piccola società](https://www.businessonline.it/articoli/quanto-costa-un-commercialista-allanno-per-la-gestione-di-una-srl-i-criteri-e-variabili-da-considerare.html).
+
+Ciò che una cooperativa ha e una DAO no è la personalità giuridica. Una DAO non può firmare contratti né possedere beni a proprio nome, e chi agisce per il gruppo lo fa a nome proprio. Per questo una DAO tratta con persone e fornitori che accettano bitcoin, e un gruppo che ha bisogno di dipendenti, prestiti bancari o contributi pubblici ha ancora bisogno di una forma registrata.
+
 ## Che cosa non è
 
 - **Non è un investimento.** Non ci sono token, quote o rendimenti. Entrare non costa nulla e non fa guadagnare nulla; dà un voto.
