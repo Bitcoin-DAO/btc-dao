@@ -128,16 +128,19 @@ Design in `docs/drafts/member-loans.md`, idea agreed 18 November 2026. Interest-
 - [ ] Rounds: due repayments first; closing repays every lender first
 - [ ] Tests, then in the wild on a testnet4 DAO
 
-## H. GRANTS DAO (design)
+## H. GRANTS DAO and repayable grants (design)
 
-Design in `docs/drafts/grants-dao.md`, idea agreed 18 November 2026. Donations in from people (P2DAO), grants out to other DAOs' treasuries (DAO2DAO). First instance: the SeedSigner DAO.
+Design in `docs/drafts/grants-dao.md`, idea agreed 18 November 2026. The GRANTS DAO is the verification gateway for outside funding; programme DAOs (first: SEEDSIGNER DAO) decide, and are measured by how well their repayable grants are repaid; local DAOs repay the GRANTS DAO when they can.
 
-- [x] Stage 0: idea written down (flow, applicant checks, additions to the core)
+- [x] Stage 0: idea written down (roles, flow, repayable grants, programme measures, website, additions to the core)
 - [ ] Design settled: open questions answered
 - [ ] Application event signed by the applicant DAO's npub (needs the DAO npub from section C)
-- [ ] Labelled inflows on the treasury page and in Accounts
+- [ ] Repayable grant on payouts (amount owed, repay-to address) and the `grant_repayment` category
+- [ ] Labelled inflows on the treasury page and in Accounts; amounts owed between DAOs in Accounts
 - [ ] Applicant record shown beside the proposal; payout address checked against the applicant's descriptor
-- [ ] In the wild: a testnet4 GRANTS DAO funds a testnet4 DAO in tranches
+- [ ] Programme measures (repayment rate, fully repaid, time to repay, outstanding, still active) on the dashboard
+- [ ] GRANTS DAO website from the `btc-dao-homepage` wrapper: projects supported, repayment chain
+- [ ] In the wild: a testnet4 GRANTS DAO funds a testnet4 SEEDSIGNER DAO, which gives a repayable kit grant to a testnet4 local DAO, which repays
 
 ## Open items
 
