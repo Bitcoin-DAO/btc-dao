@@ -38,6 +38,7 @@ All 19 screens are in [`design/`](design/README.md).
 | `docs/new-dao.md` | Checklist for starting a new DAO, in order: decisions, a web address of its own, chain gateway, chat group, wallets, printer, council keys, the founding meeting, and the relay pin after it |
 | `docs/workshop/` | The council key workshop: card maker, steps and a sample |
 | `docs/proposals/` | Proposals under discussion, such as tiers, stages and badges |
+| `docs/onboarding-kit.md` | The DAO onboarding kit: every guide in the order a group needs it, from "what is a DAO" to growing |
 | `docs/spec.md` | The full specification v0.2: roles, keys, onboarding (in person and remote), treasury, governance, proposal fields, payout rounds, event formats, threat model, security requirements, build plan |
 | `docs/protocol.md` | The protocol draft v1: every event's exact format, its validity rules, PSBT requirements and how a client rebuilds the DAO's state |
 | `docs/funding-models.md` | The four funding models (grant, production, mutual, revolving): each DAO reads it, discusses it and records its primary model in the settings before drafting its mainnet charter |

@@ -105,6 +105,43 @@ Design in `docs/drafts/action-gateway.md`, decided 17 November 2026. Built and t
 - [ ] Stage 4: outbound email to the world, once a provider passes the payment test
 - [ ] Second providers: deSEC for DNS first; nsite for the website later
 
+## F. Meeting scheduler (design)
+
+Design in `docs/drafts/meeting-scheduler.md`, idea agreed 18 November 2026. A non-binding meeting-time poll beside proposals: no council, no quorum, no treasury effect.
+
+- [x] Stage 0: idea written down (flow, time zones, where to join, provisional kinds 3593–3595)
+- [ ] Design settled: open questions in the draft answered, kinds confirmed with the rest of the block
+- [ ] Meeting poll in Discussion ("Meeting" chip): propose slots, tick yes / if need be, organiser fixes a slot, withdraw
+- [ ] "Next meeting" on Home; slots shown in the viewer's time zone with the DAO's beside it
+- [ ] Relay: accept kinds 3570–3595
+- [ ] Tests: unit tests for the suggested slot and latest-answer-counts; end-to-end: a poll opened, ticked by three members, fixed, shown on Home
+- [ ] In the wild: used to schedule a real call on a testnet4 DAO
+
+## G. Member loans to the DAO (design)
+
+Design in `docs/drafts/member-loans.md`, idea agreed 18 November 2026. Interest-free loans from members to the DAO, repaid before ordinary payouts. The DAO does not lend to members.
+
+- [x] Stage 0: idea written down (flow, rules, where it touches rounds, cap, closing, Accounts)
+- [ ] Design settled: open questions answered, protocol sections drafted
+- [ ] `member_loan` proposal type and `loan_repayment` payout category
+- [ ] Treasury page and Accounts: owed to members, free balance
+- [ ] Rounds: due repayments first; closing repays every lender first
+- [ ] Tests, then in the wild on a testnet4 DAO
+
+## H. GRANTS DAO and repayable grants (design)
+
+Design in `docs/drafts/grants-dao.md`, idea agreed 18 November 2026. The GRANTS DAO is the verification gateway for outside funding; programme DAOs (first: SEEDSIGNER DAO) decide, and are measured by how well their repayable grants are repaid; local DAOs repay the GRANTS DAO when they can.
+
+- [x] Stage 0: idea written down (roles, flow, repayable grants, programme measures, website, additions to the core)
+- [ ] Design settled: open questions answered
+- [ ] Application event signed by the applicant DAO's npub (needs the DAO npub from section C)
+- [ ] Repayable grant on payouts (amount owed, repay-to address) and the `grant_repayment` category
+- [ ] Labelled inflows on the treasury page and in Accounts; amounts owed between DAOs in Accounts
+- [ ] Applicant record shown beside the proposal; payout address checked against the applicant's descriptor
+- [ ] Programme measures (repayment rate, fully repaid, time to repay, outstanding, still active) on the dashboard
+- [ ] GRANTS DAO website from the `btc-dao-homepage` wrapper: projects supported, repayment chain
+- [ ] In the wild: a testnet4 GRANTS DAO funds a testnet4 SEEDSIGNER DAO, which gives a repayable kit grant to a testnet4 local DAO, which repays
+
 ## Open items
 
 - [x] **Paid on delivery** (protocol 4.6): staged payouts and bounties, v0.8.0. Built: staged payouts (schedule in the form, reports as thread cards, a tranche joins a round only after its report, lapse, the committed line on the treasury page), then bounties (claims; the council's round picks the claimant). Reports are read in Discussion (a chip on the thread and a Reports filter) and on the proposal page (the schedule with each tranche's status); not on Home or in the footer
@@ -118,7 +155,7 @@ Design in `docs/drafts/action-gateway.md`, decided 17 November 2026. Built and t
 - [x] **Signing steps fold away** once a round has enough signatures (COUNCIL DAO finding 6)
 - [x] **Not-listed founder after founding** (COUNCIL DAO finding 1): say the DAO is founded and link to the member sign-up
 - [ ] **Clock skew** (COUNCIL DAO finding 2): the relay refuses events dated more than ~2 minutes ahead; the app warns when the phone's clock is off
-- [ ] **Onboarding process for the council** (from COUNCIL DAO, 11 November 2026). Joining works, but the council needs one clear, step-by-step procedure it can follow. Rework `docs/guide.md` 6.1 into an onboarding section written for the council and the sponsor: who does what and in which order (check first, then the sponsor's proposal), one in-person check is enough (two council members for remote), the vote, then publishing and approving the member list (as many approvals as the threshold, not "three"), and what the candidate sees at each step. Cover the founding case too: someone left off the founders joins this way. Consider a short in-app version on the Council page next to **Check a candidate**
+- [ ] **Onboarding process for the council** (from COUNCIL DAO, 11 November 2026; **on hold until after the ALPHA DAO workshop and any changes to ALPHA DAO**, decided 18 November 2026: to be a detailed step-by-step guide with screenshots). Joining works, but the council needs one clear, step-by-step procedure it can follow. Rework `docs/guide.md` 6.1 into an onboarding section written for the council and the sponsor: who does what and in which order (check first, then the sponsor's proposal), one in-person check is enough (two council members for remote), the vote, then publishing and approving the member list (as many approvals as the threshold, not "three"), and what the candidate sees at each step. Cover the founding case too: someone left off the founders joins this way. Consider a short in-app version on the Council page next to **Check a candidate**
 - [x] **Relay write check.** Decided 9 November 2026: phones show only members' posts (as for every other kind, `docs/protocol.md` 7.3), and the relay limits how fast one key can post discussion events. A relay rule limited to the current member list waits until spam is actually seen
 - [ ] **Where the DAO npub's notes go.** The feed and announcements are ordinary notes (kind 1), and the DAO relay rejects every kind outside the DAO's range. Either they go to public relays only, or the relay also accepts kind 1 from the DAO npub alone
 - [ ] Testnet4 DAOs: feed to public relays, or only to their own relay? (ties in with the open question in `docs/decisions.md` on testnet publishing)
