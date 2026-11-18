@@ -26,16 +26,16 @@ A Bitcoin DAO has two kinds of people, and keeping them separate is what makes i
 | Role | Who | What they do | What they need |
 | --- | --- | --- | --- |
 | Member | Anyone the group admits | Propose ideas and vote on them | A phone |
-| Council member | A small group chosen by the members, five in the first DAO | Approve payments by signing, and confirm changes to the member list and rules | A small signing device kept offline, and their key on a card at home |
+| Council member | A small group chosen by the members, five in the first DAO | Approve payments by signing, and confirm changes to the member list and rules | Their own key on a card at home, used with a small offline signing device that the council can share |
 
 Members decide; the council carries out the decision. The council cannot spend without a vote, and members cannot spend without the council. In the first DAO, any three of the five council members must sign before a single satoshi moves.
 
 A payment goes from idea to payment in five steps:
 
 1. **Propose.** A member writes a short proposal: what the money is for, how much, and where it goes. The recipient's Bitcoin address goes in its own box, so it can be checked.
-2. **Vote.** Members vote yes, no or abstain for seven days. Votes are signed and public.
+2. **Vote.** Members vote yes, no or abstain for the voting period the DAO has set, usually a few days. Votes are signed and public.
 3. **Count.** When the vote closes, a council member signs the final count, so nobody can slip in a vote afterwards.
-4. **Sign.** Once a month, every approved payment goes out together. Each council member checks the amounts and addresses on their own device and signs. At the third signature the payment is sent.
+4. **Sign.** In each payout round, weekly or monthly as the DAO decides, every approved payment goes out together. Each council member loads their key into the signing device, checks the amounts and addresses on its screen, and signs. At the third signature the payment is sent.
 5. **Record.** The payment appears on the treasury page, linked to its proposal and vote, for anyone to see.
 
 ## Taking part

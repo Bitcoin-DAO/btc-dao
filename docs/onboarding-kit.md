@@ -10,6 +10,7 @@ The kit will become the "public beta: help and onboarding" docs site, in English
 
 **For:** anyone hearing about it for the first time.
 
+- [What is a DAO? One-page handout](handout.md) ([Italiano](handout.it.md)): for events and first contact. A summary of the page below; when that page changes, check the handout.
 - [What is a Bitcoin DAO?](what-is-a-bitcoin-dao.md) ([Italiano](what-is-a-bitcoin-dao.it.md)): what a DAO is, how it works, what it can be used for, how it compares with a co-op (including running costs), and what it is not.
 
 ## 2. Deciding: should our group start one?
@@ -54,4 +55,3 @@ The kit will become the "public beta: help and onboarding" docs site, in English
 
 - **Step-by-step council and member onboarding,** with screenshots. Waits until after the ALPHA DAO workshop and any changes it brings, so the screenshots match the app (`NEXT-RELEASE.md`, open item "Onboarding process for the council").
 - **Italian versions** of the checklist, the guide, the charter template and modules, and the workshop pages.
-- **A one-page introduction** to hand out at events, drawn from section 1.
