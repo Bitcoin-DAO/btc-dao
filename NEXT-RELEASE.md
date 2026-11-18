@@ -105,6 +105,18 @@ Design in `docs/drafts/action-gateway.md`, decided 17 November 2026. Built and t
 - [ ] Stage 4: outbound email to the world, once a provider passes the payment test
 - [ ] Second providers: deSEC for DNS first; nsite for the website later
 
+## F. Meeting scheduler (design)
+
+Design in `docs/drafts/meeting-scheduler.md`, idea agreed 18 November 2026. A non-binding meeting-time poll beside proposals: no council, no quorum, no treasury effect.
+
+- [x] Stage 0: idea written down (flow, time zones, where to join, provisional kinds 3593–3595)
+- [ ] Design settled: open questions in the draft answered, kinds confirmed with the rest of the block
+- [ ] Meeting poll in Discussion ("Meeting" chip): propose slots, tick yes / if need be, organiser fixes a slot, withdraw
+- [ ] "Next meeting" on Home; slots shown in the viewer's time zone with the DAO's beside it
+- [ ] Relay: accept kinds 3570–3595
+- [ ] Tests: unit tests for the suggested slot and latest-answer-counts; end-to-end: a poll opened, ticked by three members, fixed, shown on Home
+- [ ] In the wild: used to schedule a real call on a testnet4 DAO
+
 ## Open items
 
 - [x] **Paid on delivery** (protocol 4.6): staged payouts and bounties, v0.8.0. Built: staged payouts (schedule in the form, reports as thread cards, a tranche joins a round only after its report, lapse, the committed line on the treasury page), then bounties (claims; the council's round picks the claimant). Reports are read in Discussion (a chip on the thread and a Reports filter) and on the proposal page (the schedule with each tranche's status); not on Home or in the footer
