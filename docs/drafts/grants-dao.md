@@ -26,6 +26,15 @@ Because every step is on a public record, a donor can follow a sat from their wa
 - Applicants are checked from their public record, not paperwork.
 - **Repayable grants are DAO to DAO only.** A DAO does not lend to its own members (`member-loans.md`); members may lend to their DAO.
 - Nothing is legally enforceable. Repayment rests on the public record and on reputation: an unpaid grant shows on the local DAO's dashboard, and the next application can be refused.
+- The network grows on transparency and badge reputation, not fixed obligations: no fees, levies or required contributions beyond what a repayable grant states.
+
+### 2.1 No authority over branches
+
+The GRANTS DAO is where funds start, not a head office. It can fund or decline; it cannot direct. To be written into its charter:
+
+- **No say over a funded DAO.** Once sats reach a DAO's treasury, they belong to that DAO. The GRANTS DAO has no part in its decisions, rules, members or council, and cannot take funds back.
+- **Funding from anywhere.** A local or programme DAO may take donations or grants from any other source, including donors who give to it directly.
+- **Forkable.** The GRANTS DAO is a btc-dao DAO like any other. A second gateway with different priorities is welcome, not a split.
 
 ---
 
