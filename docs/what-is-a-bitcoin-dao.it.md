@@ -26,16 +26,16 @@ Una DAO bitcoin ha due tipi di persone, e tenerle separate è ciò che la rende 
 | Ruolo | Chi | Che cosa fa | Che cosa gli serve |
 | --- | --- | --- | --- |
 | Membro | Chiunque il gruppo ammetta | Propone idee e le vota | Un telefono |
-| Membro del Consiglio | Un piccolo gruppo scelto dai membri, cinque nella prima DAO | Approva i pagamenti firmandoli, e conferma le modifiche all'elenco dei membri e alle regole | Un piccolo dispositivo di firma tenuto offline, e la propria chiave su una carta a casa |
+| Membro del Consiglio | Un piccolo gruppo scelto dai membri, cinque nella prima DAO | Approva i pagamenti firmandoli, e conferma le modifiche all'elenco dei membri e alle regole | La propria chiave su una carta a casa, da usare con un piccolo dispositivo di firma offline che il Consiglio può condividere |
 
 I membri decidono; il Consiglio esegue. Il Consiglio non può spendere senza un voto, e i membri non possono spendere senza il Consiglio. Nella prima DAO servono le firme di tre dei cinque membri del Consiglio prima che si muova anche un solo satoshi.
 
 Un pagamento va dall'idea al versamento in cinque passi:
 
 1. **Proposta.** Un membro scrive una breve proposta: a cosa servono i soldi, quanti, e dove vanno. L'indirizzo bitcoin di chi riceve va in una casella apposta, così si può controllare.
-2. **Voto.** I membri votano sì, no o astensione per sette giorni. I voti sono firmati e pubblici.
+2. **Voto.** I membri votano sì, no o astensione per il periodo di voto stabilito dalla DAO, di solito qualche giorno. I voti sono firmati e pubblici.
 3. **Conteggio.** Alla chiusura del voto, un membro del Consiglio firma il conteggio finale, così nessuno può aggiungere un voto dopo.
-4. **Firma.** Una volta al mese tutti i pagamenti approvati partono insieme. Ogni membro del Consiglio controlla importi e indirizzi sul proprio dispositivo e firma. Alla terza firma il pagamento parte.
+4. **Firma.** A ogni turno di pagamento, settimanale o mensile come decide la DAO, tutti i pagamenti approvati partono insieme. Ogni membro del Consiglio carica la propria chiave nel dispositivo di firma, controlla importi e indirizzi sul suo schermo, e firma. Alla terza firma il pagamento parte.
 5. **Registro.** Il pagamento compare nella pagina della tesoreria, collegato alla sua proposta e al suo voto, visibile a tutti.
 
 ## Partecipare
