@@ -142,6 +142,24 @@ Design in `docs/drafts/grants-dao.md`, idea agreed 18 November 2026. The GRANTS 
 - [ ] GRANTS DAO website from the `btc-dao-homepage` wrapper: projects supported, repayment chain
 - [ ] In the wild: a testnet4 GRANTS DAO funds a testnet4 SEEDSIGNER DAO, which gives a repayable kit grant to a testnet4 local DAO, which repays
 
+## I. Language of DAO content (idea to test)
+
+Idea in `docs/drafts/bilingual-content.md`, 20 November 2026. Not decided. Option A: one working language chosen at founding. Option B: bilingual content (author-approved translations for proposals, a "Translate" button elsewhere).
+
+- [x] Stage 0: idea written down (both options, the language tag, how to test)
+- [ ] Language tag on every text event, and `lang` on displayed text (useful with either option; before the NIP)
+- [ ] Test option A on a testnet4 DAO
+- [ ] Decide: option A only, or option B as a module
+
+## J. Throughput and rankings (dashboard)
+
+Design in `docs/dashboard-spec.md` section 2c, decided 20 November 2026. A DAO's size is measured by throughput: sats paid out through authorised rounds over time, like assets under management.
+
+- [ ] Throughput per DAO: last 12 months, since founding, monthly chart; exclusions as in 2c
+- [ ] Network throughput on the front page
+- [ ] Rankings: throughput (main), treasury, participation, clean record, tree, repayment rate; listed mainnet DAOs only, never one combined score
+- [ ] Test cases: a migration, a sweep and a loan repayment leave throughput unchanged
+
 ## Open items
 
 - [x] **Paid on delivery** (protocol 4.6): staged payouts and bounties, v0.8.0. Built: staged payouts (schedule in the form, reports as thread cards, a tranche joins a round only after its report, lapse, the committed line on the treasury page), then bounties (claims; the council's round picks the claimant). Reports are read in Discussion (a chip on the thread and a Reports filter) and on the proposal page (the schedule with each tranche's status); not on Home or in the footer

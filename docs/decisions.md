@@ -76,12 +76,14 @@
 | Repayable grants (18 Nov 2026) | DAO to DAO only: interest-free, in sats, no deadline, repaid to the GRANTS DAO when the receiving DAO can. Not legally enforceable; repayment rests on the public record and reputation. The GRANTS DAO can vote to turn what is left into a gift |
 | No authority over branches (18 Nov 2026) | The GRANTS DAO can fund or decline but cannot direct: no say over a funded DAO's decisions, rules, members or council, and no clawback. Any DAO may take funding from anywhere. The GRANTS DAO is forkable; a second gateway is welcome |
 | No fixed obligations (18 Nov 2026) | The DAO tree grows on transparency and badge reputation. No fees, levies or required contributions to the GRANTS DAO beyond what a repayable grant states. A "network contribution" pledge was considered and dropped |
+| Throughput (20 Nov 2026) | A DAO's size is measured by throughput: sats paid out through authorised rounds over time, like assets under management for a fund manager. It is the dashboard's main ranking; treasury, participation, clean record, tree and repayment rate are separate rankings, never one combined score ([dashboard-spec.md](dashboard-spec.md) 2c) |
 
 ## Open questions
 
 - [ ] Meeting scheduler: open questions in [`drafts/meeting-scheduler.md`](drafts/meeting-scheduler.md) section 8 (council-only polls, dashboard)
 - [ ] Member loans: open questions in [`drafts/member-loans.md`](drafts/member-loans.md) section 6 (lender's own vote, unaffordable on-demand repayment, forgiving a loan)
 - [ ] GRANTS DAO: open questions in [`drafts/grants-dao.md`](drafts/grants-dao.md) section 10 (who may apply, kits or sats, default, NIP)
+- [ ] Language of DAO content: one working language chosen at founding (option A) or bilingual content (option B); idea to test, see [`drafts/bilingual-content.md`](drafts/bilingual-content.md)
 - [ ] Legal check (Italy, UK): interest-free member loans to an unregistered group; collecting public donations and passing them on as grants
 - [ ] Growth loop gaps: kit updates across the tree, two-sided lineage, mentoring capacity, failure and closure ([`proposals/badges.md`](proposals/badges.md) 4.4)
 - [ ] Payment requests and accounts: open questions in [`drafts/payments-and-accounts.md`](drafts/payments-and-accounts.md) section 7 (a vote per request or a price list, naming, supplier payment window, price source)
