@@ -1,7 +1,7 @@
 # Recovery sheet: issue, print, confirm (design draft)
 
-Status: idea agreed 20 November 2026, not yet built. Reviewed 20 November 2026.
-Scope: **mainnet DAOs only.** Protocol (one new event), app (sheet, notice, confirmation, signing gate), guide and spec (council kit, signing, council change). No change to the descriptor, the floor or the payout rules.
+Status: idea agreed 20 November 2026, not yet built. Reviewed 20 November 2026; confirmations made local, 20 November 2026.
+Scope: **mainnet DAOs only.** Protocol (the migration destination only), app (sheet, notice, confirmation, signing gate), guide and spec (council kit, signing, council change). No change to the descriptor, the floor or the payout rules.
 
 DAOs founded on testnet4 keep the shared-device setup they were founded with (one shared SeedSigner, a SeedQR card each); nothing in this draft changes them.
 
@@ -15,8 +15,8 @@ Today the sheet is a written step in the guide ("print and hand out the new reco
 
 1. **The app produces the sheet** from the settings in force, with a short **sheet ID** printed large at the top.
 2. **Every new descriptor issues a new sheet**, and every council member gets a notice: print it, archive the old one.
-3. **"I have printed it"**: each council member confirms. The confirmation is shared with the council only, not published.
-4. **No signing without it**: a council member cannot sign until they have confirmed the sheet the round needs, and coins never move to a new treasury before enough of its council hold its sheet.
+3. **"I have printed it"**: each council member confirms in their own app. The confirmation stays on their phone: no event, nothing on the relay, nothing public.
+4. **No signing without it**: a council member cannot sign until they have confirmed the sheet in force, and coins never move to a new treasury before its council have read the new sheet aloud to each other and confirmed they hold it.
 
 It also records the mainnet council kit that goes with it: **one SeedSigner per council member, no SeedQR card** (section 3).
 
@@ -24,10 +24,10 @@ It also records the mainnet council kit that goes with it: **one SeedSigner per 
 
 ## 2. Principles
 
-- **Checked across the council, not taken from one screen.** The app prints the sheet, so a tampered website could print a tampered sheet. The defence is comparison: every council member checks their own fingerprint against their own plate, and the council reads the sheet ID aloud to each other before confirming (section 6.2). The app also checks that every confirmation names the same ID.
+- **Checked across the council, not taken from one screen.** The app prints the sheet, so a tampered website could print a tampered sheet. The defence is comparison: every council member checks their own fingerprint against their own plate, and the council reads the sheet ID aloud to each other before confirming (section 6.2). A confirmation in the app is only a tap; the spoken check is what catches a wrong or tampered sheet.
 - **One sheet per descriptor.** The sheet changes exactly when the descriptor changes (founding and every council change) and at no other time.
 - **The sheet is public, like the descriptor.** It holds no secrets. It may be printed, saved as a PDF and published in the repository.
-- **Confirmations stay within the council.** Who has printed which sheet is the council's own housekeeping. It is shown on the Council page to council members, and not on the public record, the DAO history or the dashboard.
+- **Confirmations stay on the member's phone.** Who has printed which sheet is each council member's own housekeeping. It drives their own to-do list and signing gate, and is not sent to the relay, the DAO history or the dashboard.
 - **Archive, never destroy.** An earlier sheet is still needed to sweep anything that arrives at an earlier treasury.
 
 ---
@@ -105,24 +105,20 @@ Before confirming, the council compares the printed sheets: on a call or in the 
 
 Then one tap: **"I have printed recovery sheet 7f3k9q2d and archived the old one."** At founding: **"I have printed recovery sheet 7f3k9q2d."** The app first shows the sheet ID large and asks the member to read it off the printed paper.
 
-### 6.3 The event: `dao.sheet` (kind 3596, provisional)
+### 6.3 Where the confirmation lives
 
-```json
-{ "sheet": "7f3k9q2d", "settings": 4, "state": "printed" }
-```
+On the council member's own phone, in the app's local storage, keyed by DAO, settings version and sheet ID. No event is published: the relay, the members and the public see nothing.
 
-Signed by the council member, **encrypted to the council named in that settings version** (each member's identity key), and sent to the DAO's relay. Members and the public see that a sheet event exists, not its content.
+- It ticks off the member's own to-do item and banner.
+- It opens the member's own signing gate (section 7).
+- A member who changes phone, or loses their app data, confirms again from their printed sheet: one tap, after checking the ID.
 
-Valid when the signer is on the council named in that settings version (pending or in force) and `sheet` is that version's settings-descriptor checksum. The latest confirmation per council member and sheet counts. A member who loses their copy reprints it at any time; no new confirmation is needed unless they want to record it.
-
-If two confirmations name different sheet IDs for the same settings version, the app stops signing and migration for that version and shows a warning to the council: someone has printed a different sheet.
-
-Kind 3596 is the next free number: 3593–3595 are taken by the meeting scheduler draft.
+There is no automatic check across members. The spoken comparison in 6.2, before anyone confirms, is the check.
 
 ### 6.4 Shown
 
-- **Council page, to council members only:** *"Recovery sheet 7f3k9q2d: printed by 4 of 5"*, with who is still to confirm.
-- **DAO history:** each band of the descriptor chain shows its sheet ID. Confirmations are not shown.
+- **The member's own Council page:** *"Recovery sheet 7f3k9q2d: confirmed"* or *"not yet confirmed"*, for their own sheet only.
+- **DAO history:** each band of the descriptor chain shows its sheet ID.
 - **Dashboard:** nothing. The public record shows the descriptor chain, as it already does.
 
 ---
@@ -134,11 +130,11 @@ Kind 3596 is the next free number: 3593–3595 are taken by the meeting schedule
 **Council change: backup before the move.** Coins must never sit in a treasury whose sheet nobody holds. So:
 
 1. The `change_council` proposal passes: the pending sheet is issued to the new council.
-2. The migration round can be **prepared** only when at least the **new threshold** of the new council have confirmed the pending sheet, all naming the same ID.
+2. Before the migration round can be **prepared**, the new council compares the pending sheet aloud (section 6.2), on a call or in the room. The council member preparing the round then ticks a required box: *"The new council read sheet 7f3k9q2d aloud, and at least [new threshold] of them confirmed holding it printed."* The app records the tick with the round.
 3. The migration round pays to **receive index 0 of the new descriptor**, the first address printed on the pending sheet. Each signer checks the destination against it before signing.
 4. After the receipt, the new settings version is confirmed; the pending sheet comes into force; the old one is archived.
 
-**Founding.** Phase 2's gate in the guide (restore in Sparrow from the sheet alone, before any funds) is done from the printed sheet 1, and the genesis hand-out ends with every founding council member's confirmation.
+**Founding.** Phase 2's gate in the guide (restore in Sparrow from the sheet alone, before any funds) is done from the printed sheet 1. The genesis hand-out ends with the founding council reading sheet 1 aloud, then each confirming in their own app.
 
 ---
 
@@ -157,7 +153,7 @@ Kind 3596 is the next free number: 3593–3595 are taken by the meeting schedule
 
 ## 9. Changes to existing documents (when built, for mainnet)
 
-- **protocol.md:** add `dao.sheet` (3596) to the event table and a section for it (encrypted to the council); the migration round pays to receive index 0 of the new descriptor (7); the relay's accepted range.
+- **protocol.md:** the migration round pays to receive index 0 of the new descriptor (section 7). No new event kind.
 - **spec.md:** a mainnet council kit beside the testnet "Signing setup for the trial" table, which stays for testnet4 DAOs; on mainnet, no SeedQR cards in roles, rules and the threat table (S8 changes: no cards carried to a room, but a device per member to source and keep); recovery sheet section points here.
 - **guide.md:** mainnet kit list (one SeedSigner per council member, no SeedQR templates, steel plates engraved seed-only or stamped); 3.3 and the hand-out (print, compare, confirm); 6.4 signing (section 8 here); council change steps 6 and 8 (pending sheet, gate, archive); G-13 mostly resolved for mainnet.
 - **MAINNET-READINESS.md:** "every council member has confirmed the current recovery sheet", "a council change issues a new sheet before the migration", and the restore test (section 4).
@@ -168,4 +164,5 @@ Kind 3596 is the next free number: 3593–3595 are taken by the meeting schedule
 ## 10. Open questions
 
 - Should the Council page remind a council member who has not confirmed the current sheet after a set time (for example 14 days)?
-- Encrypting confirmations to the council departs from "every DAO event is public". Is a council-only event acceptable, or should the confirmation stay off the relay altogether and live only in each council member's app (which would make the migration gate rely on the members' word on a call)?
+
+**Decided 20 November 2026:** confirmations stay on each member's phone, with no `dao.sheet` event. A relay event was considered (encrypted to the council) and dropped: a confirmation is only a tap and proves nothing about the paper, while the spoken comparison already catches a wrong sheet. If the spoken check proves easy to skip in practice, an automatic check can be added later.
