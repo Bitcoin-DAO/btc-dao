@@ -163,11 +163,11 @@ Design in `docs/dashboard-spec.md` section 2c, decided 20 November 2026. A DAO's
 
 Design in `docs/drafts/recovery-sheet.md`, agreed and reviewed 20 November 2026. Mainnet only: testnet4 DAOs keep the shared SeedSigner and SeedQR cards. One SeedSigner per council member, no SeedQR card.
 
-- [x] Stage 0: draft written and reviewed (sheet ID from the settings descriptor, word form, restore and SeedSigner descriptors, kind 3596, receive index 0 for migrations)
+- [x] Stage 0: draft written and reviewed (sheet ID from the settings descriptor, word form, restore and SeedSigner descriptors, receive index 0 for migrations; confirmations local, no event)
 - [ ] Restore test on testnet4: Sparrow from a printed sheet alone, coins at receive and change addresses
 - [ ] Sheet page in the app (print and PDF), sheet ID with word form
-- [ ] Notice, compare-and-confirm, `dao.sheet` encrypted to the council; Council page status for council members only
-- [ ] Gates: signing needs the current sheet confirmed; migration needs the new threshold confirmed, all on the same ID
+- [ ] Notice, compare-aloud-and-confirm; confirmation kept on the member's phone, shown on their own Council page
+- [ ] Gates: signing needs the member's own confirmation; preparing a migration needs the required box "new council read the sheet aloud" ticked
 - [ ] Spec, guide and MAINNET-READINESS edits listed in the draft, section 9
 
 ## Open items
