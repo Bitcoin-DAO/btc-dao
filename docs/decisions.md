@@ -82,6 +82,7 @@
 - [ ] Meeting scheduler: open questions in [`drafts/meeting-scheduler.md`](drafts/meeting-scheduler.md) section 8 (council-only polls, dashboard)
 - [ ] Member loans: open questions in [`drafts/member-loans.md`](drafts/member-loans.md) section 6 (lender's own vote, unaffordable on-demand repayment, forgiving a loan)
 - [ ] GRANTS DAO: open questions in [`drafts/grants-dao.md`](drafts/grants-dao.md) section 10 (who may apply, kits or sats, default, NIP)
+- [ ] Language of DAO content: one working language chosen at founding (option A) or bilingual content (option B); idea to test, see [`drafts/bilingual-content.md`](drafts/bilingual-content.md)
 - [ ] Legal check (Italy, UK): interest-free member loans to an unregistered group; collecting public donations and passing them on as grants
 - [ ] Growth loop gaps: kit updates across the tree, two-sided lineage, mentoring capacity, failure and closure ([`proposals/badges.md`](proposals/badges.md) 4.4)
 - [ ] Payment requests and accounts: open questions in [`drafts/payments-and-accounts.md`](drafts/payments-and-accounts.md) section 7 (a vote per request or a price list, naming, supplier payment window, price source)
