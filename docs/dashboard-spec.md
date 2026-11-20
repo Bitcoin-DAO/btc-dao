@@ -80,6 +80,30 @@ The headline for a listed DAO joins sections 2 and 2b in one line:
 
 > **Chain of N descriptors · never below the floor · unauthorised spends: 0**
 
+## 2c. Throughput: governed funds over time
+
+Decided 20 November 2026. The measure of a DAO's size is what it **does** with money, not what it holds. Like assets under management for a fund manager, throughput shows how much the members are trusted to direct.
+
+> **Throughput = sats paid out through authorised rounds**, shown for the last 12 complete months and since founding, with a monthly chart
+
+- **Counted:** payouts of passed proposals in authorised rounds (section 2), including grants to other DAOs.
+- **Not counted:** council-change migrations and sweeps (the DAO paying itself), the closing round's final transfer, pledge asset payments and refunds (held for members), and repayments of member loans or repayable grants (returning money, not directing it). Each is shown in the treasury history as usual.
+- **Too new:** fewer than 3 complete months since founding shows "too new", with the total so far.
+- **Why not the balance:** a treasury in sats cannot be inflated by issuing a token, but a large balance that never moves says little. Throughput rewards a DAO that turns funds into work, round after round.
+
+**Rankings.** Throughput is the dashboard's main ranking. Other rankings sit beside it, each on its own, never added into a single score:
+
+| Ranking | Measure |
+|---|---|
+| **Throughput** (main) | Sats paid out through authorised rounds, last 12 months |
+| Treasury | DAO funds now (not counting what is held for members) |
+| Participation | Members, and members who voted in the last 12 months |
+| Clean record | Months since founding with unauthorised spends: 0 |
+| Tree | Child DAOs founded or mentored (badges) |
+| Repayment rate | Programme DAOs only (`drafts/grants-dao.md`) |
+
+Rankings cover listed mainnet DAOs only. Steady I/O (section 2a) stays unranked: it says whether a funding model works, not how big a DAO is.
+
 ## 3. Data sources
 
 The dashboard has two inputs and writes nothing back:
@@ -109,6 +133,7 @@ Every listed DAO gets the same standard view. There are no per-item display choi
 - Listed DAOs on mainnet, by funding model, with how many have a steady I/O above 1.
 - BTC held in mainnet treasuries, summed from their descriptors, with the part held for members shown apart.
 - Spends reconciled to date.
+- **Throughput, all DAOs:** sats paid out through authorised rounds in the last 12 months, with a monthly chart (section 2c), and the rankings.
 - Listed mainnet DAOs meeting the descriptor floor, and how many have never been below it.
 - Proposals currently open for voting.
 
@@ -117,6 +142,7 @@ Every listed DAO gets the same standard view. There are no per-item display choi
 - Name, site, stage, software version and build check (protocol section 7.2).
 - Funding model (`rules.fundingModel`): shown as a label with a colour, never colour alone. Grant, production, mutual, revolving, or "not stated" when unset or unknown.
 - **Steady I/O** beside the funding model, with the 12-month totals in and out and a monthly chart (section 2a).
+- **Throughput:** last 12 months and since founding, with a monthly chart (section 2c).
 - The headline line (section 2b) and the reconciliation badge: authorised spends and **unauthorised spends: 0**, with the time of the last check, and any unmatched spend in red at the top.
 - Structural grade and floor history (section 2b), and the descriptor chain with each descriptor's status.
 - Treasury: balance in two parts, **DAO funds** (what the members decide on together) and **held for members** (open pledges, each with its progress), then UTXOs, multisig policy, and the full transaction history across every descriptor the DAO has used, each row tagged received, authorised spend, pending match or unauthorised.
