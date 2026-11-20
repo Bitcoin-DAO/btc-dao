@@ -77,6 +77,7 @@
 | No authority over branches (18 Nov 2026) | The GRANTS DAO can fund or decline but cannot direct: no say over a funded DAO's decisions, rules, members or council, and no clawback. Any DAO may take funding from anywhere. The GRANTS DAO is forkable; a second gateway is welcome |
 | No fixed obligations (18 Nov 2026) | The DAO tree grows on transparency and badge reputation. No fees, levies or required contributions to the GRANTS DAO beyond what a repayable grant states. A "network contribution" pledge was considered and dropped |
 | Throughput (20 Nov 2026) | A DAO's size is measured by throughput: sats paid out through authorised rounds over time, like assets under management for a fund manager. It is the dashboard's main ranking; treasury, participation, clean record, tree and repayment rate are separate rankings, never one combined score ([dashboard-spec.md](dashboard-spec.md) 2c) |
+| Recovery sheet (20 Nov 2026) | Design stage ([drafts/recovery-sheet.md](drafts/recovery-sheet.md)), mainnet only. The app issues a new sheet with every new descriptor; council members compare it aloud and confirm they have printed it; signing and council-change migrations wait for confirmations. Confirmations are shown to the council only, not on the public record or the dashboard. Mainnet kit: one SeedSigner per council member, no SeedQR card; testnet4 DAOs keep the shared device |
 
 ## Open questions
 
