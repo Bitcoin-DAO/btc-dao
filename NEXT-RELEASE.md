@@ -159,6 +159,16 @@ Design in `docs/dashboard-spec.md` section 2c, decided 20 November 2026. A DAO's
 - [ ] Network throughput on the front page
 - [ ] Rankings: throughput (main), treasury, participation, clean record, tree, repayment rate; listed mainnet DAOs only, never one combined score
 - [ ] Test cases: a migration, a sweep and a loan repayment leave throughput unchanged
+## K. Recovery sheet (design, mainnet)
+
+Design in `docs/drafts/recovery-sheet.md`, agreed and reviewed 20 November 2026. Mainnet only: testnet4 DAOs keep the shared SeedSigner and SeedQR cards. One SeedSigner per council member, no SeedQR card.
+
+- [x] Stage 0: draft written and reviewed (sheet ID from the settings descriptor, word form, restore and SeedSigner descriptors, kind 3596, receive index 0 for migrations)
+- [ ] Restore test on testnet4: Sparrow from a printed sheet alone, coins at receive and change addresses
+- [ ] Sheet page in the app (print and PDF), sheet ID with word form
+- [ ] Notice, compare-and-confirm, `dao.sheet` encrypted to the council; Council page status for council members only
+- [ ] Gates: signing needs the current sheet confirmed; migration needs the new threshold confirmed, all on the same ID
+- [ ] Spec, guide and MAINNET-READINESS edits listed in the draft, section 9
 
 ## Open items
 
