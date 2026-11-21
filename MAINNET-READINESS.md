@@ -93,6 +93,34 @@
 - [ ] Main and spare SeedSigner from different sources (S8)
 - [ ] Mainnet config: chain sources (own indexer first), fee setting, relays
 
+## 9. Awareness and participation
+
+Added 21 November 2026. GitHub has no general messaging layer: awareness comes from making the repos easy to find and join, and from going where developers already talk. Prepare quietly now; announce just after the ALPHA DAO founding, with its public record as the proof.
+
+**Before inviting anyone in**
+
+- [ ] Two-factor authentication required for the Bitcoin-DAO and byob-zone organisations (organisation security settings)
+- [ ] Discussions switched on (repo or organisation): the public place for questions, ideas and feedback, separate from issues
+- [ ] Topics on the repos: bitcoin, dao, multisig, psbt, nostr, seedsigner, testnet4
+- [ ] Organisation profile README for Bitcoin-DAO: what btc-dao is, with links to byob.zone and ALPHA DAO
+- [ ] CONTRIBUTING.md: how to run it locally, how to test, design discussion in Discussions
+- [ ] A few small, well-described issues labelled **good first issue**
+- [ ] A tagged release with notes, so people can watch for the next one
+
+**The ALPHA DAO founding as the story**
+
+- [ ] Photos of the founding workshop: the dice and strips, the SeedSigner, the cards, the room. Never a readable SeedQR, word card, roll log or identity card, and only people who agree to be shown
+- [ ] A news post on byob.zone, linking ALPHA DAO's public record
+
+**Where to tell people**
+
+- [ ] Nostr, from the byob.zone account: the founding, with photos and a link to the record
+- [ ] The NIP: btc-dao's event format (kinds 3570–3586) submitted to nostr-protocol/nips, for reviewed developer feedback that points back to the code
+- [ ] The SeedSigner community: council signing on SeedSigners, and the plate reader fork when ready
+- [ ] Stacker News: an introduction post after the founding
+- [ ] Delving Bitcoin: specific protocol questions (the PSBT flow, the descriptor chain), once there are some to ask
+- [ ] Individual developers only with a specific question about their own project (an issue on their repo, or their listed contact), never as an advert
+
 ## Findings from UNO's practice run
 
 Built in v0.2.0 unless marked otherwise.
