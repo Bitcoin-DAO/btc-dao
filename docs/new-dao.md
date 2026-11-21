@@ -33,6 +33,7 @@ Every DAO, trial stages included, gets its **own origin** (a host name of its ow
 
 - [ ] **SeedSigners:** one per table, firmware checked, network set, persistent settings on ([guide 2.4](guide.md#24-get-the-equipment), [seedsigner.md](seedsigner.md)).
 - [ ] **Workshop cards:** `python3 docs/workshop/make_cards.py --name "<DAO name>" --keys <n>`; print single-sided at 100% and **delete the PDF**: it holds secret keys ([workshop](workshop/README.md)). Dice for keys of the members' own.
+- [ ] **KEY route** (if members make keys from eleven d2 dice): per table, the dice, the [dice strip](workshop/key/key-dice-strips.pdf) (cut out), the [word sheets](workshop/key/key-bip39-word-sheets-en.pdf) A–D and page 1 of the [step sheet](workshop/key/key-d2-steps.pdf); per KEY member, its page 2 (the roll log). None of these hold secrets until a roll log is filled in.
 
 ## E. The founding meeting
 
