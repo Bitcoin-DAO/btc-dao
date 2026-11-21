@@ -87,6 +87,7 @@ For the practice stage (section 8), 3 to 5 people are enough: the council-to-be,
 | SeedSigner (Raspberry Pi Zero without radio, 1.3" screen, camera) | 2: one in use, one spare | Bought from different sources and kept sealed between rounds (S8) |
 | microSD card | 1 per council member, plus spares | Each member's own, prepared at the SD card ceremony |
 | Casino dice | At least 1 set | For creating seeds |
+| Or: KEY dice and sheets | Eleven d2 dice (2 orange, 5 white, 4 black) per table | With the printed dice strip, word sheets and step sheet in `docs/workshop/key/`: a key from dice at the table, the SeedSigner only for word 12 |
 | Steel seed plates and letter punches | 1 per council member | The long-term backup of each seed |
 | SeedQR card templates | 1 per council member | Filled in by hand from the SeedSigner screen |
 | Printer and card stock | 1 | For the recovery sheet and identity cards; laser printing lasts longest |

@@ -14,6 +14,7 @@ One page for the room, for the organiser. The [checklist](../new-dao.md) is for 
 - [ ] WiFi works; the DAO's site opens on a test phone; the printer prints from a phone.
 - [ ] SeedSigners on, network set to the DAO's network, persistent settings on.
 - [ ] Cards cut out and laid out per council member; dice on the tables.
+- [ ] For the KEY route, on each table: eleven d2 dice (2 orange, 5 white, 4 black), the dice strip cut out, word sheets A–D and page 1 of the step sheet; a roll log (page 2) per KEY member; pens ([KEY route](key/README.md)).
 - [ ] The group's video call open on a laptop or tablet, for remote founders.
 
 ## 1. Welcome (10 min)
