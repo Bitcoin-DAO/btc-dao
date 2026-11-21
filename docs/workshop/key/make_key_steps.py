@@ -93,21 +93,21 @@ y = para(15*mm, y, 'Use this sheet with card 3 ("A key of your own") from your c
 y -= 3*mm
 
 y, n = section('At the table: what you need', [
-    ('Eleven dice:', '2 orange, 5 white, 4 black. Line them up left to right: orange, white, black. Within each colour, '
-                     'the die with the fewest dots on its dotted face goes on the left. Keep this order for every roll.'),
+    ('Eleven dice and a dice strip:', '2 orange, 5 white, 4 black, and the KEY dice strip (key-dice-strips.pdf, cut out). '
+                     'Each die has one slot: its colour gives the group, its number of dots its place, fewest on the left.'),
     ('The KEY word sheets A to D', '(one set per table), card 3, a pen, and the roll log overleaf.'),
 ], y)
 
 y, n = section('Words 1 to 11, at the table', [
-    ('Roll all eleven', 'and put them back in their places without turning them. Read only the top faces: ● dots, ○ blank.'),
-    ('Write the pattern', 'in the roll log: 2 orange, 5 white, 4 black.'),
+    ('Roll all eleven', 'and place each die in its slot on the strip, the same way up as it landed. Never turn a die.'),
+    ('Read the top faces', '(● dots, ○ blank) left to right and write the pattern in the roll log: 2 orange, 5 white, 4 black.'),
     ('Orange picks the sheet:', '○○ A, ○● B, ●○ C, ●● D. White picks the row, black the column: both are printed on the sheet.'),
     ('Write the word', 'and its four-digit number in the log, and the word on card 3. The number is its place in the official list, from 0000.'),
     ('Repeat', 'until you have 11 words.'),
 ], y, n)
 
 y, n = section('Word 12, then the SeedSigner (one person at a time)', [
-    ('Roll once more', 'and write only the 2 orange and 5 white faces: 7 results. The black dice are not used. '
+    ('Roll once more', 'on the row-12 strip (its black slots are greyed) and write the 2 orange and 5 white faces: 7 results. The black dice are not used. '
                        'Word 12 holds 7 bits of your dice; its last 4 bits are a checksum the SeedSigner works out.'),
     ('On the SeedSigner:', 'Tools → Calc 12th/24th word → 12 words. Type words 1 to 11 from card 3.'),
     ('Choose coin flips', 'and enter the 7 results left to right, orange first: ● as 1, ○ as 0. Check the screen\'s own labels before you start.'),
