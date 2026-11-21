@@ -23,6 +23,7 @@ What the DAO is for, what happens today, and what nobody will ever ask anyone fo
 ## 2. Council keys (30–45 min)
 
 Each council member, with the steps on page 1 of the cards (A: the ready-made key, or B: a key of their own from dice), until the SeedSigner shows their key's fingerprint, written on their card.
+- KEY route members roll and look up words 1–11 at their table ([step sheet](key/key-d2-steps.pdf)) and queue for the SeedSigner only for word 12; ready-made and SeedSigner-entropy members use the device meanwhile.
 
 ## 3. Sign-up (20 min)
 
