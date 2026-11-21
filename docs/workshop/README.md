@@ -34,7 +34,7 @@ python3 make_cards.py --name "ALPHA DAO" --keys 5 --out alpha-cards.pdf
 - One SeedSigner (firmware 0.8.6) per table, set to the DAO's network, with persistent settings on.
 - The cards printed single-sided at 100%, and cut out.
 - Dice, for the keys of the members' own: casino dice for the SeedSigner, or eleven d2 dice per table for the KEY route.
-- For the KEY route: the [step sheet](key/key-d2-steps.pdf) (page 1 per table, page 2 per member) and the [KEY word sheets](key/key-bip39-word-sheets-en.pdf), one set per table.
+- For the KEY route: the [step sheet](key/key-d2-steps.pdf) (page 1 per table, page 2 per member), the [dice strip](key/key-dice-strips.pdf) (one per table, cut out) and the [KEY word sheets](key/key-bip39-word-sheets-en.pdf), one set per table.
 - Each council member's phone, with the DAO's site open: the founding (guide, section 3) follows the key steps.
 
 ## After
