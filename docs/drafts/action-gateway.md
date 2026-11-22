@@ -74,6 +74,70 @@ The DAO works like a community **notice board**: jobs and needs are listed; a tr
 - **Physical:** buy, collect, install, attend.
 - **Reporting** (the Lloyd's Agents' original job): confirm a merchant still accepts bitcoin, inspect a delivery, check a site. Cheap, low-risk; suits a first badge.
 - **Digital deliverables:** writing, translation, design, code, research. Same pipeline, with all members in the decision. The risk runs the other way (once files are handed over the DAO has them), so, *proposed, to confirm:* the Agent posts a hash and a preview, payment follows, the full files are released and checked against the hash; and the DAO's own record as a payer (tasks paid, disputed, time to pay) shown on the dashboard.
+- **Fiat bridge:** buying something from a counterparty who takes only fiat (3.4).
+
+### 3.4 Fiat, Agent tasks and claim codes (22 November 2026)
+
+**Decided:** the DAO never pays in fiat. It pays in bitcoin: directly to a counterparty who accepts it, or for a fiat-denominated voucher (a gift card bought for bitcoin, paid from the treasury like any merchant). When a counterparty takes only fiat, the DAO commissions an **Agent** at a price in sats, and the Agent delivers the outcome. How the Agent gets from sats to fiat is their own business: the first route considered is a **Bitrefill Card owned by the Agent personally** (a prepaid Visa topped up from bitcoin, KYC'd to the Agent). It is never DAO infrastructure.
+
+Consistent with "no card paid by a person and reimbursed" (4.2):
+
+- **The Agent quotes a price in sats for the finished outcome**, goods included, agreed in the draft's discussion before the vote fixes the schedule (4.6 in `protocol.md`). The DAO pays that price, staged or on completion, **never against a fiat receipt**.
+- **Fiat stays off the record.** The task describes the goods ("one 5 kg bag of X from Y"), not a euro price. The quote absorbs the fiat cost, card fees and exchange movement; once voted it is fixed, and the movement is the Agent's risk.
+- **Goods paid directly first.** The fiat route is only for counterparties who cannot be paid in bitcoin.
+- **Proof is of the outcome**, not of the card transaction.
+
+| On the record (public) | Never on the record |
+| --- | --- |
+| The task, the outcome that counts as done | Fiat amount |
+| Recipient reference ("Recipient A") | Card, provider, exchange rate |
+| The Agent's sats price (the schedule) | Merchant receipt (optional, the Agent's choice) |
+| Code commitment, confirmation, round, receipt txid | The recipient's name and address |
+
+#### 3.4.1 Two task examples
+
+*Proposed.*
+
+1. **Delivered to a member.** The bounty names the member who receives the item. That member confirms delivery in the app. The simplest case, and the only one open to a first task.
+2. **Delivered to someone who is not a member** (a supplier, a venue, a gift, help in kind for an outsider). The recipient cannot sign in and has no reputation in the DAO, so:
+   - **The proposal names the recipient**, not the Agent: the Agent cannot redirect the item afterwards.
+   - **Confirmation runs through a channel the Agent does not control**, fixed in the proposal: a **claim code** (3.4.2), or the merchant's receipt sent straight to the DAO inbox (the Agent gives `admin@<dao>.byob.zone` as the order email; some receipts show a name or card digits, which the Agent should know first), or a **Witness**: a member present at the handover.
+   - **Recipient privacy:** the public record holds a reference only; name and address go to the Agent privately.
+   - **Fallback:** if the recipient never confirms within the window, the claimant's `dao.report` carries the evidence (photo, tracking) and the council's round decides, as for any tranche ("approval is execution", `protocol.md` 4.6.2), giving a public reason if it declines.
+   - **Higher threshold:** open from a set Fiat bridge count (say 3), or at any level with a Witness present.
+
+| | Member recipient | Non-member recipient |
+| --- | --- | --- |
+| Recipient chosen by | the proposal | the proposal |
+| Confirmation | the member, in the app | claim code, merchant receipt to the DAO inbox, or a Witness |
+| Recipient privacy | pseudonymous member | public reference, details to the Agent privately |
+| Who can claim | any new Agent | Fiat bridge ×3, or any level with a Witness |
+| No confirmation | not expected | window, then the claimant's report and the council's round |
+
+#### 3.4.2 The claim code
+
+*Proposed.* A **hash commitment**: the proposal publishes the fingerprint of a secret code; the recipient reveals the code to confirm. Anyone can check the code against the fingerprint, so confirming needs no server and no account.
+
+1. **Draft.** The proposer's app generates a random **six-word code** (BIP39 words, 66 bits, for example `orbit velvet candle rescue amber logic`) and a random nonce, and puts only the commitment into the bounty:
+   `"delivery": {"recipient": "Recipient A", "channel": "email", "nonce": "<hex>", "commit": "<sha256 hex>", "windowDays": 7}`
+   with `commit = SHA-256("btc-dao/delivery" ‖ nonce ‖ code)`. The proposal id cannot be used in the hash (the commitment is part of the content that makes the id), hence the nonce. Six words, not four: the commitment is public, so the code must resist an offline guessing attack by the Agent.
+2. **Code sent.** The proposer's app sends the code to the recipient over the channel named in the proposal (email from the DAO, a Nostr message, or on paper by a member). **The proposer cannot claim a bounty they hold the code for.** Later, the executor (4.5) generates and sends the code itself, so no person ever sees it.
+3. **Vote, claim, delivery** as for any bounty (`protocol.md` 4.6): the Agent claims with an address, buys with their own tools, delivers.
+4. **Confirmed.** The recipient opens `<dao>.byob.zone/confirm/<proposal id>` and types the six words. The page checks the hash in the browser and, on a match, publishes **`dao.delivered`** (proposed kind 3596), signed by a key the page creates on the spot. Like `dao.confirm`, **any key may sign it**; it is valid when the hash of its code matches the commitment. The first valid one counts. The code is never in the link, so the link can be printed or left with the item.
+5. **Paid.** A tranche with `delivery` can join a round only after a valid `dao.delivered` (or, past the window, a claimant's report: 3.4.1). The council signs the round; the receipt marks the task paid; the Agent badge counts it.
+
+`dao.delivered`, content `{"tranche": 1, "code": "<six words>"}`, tagged `["e", <proposal id>]`. **Member recipient:** `"delivery": {"member": "<identity key>"}` and no code; the `dao.delivered` is signed by that member. **Staged tasks:** one commitment per tranche (for example "bought", confirmed by a Witness; "delivered", by the recipient's code).
+
+Limits: a recipient can still pass the code to the Agent. The proposal naming the recipient, and the thresholds for non-member tasks, contain that; they do not remove it.
+
+#### 3.4.3 Agent badges by task type
+
+*Proposed,* extending [`proposals/badges.md`](../proposals/badges.md) 1.3, where the Agent badge is already counted by type. The **Fiat bridge** count is the first threshold; it is named for the function, not the provider (a Bitrefill Card is one route), in line with design by function.
+
+- **Earned** by a fiat-bridge task claimed, confirmed and paid in a round. Owning a card earns nothing: the DAO never checks an Agent's accounts.
+- **Before any Agent task:** the member holds the four member badges and is not on the council.
+- **Trust ladder:** first tasks small, member recipient, paid on completion only. Higher counts open non-member recipients, larger tasks and staged payment (the one case where the DAO pays before delivery). Each DAO sets the limits in its rules.
+- **Other types**, each counted on the same badge: Procurement (goods paid directly in bitcoin), Courier (moving items, such as kits to a new council member), Representation (attending an office, a meeting or a supplier and reporting back), Post (physical mail, beside the email module), Witness (confirming another Agent's handover in person, close to the Reporting type in 3.3).
 
 ## 4. Modules
 
@@ -257,6 +321,11 @@ An **"Enable email"** proposal, guided in the app: addresses, retention period, 
 - [ ] **Executor and chain gateway:** one Worker or two? The chain gateway holds no secrets today, and the comms draft puts the DAO npub's nsec there
 - [ ] Digital deliverables: hash and preview before payment; delivery accepted by the council's round (as 4.6 today) or a members' step for larger work; default licence (open, or per task)
 - [ ] Agent tasks in the protocol: Agent badge and region, council barred from claiming, merchant outputs, the Agent's choice of schedule
+- [ ] Claim codes (3.4.2): the `delivery` field and `dao.delivered` in `protocol.md`; the relay range to 3596; clients keep `dao.delivered` from any key when its code matches (an exception to members-only filtering, like `dao.confirm`); window default; who sends the code before the executor exists
+- [ ] Kind numbers: 3593 is proposed twice (`dao.link` in `proposals/badges.md`, `dao.meeting` in `meeting-scheduler.md`); settle the order before 3596 is assigned
+- [ ] Fallback when a non-member never confirms: the council's round (as now) or a members' step
+- [ ] Fiat bridge thresholds (count for non-member recipients, staged payment) as reference rules
+- [ ] Bitrefill checks: guest purchase with email only and on-chain payment (for vouchers bought by the treasury); its terms on passing codes to others; Bitrefill Card terms for an Agent buying on someone else's behalf
 - [ ] Operators in the protocol: settings fields, the Operator badge, the 1 → 3 change and its flag
 - [ ] Cloudflare details to confirm against its API docs: tokens that create tokens, token expiry, account-owned tokens
 - [ ] HostSailor checks (6); whether byob.zone moves
