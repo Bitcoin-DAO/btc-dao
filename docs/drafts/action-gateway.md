@@ -320,6 +320,24 @@ Unblocks: Correspondence replies to the world (9.4), claim codes by email (3.4.2
 
 Decided 17 November 2026, unless marked otherwise. The aim: an easy way for members to run the DAO's email themselves, so the DAO can deal with traditional companies and individuals as well as with Nostr users.
 
+### 9.0 Inbound: which route (open, 22 November 2026)
+
+Cloudflare Email Routing works only when Cloudflare is the domain's DNS provider: byob.zone's nameservers would move from Porkbun to the DAO's own Cloudflare account. That is a decision for the DNS module (6, 7), not only for email. DAO addresses are on subdomains (`admin@<dao>.byob.zone`), and each subdomain's MX can point anywhere, so inbound can be tested without touching byob.zone's own mail forwarding.
+
+| Route | DNS | For | Against |
+| --- | --- | --- | --- |
+| **A. Cloudflare Email Routing → Worker** (this draft so far) | moves to the DAO's Cloudflare account | free; the Worker receives the raw message, a clean fit with the executor | more weight on Cloudflare (relay, gateway, DNS, email); needs the nameserver move |
+| **B. Resend receiving → webhook to the Worker** | stays at Porkbun | no DNS move; testable now on `test.byob.zone` | sending and receiving on one provider unless KingSMTP takes sending; received mail counts toward the free quota (100 a day) |
+| **C. KingSMTP MX routing** | stays at Porkbun | paid in bitcoin; already the outbound second provider | untested; may only forward to a mailbox, not to a Worker |
+
+Next: test B (9.0.1). The DNS decision (Cloudflare as DNS provider in the final form, deSEC second, or DNS kept at the registrar) decides between A and B/C.
+
+#### 9.0.1 Test B
+
+- [ ] Receiving enabled on `test.byob.zone`, MX added at Porkbun; a message from Gmail arrives in Resend's Receiving view with sender, subject and full text
+- [ ] The webhook payload (`email.received`): does it carry the whole message, or only metadata the Worker must fetch through the API? Decides how the Worker reads mail
+- [ ] Sender checks: does Resend pass on SPF/DKIM/DMARC results, which the spam rules (9.8) need?
+
 ### 9.1 Addresses
 
 | Address | For | Who reads it |
