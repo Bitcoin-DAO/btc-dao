@@ -424,6 +424,7 @@ An **"Enable email"** proposal, guided in the app: addresses, retention period, 
 
 ## 10. Open questions
 
+- [ ] **A cleaner definition of the Operator role** (22 Nov 2026): what an Operator does and holds, what it never holds, and whether a council member may also be an Operator. Today the separation is implied (council holds the money, Operators hold the root shares) but only "council members are not Agents" is stated as a rule. ALPHA DAO runs without a meaningful Operator role until this is settled
 - [ ] Email retention period default; how the encrypted summary is written (automatic, or by the member who files the email)
 - [ ] Inbox events in the protocol: kinds for received email, inbox-key wrapping, sender admission, correspondence receipts
 - [ ] **Single-Operator backup.** A sealed copy of the root split among the council, opened only by a Recovery proposal if the only Operator is gone, retired at three Operators? Blurs council/Operator separation in an emergency only
