@@ -310,9 +310,11 @@ The Announcement proposal and the DAO npub ([`discussion-and-comms.md`](discussi
 
 **Tests before building:**
 
-- [ ] Resend's free plan delivers to any address once the domain is verified (one integration guide says free plans deliver only to the sign-up address; believed to apply before domain verification only)
+- [x] Resend's free plan delivers to any address once the domain is verified. **Passed 22 November 2026:** a free account (registered to the project address, email and password, not a GitHub login) with `test.byob.zone` verified (EU region, records added by hand at Porkbun) sent through the API to a Gmail address that is not the sign-up address; Resend reported it delivered. The "sign-up address only" limit applies to Resend's shared `resend.dev` domain, not to a verified one. Test key deleted afterwards.
 - [ ] KingSMTP: API keys created, revoked and listed through its API
-- [ ] Deliverability from `admin@<dao>.byob.zone` to Gmail and Outlook inboxes, with SPF and DKIM for both providers in the DAO's DNS (9.7)
+- [ ] Deliverability from `admin@<dao>.byob.zone` to Gmail and Outlook inboxes, with SPF and DKIM for both providers in the DAO's DNS (9.7). **Partly done 22 November 2026:** Resend to Gmail landed in the **inbox** (plain text, new subdomain). Still to do: SPF/DKIM/DMARC results in the message headers, an Outlook address, and KingSMTP.
+
+Records found on 22 November 2026: Resend now verifies a domain with a DKIM TXT record and two CNAMEs for sending (`rsend.<sub>` and `send.<sub>`), not MX and SPF TXT; DMARC (`_dmarc.<sub>`, `p=none`) added by hand. Porkbun's own DNS runs on Cloudflare, so byob.zone already depends on Cloudflare without a Cloudflare account (relevant to the second DNS provider, 7).
 
 Unblocks: Correspondence replies to the world (9.4), claim codes by email (3.4.2), and invoice PDFs as attachments (9.6).
 
