@@ -273,7 +273,7 @@ Cloudflare is the current core (DNS, inbound email, website, Workers): a central
 | Function | Second options |
 | --- | --- |
 | DNS | deSEC (free, non-profit; token API to confirm). The cheapest real exit test |
-| Website | nsite: static sites as Nostr events signed by the DAO npub, files on Blossom. To look at later |
+| Website | Cloudflare Pages as the tested second host; nsite (static sites as Nostr events signed by the DAO npub, files on Blossom) as the final form (8.2) |
 | Executor, email | a VPS paid in bitcoin (some take Lightning, with Nostr login and an API) |
 | Executor | the Operator's own hardware, as a fallback |
 
@@ -285,7 +285,7 @@ On the free tier, under the admission tests:
 | --- | --- | --- |
 | 0 | This document | now |
 | 1 | Operator role in the app: badge, founding minimum, 1 → 3 vote, dashboard | beside the council-change work |
-| 2 | Cloudflare base module: account (setup, handover, rotation, watcher); **inbound email** as in section 9; the DAO website via Pages ("Publish site update" proposals) | text only first; attachments later (9.6). Any member can turn an email into a draft |
+| 2 | Cloudflare base module: account (setup, handover, rotation, watcher); **inbound email** as in section 9. The DAO website is its own module (8.2) | text only first; attachments later (9.6). Any member can turn an email into a draft |
 | 3 | **Free outbound to verified addresses:** member notifications (new proposals, votes closing, to-dos) to members who opt in by verifying their address | alongside the Nostr notification layer |
 | 4 | Outbound email to the world | through a separate sending provider (8.1); Cloudflare's own sending needs a paid plan by card, which fails the payment test |
 
@@ -317,6 +317,31 @@ The Announcement proposal and the DAO npub ([`discussion-and-comms.md`](discussi
 Records found on 22 November 2026: Resend now verifies a domain with a DKIM TXT record and two CNAMEs for sending (`rsend.<sub>` and `send.<sub>`), not MX and SPF TXT; DMARC (`_dmarc.<sub>`, `p=none`) added by hand. Porkbun's own DNS runs on Cloudflare, so byob.zone already depends on Cloudflare without a Cloudflare account (relevant to the second DNS provider, 7).
 
 Unblocks: Correspondence replies to the world (9.4), claim codes by email (3.4.2), and invoice PDFs as attachments (9.6).
+
+### 8.2 The site module
+
+*Proposed, 22 November 2026.* The DAO's site is static files, so it is defined by function, not tied to a host: **one build, published to several hosts**. Leaving a host is a DNS change.
+
+| Layer | Host | Role |
+| --- | --- | --- |
+| Source and history | GitHub repo | every DAO's source; what a fork copies |
+| Primary host | **GitHub Pages** | live today (`byob.zone`, `www`, `alpha`); a fork gets it by enabling Pages, with no extra account |
+| Second host (exit test) | Cloudflare Pages, built from the same repo | tested once, kept ready |
+| Final form | **nsite**: files on Blossom, signed by the DAO npub | no account to close: any relay or Blossom server serves it, and anyone can check a page is the DAO's |
+
+Why GitHub stays primary:
+
+- **Forking:** the site comes with the repo, the smoothest path for a new DAO.
+- **Separate blocks:** Cloudflare already runs the relay, the chain gateway and (planned) inbound email, and sits behind Porkbun's DNS. The site on GitHub means a Cloudflare problem does not take it down.
+- **Public history:** every DAO's site is a public repo, in line with all DAO data public.
+
+**Publish site update** proposals: once passed, the executor publishes the new build to the primary host (and the second, if active), and the receipt records the commit and the deployed hash.
+
+To check:
+
+- [ ] **GitHub and the token test.** Fine-grained personal tokens are made by hand, not by API. Candidates that may pass: a **GitHub App** (installation tokens created and revoked by API, short-lived) or a repo **deploy key** (added, listed and removed by API; SSH, so awkward from a Worker). Cloudflare's token API passes cleanly.
+- [ ] **GitHub Pages terms:** not meant for sites primarily facilitating commercial transactions. A DAO's static app should be fine; a marketplace DAO selling through its site is a reason to have the second host ready.
+- [ ] Cloudflare Pages built from the same repo: one test deploy and a DNS switch, then back.
 
 ## 9. The email module
 
