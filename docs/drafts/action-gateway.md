@@ -347,6 +347,24 @@ To check:
 
 Decided 17 November 2026, unless marked otherwise. The aim: an easy way for members to run the DAO's email themselves, so the DAO can deal with traditional companies and individuals as well as with Nostr users.
 
+### 9.0 Inbound: which route (open, 22 November 2026)
+
+Cloudflare Email Routing works only when Cloudflare is the domain's DNS provider: byob.zone's nameservers would move from Porkbun to the DAO's own Cloudflare account. That is a decision for the DNS module (6, 7), not only for email. DAO addresses are on subdomains (`admin@<dao>.byob.zone`), and each subdomain's MX can point anywhere, so inbound can be tested without touching byob.zone's own mail forwarding.
+
+| Route | DNS | For | Against |
+| --- | --- | --- | --- |
+| **A. Cloudflare Email Routing → Worker** (this draft so far) | moves to the DAO's Cloudflare account | free; the Worker receives the raw message, a clean fit with the executor | more weight on Cloudflare (relay, gateway, DNS, email); needs the nameserver move |
+| **B. Resend receiving → webhook to the Worker** | stays at Porkbun | no DNS move; testable now on `test.byob.zone` | sending and receiving on one provider unless KingSMTP takes sending; received mail counts toward the free quota (100 a day) |
+| **C. KingSMTP MX routing** | stays at Porkbun | paid in bitcoin; already the outbound second provider | untested; may only forward to a mailbox, not to a Worker |
+
+Next: test B (9.0.1). The DNS decision (Cloudflare as DNS provider in the final form, deSEC second, or DNS kept at the registrar) decides between A and B/C.
+
+#### 9.0.1 Test B
+
+- [x] Receiving enabled on `test.byob.zone`, MX added at Porkbun; a message from Gmail arrives in Resend's Receiving view with sender, subject and full text. **Passed 22 November 2026.** Resend keeps each received email as structured data: `subject`, `text`, `html`, `from`, `to`, `cc`, `reply_to` and every original header (including `message-id`, for threading replies, 9.4, and `dkim-signature`).
+- [x] The webhook payload (`email.received`): **a notice, not the message.** The request was 403 bytes, too small to hold the email, so the Worker receives the email's id and fetches the message through Resend's API. The webhook is signed (Svix: `svix-id`, `svix-timestamp`, `svix-signature`), so the Worker can check it came from Resend before acting. Needs the Worker's API key to allow reading received mail (a scope to check against the token test). Webhook endpoint to delete after the test (webhook.site is public).
+- [ ] Sender checks: no `authentication-results` from Resend seen in the stored headers (only Google's own `arc-authentication-results`). If Resend does not add one, the Worker verifies DKIM itself from the original headers before applying 9.8.
+
 ### 9.1 Addresses
 
 | Address | For | Who reads it |
