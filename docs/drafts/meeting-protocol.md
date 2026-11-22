@@ -94,11 +94,50 @@ One minute per meeting, posted to the DAO's record at the close.
 
 ---
 
-## 8. Open questions
+## 8. Minute-taking
+
+Two ways, both producing the same minute (section 7). The AI drafts; **the meeting approves.** The read-back at Close is the check either way.
+
+### 8.1 AI-assisted, everything local
+
+A laptop records the whole meeting (the room and the remote members), transcribes it and fills in the agenda template, with nothing leaving the laptop. The internet is used only by the call itself.
+
+| Part | Choice |
+|---|---|
+| Software | **Meetily** Community Edition (MIT licence, open source): records microphone + system audio, no bot joins the call |
+| Transcription | Parakeet (built for CPU), in Meetily. Whisper only with a GPU |
+| Summary | Ollama, local, a 7–8B model with good Italian. Every cloud provider in Meetily left unset, no API keys |
+| Template | The agenda (section 3) as a Meetily custom template, one section per item: *business* (and what), *no business*, *not yet* or *overdue* |
+| Audio | One USB conference speakerphone, set as microphone **and** speaker for the system and the call. The call runs on the laptop (WhatsApp Desktop), not on a phone |
+| Laptop | 16 GB RAM minimum, about 20 GB free disk, full-disk encryption on (FileVault / BitLocker). No GPU needed |
+
+Rules:
+
+- **Say so at Opening:** the meeting is recorded, for the minute only.
+- **The chair names each item aloud** ("Item 4, Council and keys"): the markers the transcript needs. Members say their names at Opening, since speaker labels are only "Speaker 1, 2…".
+- **The summary takes time on a CPU laptop.** Stop recording after Rules, generate the minute during a short break, then read it back at Close.
+- **Delete the audio and transcript** once the minute is posted. Only the approved minute is kept.
+
+### 8.2 By hand
+
+A rotating minute-taker fills in the printed agenda during the meeting: one word per item (*business*, *no business*, *not yet*, *overdue*) plus links. The fixed form makes this quick; it is also the fallback when the laptop fails.
+
+### 8.3 Tests
+
+| Test | Where | Passes when |
+|---|---|---|
+| **MT-0 Dry run** | At home, before ALPHA DAO's second meeting: a 10-minute mock meeting, one person in the room, one remote on WhatsApp Desktop, Italian and English mixed | Both voices in the transcript; template filled in; summary time measured; a re-run with Wi-Fi off after the call ends still produces the summary |
+| **MT-1 First real meeting** | ALPHA DAO's second meeting ([run sheet](../workshop/second-meeting.md)), with a by-hand minute kept in parallel | The AI minute matches the by-hand minute on every item's status; corrections at the read-back counted and recorded |
+
+Results go in `docs/runs/` with the summary time, model, and corrections. If the CPU summary is too slow, the next test is pointing the summary step at the household AI server on the local network (if Meetily allows another Ollama address).
+
+---
+
+## 9. Open questions
 
 - Minute format: `dao.post` with a template, or a new event kind for the future NIP.
 - Should the app print the agenda (with "not yet" lines filled in from the DAO's stage) as a one-page sheet for the table, in the DAO's language?
 - Quorum for a meeting: none (the vote happens in the app), or a minimum for *do* items such as signing at the table.
 - How the [meeting scheduler](meeting-scheduler.md) links a fixed meeting to its minute.
 - Whether minutes count toward a badge (for example, a DAO badge for twelve consecutive meetings minuted).
-- First test: run the template at the ALPHA DAO workshop and its following meetings, and revise from what happens.
+- First test: run the template at the ALPHA DAO workshop and its following meetings, and revise from what happens. The second meeting is the first full run, with minute-taking test MT-1 ([run sheet](../workshop/second-meeting.md)).
