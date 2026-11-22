@@ -287,9 +287,34 @@ On the free tier, under the admission tests:
 | 1 | Operator role in the app: badge, founding minimum, 1 → 3 vote, dashboard | beside the council-change work |
 | 2 | Cloudflare base module: account (setup, handover, rotation, watcher); **inbound email** as in section 9; the DAO website via Pages ("Publish site update" proposals) | text only first; attachments later (9.6). Any member can turn an email into a draft |
 | 3 | **Free outbound to verified addresses:** member notifications (new proposals, votes closing, to-dos) to members who opt in by verifying their address | alongside the Nostr notification layer |
-| 4 | Outbound email to the world | blocked: Cloudflare's sending needs a paid plan by card, which fails the payment test. Waits for a provider that passes |
+| 4 | Outbound email to the world | through a separate sending provider (8.1); Cloudflare's own sending needs a paid plan by card, which fails the payment test |
 
 The Announcement proposal and the DAO npub ([`discussion-and-comms.md`](discussion-and-comms.md) 4) follow the same pattern: an approved proposal, executed by code holding a credential, with a public result.
+
+### 8.1 Stage 4: outbound only, on a separate provider
+
+*Proposed, 22 November 2026.* Inbound stays on Cloudflare Email Routing (free, fits the Worker). Only **sending** moves to another provider:
+
+- **Split by function.** Receiving on one provider and sending on another is design by function (2): losing either breaks half of email, and each half is replaced alone.
+- **Neutral interface.** The executor calls `send(message)`; an adapter speaks to the provider's HTTP API (or SMTP). Changing provider is a settings change, by proposal.
+- **Inbound exit covered.** The bitcoin-paid candidates below also offer receiving (MX routing), so inbound has a second provider too.
+
+| Provider | Payment test | Token test | Notes |
+| --- | --- | --- | --- |
+| **Resend** | free tier: 3,000 emails a month, 100 a day, 3 domains | passes: API keys created, listed and deleted by API; a key can be limited to sending only | far above a DAO's volume; a free account a US company can close |
+| **KingSMTP** | bitcoin, no KYC, from $49 a year (5,000 emails a month) | HTTP API and API keys; create, revoke and list by API **to confirm** | built on Postal (open source); includes MX routing |
+| **Maileroo** | crypto invoices, no minimum tier | to check | a further bitcoin-paid option |
+| Proton Mail | bitcoin as account credit | **fails**: SMTP tokens are made by hand in settings, with the account password | paid plans with a custom domain only; a human mailbox, not an executor provider |
+
+**Choice:** **Resend** (free tier) as the primary sender; **KingSMTP** (bitcoin) as the second provider for the exit test, and the better long-term fit (paid in bitcoin, no KYC).
+
+**Tests before building:**
+
+- [ ] Resend's free plan delivers to any address once the domain is verified (one integration guide says free plans deliver only to the sign-up address; believed to apply before domain verification only)
+- [ ] KingSMTP: API keys created, revoked and listed through its API
+- [ ] Deliverability from `admin@<dao>.byob.zone` to Gmail and Outlook inboxes, with SPF and DKIM for both providers in the DAO's DNS (9.7)
+
+Unblocks: Correspondence replies to the world (9.4), claim codes by email (3.4.2), and invoice PDFs as attachments (9.6).
 
 ## 9. The email module
 
@@ -321,7 +346,7 @@ Sub-addresses (`admin+printer@…`) arrive at `admin@`. Each counterparty gets i
 - **Correspondence** is a proposal category with a **3-day voting period**. Every outgoing message, to anyone, goes through it: idea → draft → discuss → proposal → vote → sent. No standing mandates or pre-approved templates.
 - A passed reply is sent by the executor, word for word, threaded into the counterparty's conversation (reply headers), and its receipt published.
 - **Comms transparency:** every outgoing email's hash goes into its receipt, with a footer link to the public record. The recipient can verify the message is the DAO's and was voted, and can follow the **current status** of the DAO's processing of their matter (draft, discussion, vote, result).
-- Outbound to the world waits for a provider that passes the payment test (section 8, stage 4).
+- Outbound to the world goes through the separate sending provider (8.1).
 
 ### 9.5 Payment fraud
 
