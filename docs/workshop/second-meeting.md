@@ -2,7 +2,7 @@
 
 The first ordinary meeting after the founding day, and the first full run of the [meeting protocol](../drafts/meeting-protocol.md): the workshop is the meeting, and the agenda template is the business of the day. It also runs minute-taking test **MT-1** (protocol 8.3).
 
-Status: outline, 22 November 2026. Date, chair and members to be fixed with the [meeting scheduler](../drafts/meeting-scheduler.md) or the group chat.
+Status: outline, 22 November 2026. Optional later: [meeting #3](third-meeting.md), on Corny Chat. Date, chair and members to be fixed with the [meeting scheduler](../drafts/meeting-scheduler.md) or the group chat.
 
 ## Goals
 
@@ -21,7 +21,7 @@ Status: outline, 22 November 2026. Date, chair and members to be fixed with the 
 
 - [ ] Lenovo ThinkPad T480 (Windows 11 Pro, 32 GB RAM), on mains power, sleep set to never, BitLocker on.
 - [ ] USB conference speakerphone.
-- [ ] WhatsApp Desktop on the laptop, signed in, with the group's call.
+- [ ] WhatsApp Desktop on the laptop, signed in, with the group's call. Remote members join on their phones; the call in the room runs on the laptop, not on a phone, or Meetily hears only the room.
 - [ ] Meetily, Parakeet model and an Ollama 7–8B model installed; the agenda template loaded; no cloud provider or API key set.
 - [ ] One SeedSigner and the council's SeedQR cards, if signing.
 - [ ] Printed agendas: one for the chair, one for the by-hand minute-taker.
