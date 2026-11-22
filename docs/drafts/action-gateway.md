@@ -94,34 +94,54 @@ Consistent with "no card paid by a person and reimbursed" (4.2):
 | The Agent's sats price (the schedule) | Merchant receipt (optional, the Agent's choice) |
 | Code commitment, confirmation, round, receipt txid | The recipient's name and address |
 
-#### 3.4.1 Two task examples
+#### 3.4.1 One process for every recipient
 
-*Proposed.*
+*Proposed.* One process serves a recipient who is a member and one who is not, and goods, payments and services alike. What differs is set in the proposal, not in the steps.
 
-1. **Delivered to a member.** The bounty names the member who receives the item. That member confirms delivery in the app. The simplest case, and the only one open to a first task.
-2. **Delivered to someone who is not a member** (a supplier, a venue, a gift, help in kind for an outsider). The recipient cannot sign in and has no reputation in the DAO, so:
-   - **The proposal names the recipient**, not the Agent: the Agent cannot redirect the item afterwards.
-   - **Confirmation runs through a channel the Agent does not control**, fixed in the proposal: a **claim code** (3.4.2), or the merchant's receipt sent straight to the DAO inbox (the Agent gives `admin@<dao>.byob.zone` as the order email; some receipts show a name or card digits, which the Agent should know first), or a **Witness**: a member present at the handover.
-   - **Recipient privacy:** the public record holds a reference only; name and address go to the Agent privately.
-   - **Fallback:** if the recipient never confirms within the window, the claimant's `dao.report` carries the evidence (photo, tracking) and the council's round decides, as for any tranche ("approval is execution", `protocol.md` 4.6.2), giving a public reason if it declines.
-   - **Higher threshold:** open from a set Fiat bridge count (say 3), or at any level with a Witness present.
+1. **Draft.** A member posts the need: the **outcome type**, the **recipient reference** and the **channel** for the code. An Agent quotes a price in sats in the discussion.
+2. **Proposal.** A bounty (`protocol.md` 4.6) with the Agent's price as its schedule. The app generates the six-word code and puts only its commitment in the proposal (3.4.2).
+3. **Vote.** Once it passes, the code goes to the recipient by the named channel. A rejected task never reaches the recipient.
+4. **Claim.** An Agent at the badge level the recipient requires claims with an address.
+5. **Act.** The Agent buys, pays or arranges the work with their own tools, outside the DAO.
+6. **Confirm.** The recipient shows or types the code; `dao.delivered` is published.
+7. **Paid.** The council's round pays the Agent's sats price; the receipt marks the task paid; the badge counts it.
+
+**No confirmation** within the window: the claimant's `dao.report` carries the evidence (photo, tracking) and the council's round decides, as for any tranche ("approval is execution", `protocol.md` 4.6.2), giving a public reason if it declines.
+
+**Every task has a code**, members' included. The Agent's handover scan then works the same at every door, and the Agent need not know whether the recipient is a member. A member recipient may instead confirm by signing in the app, but nothing depends on it.
+
+**Outcome types**, each confirmed by the same code:
+
+| Outcome | The recipient shows the code when | Example |
+| --- | --- | --- |
+| `goods` | they hold the item | a part from a fiat-only shop, delivered to a venue |
+| `payment` | the money has arrived | a plumber's or printer's fiat invoice, a venue deposit |
+| `service` | the work is done | a repair arranged and paid by the Agent |
+
+A **payment** task names the counterparty's own invoice ("pay Recipient A's invoice, ref 0412"), not a euro amount. Members see the amount on the invoice in the DAO inbox, encrypted (9.2); the public record holds only the reference and the Agent's sats price.
+
+**What the recipient type sets:**
 
 | | Member recipient | Non-member recipient |
 | --- | --- | --- |
-| Recipient chosen by | the proposal | the proposal |
-| Confirmation | the member, in the app | claim code, merchant receipt to the DAO inbox, or a Witness |
-| Recipient privacy | pseudonymous member | public reference, details to the Agent privately |
 | Who can claim | any new Agent | Fiat bridge ×3, or any level with a Witness |
-| No confirmation | not expected | window, then the claimant's report and the council's round |
+| How the code reaches them | in the app | email, Nostr, or paper |
+| On the record | pseudonymous member | a reference; name and address to the Agent privately |
+
+Rules for every task:
+
+- **The proposal names the recipient**, not the Agent: the Agent cannot redirect the outcome afterwards.
+- **The code travels by a channel the Agent does not control.** Extra evidence may sit beside it: the merchant's receipt sent straight to the DAO inbox (the Agent gives `admin@<dao>.byob.zone` as the order email; some receipts show a name or card digits, which the Agent should know first), or a **Witness**, a member present at the handover.
 
 #### 3.4.2 The claim code
 
 *Proposed.* A **hash commitment**: the proposal publishes the fingerprint of a secret code; the recipient reveals the code to confirm. Anyone can check the code against the fingerprint, so confirming needs no server and no account.
 
 1. **Draft.** The proposer's app generates a random **six-word code** (BIP39 words, 66 bits, for example `orbit velvet candle rescue amber logic`) and a random nonce, and puts only the commitment into the bounty:
-   `"delivery": {"recipient": "Recipient A", "channel": "email", "nonce": "<hex>", "commit": "<sha256 hex>", "windowDays": 7}`
+   `"delivery": {"outcome": "goods", "recipient": "Recipient A", "channel": "email", "nonce": "<hex>", "commit": "<sha256 hex>", "windowDays": 7}`
+   (`outcome`: `goods`, `payment` or `service`; `channel`: `app` for a member recipient, `email`, `nostr` or `paper`)
    with `commit = SHA-256("btc-dao/delivery" ‖ nonce ‖ code)`. The proposal id cannot be used in the hash (the commitment is part of the content that makes the id), hence the nonce. Six words, not four: the commitment is public, so the code must resist an offline guessing attack by the Agent.
-2. **Code sent.** The proposer's app sends the code to the recipient over the channel named in the proposal (email from the DAO, a Nostr message, or on paper by a member). **The proposer cannot claim a bounty they hold the code for.** Later, the executor (4.5) generates and sends the code itself, so no person ever sees it.
+2. **Code sent** once the vote passes. The proposer's app sends the code to the recipient over the channel named in the proposal (in the app for a member, email from the DAO, a Nostr message, or on paper by a member). **The proposer cannot claim a bounty they hold the code for.** Later, the executor (4.5) generates and sends the code itself, so no person ever sees it.
 3. **Vote, claim, delivery** as for any bounty (`protocol.md` 4.6): the Agent claims with an address, buys with their own tools, delivers.
 4. **Confirmed.** The recipient opens `<dao>.byob.zone/confirm/<proposal id>` and types the six words. The page checks the hash in the browser and, on a match, publishes **`dao.delivered`** (proposed kind 3596), signed by a key the page creates on the spot. Like `dao.confirm`, **any key may sign it**; it is valid when the hash of its code matches the commitment. The first valid one counts. The code is never in the link, so the link can be printed or left with the item.
 5. **Paid.** A tranche with `delivery` can join a round only after a valid `dao.delivered` (or, past the window, a claimant's report: 3.4.1). The council signs the round; the receipt marks the task paid; the Agent badge counts it.
@@ -145,7 +165,7 @@ The code only has to stay secret until the handover: showing it *is* the confirm
 | Recipient types the code | the recipient, with a key made on the spot | the recipient confirmed on their own device |
 | Handover scan | the Agent's member key, `"via": "scan"` | the code left the recipient at the handover |
 
-`dao.delivered`, content `{"tranche": 1, "code": "<six words>"}` (with `"via": "scan"` in scan mode), tagged `["e", <proposal id>]`. **Member recipient:** `"delivery": {"member": "<identity key>"}` and no code; the `dao.delivered` is signed by that member. **Staged tasks:** one commitment per tranche (for example "bought", confirmed by a Witness; "delivered", by the recipient's code).
+`dao.delivered`, content `{"tranche": 1, "code": "<six words>"}` (with `"via": "scan"` in scan mode), tagged `["e", <proposal id>]`. **Member recipient:** the same field with `"channel": "app"`; a `dao.delivered` signed by that member, without the code, also counts. **Staged tasks:** one commitment per tranche (for example "bought", confirmed by a Witness; "delivered", by the recipient's code).
 
 Limits: a recipient can still pass the code to the Agent. The proposal naming the recipient, and the thresholds for non-member tasks, contain that; they do not remove it.
 
