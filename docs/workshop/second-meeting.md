@@ -2,7 +2,7 @@
 
 The first ordinary meeting after the founding day, and the first full run of the [meeting protocol](../drafts/meeting-protocol.md): the workshop is the meeting, and the agenda template is the business of the day. It also runs minute-taking test **MT-1** (protocol 8.3).
 
-Status: outline, 22 November 2026. Next: [meeting #3](third-meeting.md), on Corny Chat. Date, chair and members to be fixed with the [meeting scheduler](../drafts/meeting-scheduler.md) or the group chat.
+Status: outline, 22 November 2026. Optional later: [meeting #3](third-meeting.md), on Corny Chat. Date, chair and members to be fixed with the [meeting scheduler](../drafts/meeting-scheduler.md) or the group chat.
 
 ## Goals
 

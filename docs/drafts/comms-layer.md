@@ -72,12 +72,12 @@ Cloudflare Realtime offers managed TURN (free STUN; 1,000 GB a month free, share
 
 ## 6. Test sequence
 
-One new thing per meeting.
+One new thing per meeting. WhatsApp is the call layer in practice; #3 and later run only if WhatsApp causes a real problem.
 
 | Meeting | Call layer | Audio server and TURN | New thing tested |
 |---|---|---|---|
 | **#2** | WhatsApp: remote members on their phones, the meeting laptop on WhatsApp Desktop | WhatsApp's | Agenda template, Meetily minute (MT-1) ([run sheet](../workshop/second-meeting.md)) |
-| **#3** | Corny Chat, protected room, council as moderators by npub | Corny Chat's (the operator's) | Group call on Nostr identity, real networks ([run sheet](../workshop/third-meeting.md)) |
+| **#3 (optional)** | Corny Chat, protected room, council as moderators by npub | Corny Chat's (the operator's) | Group call on Nostr identity, real networks ([run sheet](../workshop/third-meeting.md)) |
 | **Future** | The DAO's own room | The DAO's own audio server (Nests-style) + Cloudflare TURN | All three pieces owned by the DAO |
 
 - **Meeting #3 is for routine business only:** on a public instance the audio passes through the operator's server.

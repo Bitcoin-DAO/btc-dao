@@ -35,9 +35,9 @@ In growth-model order. *Stage* is the competence path stage ([badges](../proposa
 
 | # | Item | Stage | Type | Present from | What is raised |
 |---|---|---|---|---|---|
-| 0 | **Opening** | — | talk | founding | Who is present (in the room, on the call). Last meeting's minute posted? Anything added to the record since. |
+| 0 | **Opening** | — | talk | founding | Who is present: the chair reads out everyone on the call, and remote members say if anyone else can hear them. Last meeting's minute posted? Anything added to the record since. |
 | 1 | **Record** | 1. Found | talk | founding | Is the DAO's site, relay and record working and intact? Unauthorised spends: 0? |
-| 2 | **Members** | 2. Learn | do | founding | New members vouched in, members leaving, badges earned. Who has not yet tried a part of the DAO, and who will help them. |
+| 2 | **Members** | 2. Learn | do | founding | New members vouched in, members leaving, badges earned. Does the chat group match the roster (leavers removed)? Who has not yet tried a part of the DAO, and who will help them. |
 | 3 | **Proposals and treasury** | 3. Pay | do | founding | Drafts read aloud, open votes, results. Payout round: built, checked and signed at the table. |
 | 4 | **Council and keys** | 4. Endure | do · **due** | founding | Council health, spare key, recovery sheets confirmed, council change proposed. |
 | 5 | **Operators, Agents, Correspondence** | 5. Operate | talk · do | first Operator / module | Infrastructure and credentials (**due**), open Agent tasks and claim codes, inbound mail read aloud, replies drafted as proposals. |
@@ -79,7 +79,7 @@ On a due item, the chair asks for the check itself, not just for business. Silen
 - **Call, pause, move on.** The chair reads each item and waits a fixed moment (about ten seconds) before minuting "no business". Silence must be real, not the result of someone speaking for the room.
 - **Quiet voices.** A member who does not want to speak up can raise an item beforehand as a draft in the Discussion thread; the chair must read every such draft aloud under its item.
 - **Open talk, recorded vote.** Discussion happens in the room; the vote happens in the app, by name, after the meeting or at the table.
-- **Remote members.** On the call, the chair asks remote members by name on each item with business.
+- **Remote members.** On the call, the chair asks remote members by name on each item with business. The call is started from inside the DAO's chat group, never from a shared call link.
 - **Time.** An item with no business takes seconds; the whole template with no business takes about five minutes. A meeting with nothing to do is short and still held: the habit is the point.
 
 ---

@@ -2,7 +2,7 @@
 
 The second run of the [meeting protocol](../drafts/meeting-protocol.md), and the first meeting on a Nostr call layer: **Corny Chat** in place of WhatsApp ([comms layer](../drafts/comms-layer.md) section 6). The agenda, minute-taking and posting stay as at the [second meeting](second-meeting.md), so the call layer is the only new thing.
 
-Status: outline, 22 November 2026. Date and chair to be fixed.
+Status: **optional**, 22 November 2026. WhatsApp is the call layer; run this only if WhatsApp causes a real problem.
 
 ## Goals
 
