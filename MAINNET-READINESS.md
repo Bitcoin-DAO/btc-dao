@@ -11,7 +11,7 @@
 | UNO practice | testnet4, 2 of 2, two phones, short votes | The whole life of a DAO, quickly, with the developer at hand |
 | UNO testnet | testnet4, hardware signing | SeedSigner, recovery without the website, real vote lengths. Hardware signing passed on SEEDSIGNER DAO (10 Nov 2026) |
 | COUNCIL DAO | testnet4, SeedSigner council | Council change in the wild: a lost key replaced and the council grown to 3 of 4 (v0.5.x, 11 Nov 2026); bounty runs paid in rounds |
-| ALPHA DAO (next) | testnet4, 3 of 5, its own address (alpha.byob.zone) | Founded in person at a workshop with people other than the developer: council keys made on the day, many phones, identity cards printed, votes and signatures spread over days |
+| ALPHA DAO (next) | testnet4, 2 of 3 (the developer plus two others; ordinary members on phones), its own address (alpha.byob.zone) | Founded in person at a workshop with people other than the developer: council keys made on the day, many phones, identity cards printed, votes and signatures spread over days |
 | First mainnet DAO | mainnet, treasury capped (S9) | Three monthly rounds without developer help (release condition in FORK-TASKS.md) |
 
 **Rule:** an item is ticked only when it has passed on a real network, with the release and the date written next to it. A fix found in one stage is released, and the item is tested again.
@@ -21,7 +21,7 @@
 ## 1. Founding and identity
 
 - [x] Founding in person and remote, 2 of 2, short codes checked (UNO practice, v0.1.1–v0.1.5, 6 Nov 2026)
-- [ ] Founding 3 of 5 with people other than the developer, at a workshop (ALPHA DAO)
+- [ ] Founding 2 of 3 with people other than the developer, at a workshop, plus ordinary members (ALPHA DAO); growing to 3 of 5 later by a council change
 - [ ] Council keys made three ways on the day: the ready-made card, SeedSigner entropy, and the KEY route (eleven d2 dice, the SeedSigner for word 12); each key's fingerprint matches the one the DAO shows (ALPHA DAO)
 - [ ] A DAO founded on its own web address, with no keys or passkeys shared with earlier DAOs (ALPHA DAO, alpha.byob.zone)
 - [ ] Passkeys on iPhone (Safari) and Android (Chrome), and a passkey synced to a second device (ALPHA DAO)
@@ -63,7 +63,7 @@
 - [x] First payout confirmed on chain, receipt published, proposal shows paid (UNO practice, round 2026-11, v0.1.6, 6 Nov 2026: 5,000 sats, fee 181, block 159459, tx `610238de…a3b`. Reached the network on the second attempt, through Blockbook; one reorg on the way)
 - [x] A broadcast reaches the network first time, and the round confirms within a few blocks: UNO DAO's payout (block 160142) and closing (160156), SEEDSIGNER DAO's payout and closing (160349, 160355). A second broadcast is often needed to reach every source; since v0.3.0 the app sends it by itself (seen working 10 Nov 2026)
 - [ ] Round with several payouts (ALPHA DAO)
-- [ ] Signatures collected over days, 3 of 5, the council taking turns at one shared SeedSigner (ALPHA DAO)
+- [ ] Signatures collected over days, 2 of 3, the council taking turns at one shared SeedSigner (ALPHA DAO)
 - [ ] A council member declines a round, with the reason shown (ALPHA DAO)
 - [ ] Payment that lapses after two rounds (ALPHA DAO)
 - [ ] Bounty claimed, reported and paid in tranches across rounds, by members other than the developer (ALPHA DAO)
