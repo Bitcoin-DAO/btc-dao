@@ -334,9 +334,9 @@ Next: test B (9.0.1). The DNS decision (Cloudflare as DNS provider in the final 
 
 #### 9.0.1 Test B
 
-- [ ] Receiving enabled on `test.byob.zone`, MX added at Porkbun; a message from Gmail arrives in Resend's Receiving view with sender, subject and full text
-- [ ] The webhook payload (`email.received`): does it carry the whole message, or only metadata the Worker must fetch through the API? Decides how the Worker reads mail
-- [ ] Sender checks: does Resend pass on SPF/DKIM/DMARC results, which the spam rules (9.8) need?
+- [x] Receiving enabled on `test.byob.zone`, MX added at Porkbun; a message from Gmail arrives in Resend's Receiving view with sender, subject and full text. **Passed 22 November 2026.** Resend keeps each received email as structured data: `subject`, `text`, `html`, `from`, `to`, `cc`, `reply_to` and every original header (including `message-id`, for threading replies, 9.4, and `dkim-signature`).
+- [x] The webhook payload (`email.received`): **a notice, not the message.** The request was 403 bytes, too small to hold the email, so the Worker receives the email's id and fetches the message through Resend's API. The webhook is signed (Svix: `svix-id`, `svix-timestamp`, `svix-signature`), so the Worker can check it came from Resend before acting. Needs the Worker's API key to allow reading received mail (a scope to check against the token test). Webhook endpoint deleted after the test.
+- [ ] Sender checks: no `authentication-results` from Resend seen in the stored headers (only Google's own `arc-authentication-results`). If Resend does not add one, the Worker verifies DKIM itself from the original headers before applying 9.8.
 
 ### 9.1 Addresses
 
