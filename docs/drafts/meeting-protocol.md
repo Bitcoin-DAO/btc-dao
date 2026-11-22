@@ -92,6 +92,51 @@ One minute per meeting, posted to the DAO's record at the close.
 - **Heartbeat.** Over time the minutes show which parts of the DAO are active and which are dormant: the off-DAO counterpart of the treasury's "unauthorised spends: 0". The dashboard could show it as a strip per item (to decide).
 - **Format:** to be decided. A first version can be a `dao.post` in a "Meetings" thread with a fixed template; a dedicated event kind only if the dashboard needs to read minutes.
 
+### 7.1 Two parts
+
+The minute has two parts, in this order, in the one post:
+
+1. **Summary:** readable text, item by item, for members.
+2. **Status block:** one line per item in a fixed form, for the dashboard heartbeat:
+
+```
+MINUTE <DAO name> <YYYY-MM-DD>
+0 opening: business
+1 record: no business
+2 members: business
+3 proposals-treasury: business
+4 council-keys: overdue
+5 operate: not yet
+6 trade: not yet
+7 mainnet: business
+8 lineage: no business
+9 rules: no business
+10 close: business
+```
+
+Status words are only `business`, `no business`, `not yet`, `overdue`. If the dashboard comes to read minutes, this block is what a dedicated event kind would carry (for the future btc-dao NIP); until then it is plain text in the post.
+
+### 7.2 Posting: the record step
+
+1. **Read back and correct** at Close. Only then is it the minute.
+2. **The chair posts it**, from their own member key, at Close, in front of the room: the minute is attributable to the person who ran the meeting.
+3. **Links added by hand** before posting: each item with business links to the drafts, proposals or rounds it touched, so the off-DAO and on-DAO records point at each other.
+4. **Corrections after posting** are replies in the same thread ("Correction to item 3: …"). The original stands: posts are never edited or deleted (Discussion rules).
+5. **Working files deleted:** audio and transcript removed once the post is on the relay.
+
+### 7.3 What the software does and what people do
+
+| Step | Meetily (local) | People |
+|---|---|---|
+| Record, transcribe | yes | the chair names each item aloud |
+| Summary, item by item | yes: one template section per item | correct at read-back |
+| Status block | yes: a final template section with a fixed output form | check every status word at read-back |
+| Links to proposals and rounds | no (it cannot see the record) | the chair adds them |
+| Posting to the record | no | the chair, in the DAO app |
+| Deleting audio and transcript | no (manual) | the laptop keeper |
+
+Draft template: [`docs/workshop/meetily/btc-dao-minute.json`](../workshop/meetily/btc-dao-minute.json), copied into `~/.meetily/templates` on the laptop. Its schema is from Meetily's template system (name, description, ordered sections of title, instruction, prompt) and is to be confirmed at the MT-0 dry run, along with how the summary is copied out of Meetily.
+
 ---
 
 ## 8. Minute-taking
@@ -126,7 +171,7 @@ A rotating minute-taker fills in the printed agenda during the meeting: one word
 
 | Test | Where | Passes when |
 |---|---|---|
-| **MT-0 Dry run** | At home, before ALPHA DAO's second meeting: a 10-minute mock meeting, one person in the room, one remote on WhatsApp Desktop, Italian and English mixed | Both voices in the transcript; template filled in; summary time measured; a re-run with Wi-Fi off after the call ends still produces the summary |
+| **MT-0 Dry run** | At home, before ALPHA DAO's second meeting: a 10-minute mock meeting, one person in the room, one remote on WhatsApp Desktop, Italian and English mixed | Both voices in the transcript; template filled in; summary time measured; a re-run with Wi-Fi off after the call ends still produces the summary; the template loads, the status block comes out in the fixed form (7.1), and the summary can be copied into a post |
 | **MT-1 First real meeting** | ALPHA DAO's second meeting ([run sheet](../workshop/second-meeting.md)), with a by-hand minute kept in parallel | The AI minute matches the by-hand minute on every item's status; corrections at the read-back counted and recorded |
 
 Results go in `docs/runs/` with the summary time, model, and corrections. If the CPU summary is too slow, the next test is pointing the summary step at the household AI server on the local network (if Meetily allows another Ollama address).
