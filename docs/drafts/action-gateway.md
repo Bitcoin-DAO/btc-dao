@@ -126,7 +126,26 @@ Consistent with "no card paid by a person and reimbursed" (4.2):
 4. **Confirmed.** The recipient opens `<dao>.byob.zone/confirm/<proposal id>` and types the six words. The page checks the hash in the browser and, on a match, publishes **`dao.delivered`** (proposed kind 3596), signed by a key the page creates on the spot. Like `dao.confirm`, **any key may sign it**; it is valid when the hash of its code matches the commitment. The first valid one counts. The code is never in the link, so the link can be printed or left with the item.
 5. **Paid.** A tranche with `delivery` can join a round only after a valid `dao.delivered` (or, past the window, a claimant's report: 3.4.1). The council signs the round; the receipt marks the task paid; the Agent badge counts it.
 
-`dao.delivered`, content `{"tranche": 1, "code": "<six words>"}`, tagged `["e", <proposal id>]`. **Member recipient:** `"delivery": {"member": "<identity key>"}` and no code; the `dao.delivered` is signed by that member. **Staged tasks:** one commitment per tranche (for example "bought", confirmed by a Witness; "delivered", by the recipient's code).
+**Handover scan** (*proposed*, the courier-signature mode). The recipient shows the code; the Agent's phone reads it.
+
+1. **The email to the recipient** carries the six words as text and as a QR code, with one instruction: *show this only when you have the item in your hands.* For the paper channel, the DAO prints a small card with both.
+2. **The Agent opens** `<dao>.byob.zone/deliver/<proposal id>` before setting out. The page loads and keeps the commitment, so the check works on a weak signal.
+3. **At the handover** the Agent scans the QR (or types the words, if the recipient's email blocks images). The page hashes the code at once: a green tick on a match, a red cross and nothing published on none.
+4. **Published** straight away, or when the phone is back online, signed with the **Agent's member key** and marked `"via": "scan"`, with the scan time. The record then says plainly that the Agent submitted it, and the confirmation counts on their badge.
+
+The code only has to stay secret until the handover: showing it *is* the confirmation, so the Agent's phone reading it changes nothing. Validity still rests on the hash alone, so one code serves both modes.
+
+- **QR content:** a `btcdao:delivered` URI with the proposal id, the tranche and the six words, so the scanner refuses a code meant for another task.
+- **Shown too early** ("let me check your code first"): the instruction beside the QR is the guard, as with a courier signature; a dispute goes to the claimant's report and the council's round.
+- **Shared inboxes:** anyone who can read the recipient's email can show the code, as anyone at a front desk can sign for a parcel.
+- **No location** is recorded: a position would put the recipient's address on the public record.
+
+| Mode | Published by | The record shows |
+| --- | --- | --- |
+| Recipient types the code | the recipient, with a key made on the spot | the recipient confirmed on their own device |
+| Handover scan | the Agent's member key, `"via": "scan"` | the code left the recipient at the handover |
+
+`dao.delivered`, content `{"tranche": 1, "code": "<six words>"}` (with `"via": "scan"` in scan mode), tagged `["e", <proposal id>]`. **Member recipient:** `"delivery": {"member": "<identity key>"}` and no code; the `dao.delivered` is signed by that member. **Staged tasks:** one commitment per tranche (for example "bought", confirmed by a Witness; "delivered", by the recipient's code).
 
 Limits: a recipient can still pass the code to the Agent. The proposal naming the recipient, and the thresholds for non-member tasks, contain that; they do not remove it.
 
