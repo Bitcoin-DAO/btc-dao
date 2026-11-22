@@ -1,0 +1,66 @@
+{
+  "name": "btc-dao meeting minute",
+  "description": "Draft minute for a btc-dao meeting: one section per agenda item (docs/drafts/meeting-protocol.md section 3), then the status block (section 7.1). Schema and transcript placement to be confirmed at the MT-0 dry run.",
+  "sections": [
+    {
+      "title": "0 Opening",
+      "instruction": "Use only what was said in the transcript. Never invent decisions, names, amounts or links. If nobody spoke to this item, write exactly: No business. Write in the language the meeting mostly used.",
+      "prompt": "Summarise agenda item 0 Opening in two to four sentences. Covers: Date, chair, and members present (in the room and remote) by the names they gave."
+    },
+    {
+      "title": "1 Record",
+      "instruction": "Use only what was said in the transcript. Never invent decisions, names, amounts or links. If nobody spoke to this item, write exactly: No business. Write in the language the meeting mostly used.",
+      "prompt": "Summarise agenda item 1 Record in two to four sentences. Covers: Is the DAO's site, relay and record working? Any unauthorised spends?"
+    },
+    {
+      "title": "2 Members",
+      "instruction": "Use only what was said in the transcript. Never invent decisions, names, amounts or links. If nobody spoke to this item, write exactly: No business. Write in the language the meeting mostly used.",
+      "prompt": "Summarise agenda item 2 Members in two to four sentences. Covers: Members vouched in or leaving, badges earned, who still needs help trying a part of the DAO."
+    },
+    {
+      "title": "3 Proposals and treasury",
+      "instruction": "Use only what was said in the transcript. Never invent decisions, names, amounts or links. If nobody spoke to this item, write exactly: No business. Write in the language the meeting mostly used.",
+      "prompt": "Summarise agenda item 3 Proposals and treasury in two to four sentences. Covers: Drafts read aloud, open votes, results, payout rounds signed at the table."
+    },
+    {
+      "title": "4 Council and keys",
+      "instruction": "Use only what was said in the transcript. Never invent decisions, names, amounts or links. If nobody spoke to this item, write exactly: No business. Write in the language the meeting mostly used.",
+      "prompt": "Summarise agenda item 4 Council and keys in two to four sentences. Covers: Council health, spare key, recovery sheets confirmed, council change. This is a due item: if the check was not done, the status is overdue."
+    },
+    {
+      "title": "5 Operate",
+      "instruction": "Use only what was said in the transcript. Never invent decisions, names, amounts or links. If nobody spoke to this item, write exactly: No business. Write in the language the meeting mostly used.",
+      "prompt": "Summarise agenda item 5 Operate in two to four sentences. Covers: Operators and credentials, Agent tasks, inbound mail and replies. If the chair read it in the 'Not yet' line, the status is not yet."
+    },
+    {
+      "title": "6 Trade",
+      "instruction": "Use only what was said in the transcript. Never invent decisions, names, amounts or links. If nobody spoke to this item, write exactly: No business. Write in the language the meeting mostly used.",
+      "prompt": "Summarise agenda item 6 Trade in two to four sentences. Covers: Payment requests, statement, throughput. If the chair read it in the 'Not yet' line, the status is not yet."
+    },
+    {
+      "title": "7 Mainnet",
+      "instruction": "Use only what was said in the transcript. Never invent decisions, names, amounts or links. If nobody spoke to this item, write exactly: No business. Write in the language the meeting mostly used.",
+      "prompt": "Summarise agenda item 7 Mainnet in two to four sentences. Covers: On testnet: what stands between the DAO and mainnet. On mainnet: is the treasury structure still sound."
+    },
+    {
+      "title": "8 Lineage",
+      "instruction": "Use only what was said in the transcript. Never invent decisions, names, amounts or links. If nobody spoke to this item, write exactly: No business. Write in the language the meeting mostly used.",
+      "prompt": "Summarise agenda item 8 Lineage in two to four sentences. Covers: Child DAOs, mentoring, forks proposed or completed."
+    },
+    {
+      "title": "9 Rules",
+      "instruction": "Use only what was said in the transcript. Never invent decisions, names, amounts or links. If nobody spoke to this item, write exactly: No business. Write in the language the meeting mostly used.",
+      "prompt": "Summarise agenda item 9 Rules in two to four sentences. Covers: Charter, settings, funding model, and whether the agenda itself is still right."
+    },
+    {
+      "title": "10 Close",
+      "instruction": "Use only what was said in the transcript. Never invent decisions, names, amounts or links. If nobody spoke to this item, write exactly: No business. Write in the language the meeting mostly used.",
+      "prompt": "Summarise agenda item 10 Close in two to four sentences. Covers: Next meeting date. Anything left for the next meeting."
+    },
+    {
+      "title": "Status block",
+      "instruction": "Output only the block below, as plain text, with no other words. Replace <status> with exactly one of: business, no business, not yet, overdue. Keep the numbers and keys unchanged.",
+      "prompt": "MINUTE <DAO name> <YYYY-MM-DD>\n0 opening: <status>\n1 record: <status>\n2 members: <status>\n3 proposals-treasury: <status>\n4 council-keys: <status>\n5 operate: <status>\n6 trade: <status>\n7 mainnet: <status>\n8 lineage: <status>\n9 rules: <status>\n10 close: <status>"
+    }
+  ]
+}
