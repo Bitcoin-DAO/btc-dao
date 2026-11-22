@@ -41,20 +41,65 @@ A drop-in swap with the same laptop and speakerphone: end-to-end encrypted group
 
 ---
 
-## 5. NCC: work list before it can replace WhatsApp
+## 5. What others have built (research, 22 November 2026)
 
-State as of November 2026: on hold as a separate project. Amber NIP-46 sign-in and 1:1 audio on the same network work.
+Signalling calls over Nostr is solved many times over; the hard part is getting audio through home routers and mobile networks, and everyone who does it reliably uses **TURN**.
 
-1. **Calls across networks** (WiFi to 4G): needs a TURN relay. A TURN relay is a server, so it becomes one more per-DAO piece of infrastructure beside the relay and the chain gateway, with the exit test (a known second provider) and an Operator holding its credentials.
-2. **Group calls:** peer-to-peer mesh audio holds a handful of people. A meeting of ten or more needs a mixing or forwarding server (SFU), or a cap on remote participants. Design question: what size of meeting a btc-dao DAO actually holds.
-3. **Membership check:** only the DAO's members and council (by their keys in the roster) can join a DAO call; others are filtered, as Discussion filters non-members' posts.
-4. **Meeting link:** a fixed meeting ([meeting scheduler](meeting-scheduler.md)) opens the DAO's NCC room from the app.
-5. **Tests:** a 1:1 call across networks; a meeting-sized call with the room on the speakerphone and remote members on phones; test MT-0 ([meeting protocol](meeting-protocol.md) 8.3) repeated with NCC in place of WhatsApp.
+| Project | What it does | Relevance |
+|---|---|---|
+| 0xchat | 1:1 encrypted audio/video calls, signalling over Nostr with NIP-100, media via ICE servers | Use NIP-100 rather than a new signalling format |
+| bloop | Ring over a Nostr relay, voice through a TURN relay | Almost NCC's design; TURN sees only encrypted packets |
+| Amethyst | Nostr-signalled voice calls (Android) | Reference implementation others study |
+| voistr | Experimental Nostr softphone, multi-peer rooms (Linux) | Room handshake over Nostr |
+| Corny Chat | Audio rooms built on Jam; npub roles, private and passphrase rooms; public instance cornychat.com | Ready to use now: the trial for meeting #3 |
+| Nests | Nostr for rooms, chat and presence; one MoQ audio server is the only backend; rooms can name their own audio server (kind 10112) | The model for a per-DAO audio server |
+
+Direction among Nostr developers: mesh for tiny rooms, a forwarding audio server (SFU) for real rooms; NIP-53 kind 30312 for interactive rooms.
+
+### 5.1 The three pieces of a group call
+
+| Piece | Job |
+|---|---|
+| Room and identity | Who is in the room, roles, access |
+| Audio server | Receives each person's audio and forwards it to the others: what makes a 10-person meeting work |
+| TURN | Gets a device through a blocking network (4G, strict WiFi) to the audio server or another person |
+
+### 5.2 TURN on Cloudflare
+
+Cloudflare Realtime offers managed TURN (free STUN; 1,000 GB a month free, shared with its SFU, then $0.05 per GB). Voice meetings stay far inside the free tier. It sits beside the DAO's relay and chain gateway on Cloudflare; **coturn, self-hosted, is the exit** (a known second provider), per the action gateway's exit test.
 
 ---
 
-## 6. Open questions
+## 6. Test sequence
+
+One new thing per meeting.
+
+| Meeting | Call layer | Audio server and TURN | New thing tested |
+|---|---|---|---|
+| **#2** | WhatsApp: remote members on their phones, the meeting laptop on WhatsApp Desktop | WhatsApp's | Agenda template, Meetily minute (MT-1) ([run sheet](../workshop/second-meeting.md)) |
+| **#3** | Corny Chat, protected room, council as moderators by npub | Corny Chat's (the operator's) | Group call on Nostr identity, real networks ([run sheet](../workshop/third-meeting.md)) |
+| **Future** | The DAO's own room | The DAO's own audio server (Nests-style) + Cloudflare TURN | All three pieces owned by the DAO |
+
+- **Meeting #3 is for routine business only:** on a public instance the audio passes through the operator's server.
+- **Before the future meeting, a 10-minute TURN check on its own:** one phone on 4G, one on WiFi, both reaching the DAO's audio server with TURN on. A failed meeting then points at one cause.
+
+---
+
+## 7. NCC: work list (revised)
+
+State as of November 2026: on hold as a separate project. Amber NIP-46 sign-in and 1:1 audio on the same network work.
+
+1. **Signalling:** adopt NIP-100 for 1:1 calls (interoperable with 0xchat) instead of NCC's own format.
+2. **TURN required:** Cloudflare TURN as the first adapter, coturn as the exit; an Operator holds the credentials.
+3. **Meetings through an audio server, not mesh:** a per-DAO Nests-style MoQ relay (or LiveKit), listed on Nostr. Whether Cloudflare's MoQ relays can serve this is to check.
+4. **Membership check:** only keys in the DAO's roster can join a DAO room.
+5. **Meeting link:** a fixed meeting ([meeting scheduler](meeting-scheduler.md)) opens the DAO's room from the app.
+6. **Tests:** the sequence in section 6; MT-0 ([meeting protocol](meeting-protocol.md) 8.3) repeated on each new call layer.
+
+---
+
+## 8. Open questions
 
 - Is NCC developed inside the Bitcoin-DAO organisation, or kept as a separate project that btc-dao DAOs use?
-- TURN: self-hosted per DAO, or a free-tier service as a first adapter?
+- Build NCC's meeting side, or adopt Nests (self-hosted per DAO) and keep NCC for 1:1 calls?
 - Whether the DAO's chat group (text) also moves to Nostr, or only calls.
