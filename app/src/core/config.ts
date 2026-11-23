@@ -44,6 +44,10 @@ export interface Rules {
   /** Language of the binding charter text, as a language code ("en", "it"). English if unset. */
   charterLanguage?: string;
   charterSha256: string;
+  /** Dues each member pays per period, in sats. Unset or 0: no dues. Set by a rules vote (badges proposal 1.2.1). */
+  duesSats?: number;
+  /** How often dues are paid: "monthly" or "yearly". */
+  duesPeriod?: 'monthly' | 'yearly';
   [k: string]: unknown;
 }
 
@@ -72,6 +76,9 @@ const RULE_CHECKS: Record<string, (v: unknown, valid: { timeZone: (tz: unknown) 
   charterSha256: v => typeof v === 'string' && /^[0-9a-f]{64}$/.test(v),
   maxTranches: v => isInt(v, 1, 10),
   maxScheduleDays: v => isInt(v, 1, 3650),
+  // 0 turns dues off; otherwise above the dust limit (546 sats), so every payment can be a real output.
+  duesSats: v => v === 0 || isInt(v, 547, 21e14),
+  duesPeriod: v => v === 'monthly' || v === 'yearly',
 };
 export const RULE_NAMES = Object.keys(RULE_CHECKS);
 /** Why a rule change cannot be applied, or undefined when the name is a known rule and the value is usable. */

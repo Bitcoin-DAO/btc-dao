@@ -366,7 +366,7 @@ function Payload({ p }: { p: ProposalView }) {
   }
 }
 
-export const EDITABLE_RULES = ['votingPeriodDays', 'quorum', 'payoutRound', 'lapseAfterRounds', 'maxFeeRateSatVb', 'feePolicy', 'treasuryCapSats'] as const;
+export const EDITABLE_RULES = ['votingPeriodDays', 'quorum', 'payoutRound', 'lapseAfterRounds', 'maxFeeRateSatVb', 'feePolicy', 'treasuryCapSats', 'duesSats', 'duesPeriod'] as const;
 
 /** A voting period in words: practice votes in minutes, short ones in hours, the rest in days. */
 export function periodText(days: number): string {
@@ -385,6 +385,8 @@ export function ruleValue(key: string, v: unknown): string {
     case 'maxFeeRateSatVb': return `${v} sat/vB`;
     case 'treasuryCapSats': return `${fmtSats(Number(v))} sats`;
     case 'lapseAfterRounds': return String(v);
+    case 'duesSats': return !v ? t('dues.none') : `${fmtSats(Number(v))} sats`;
+    case 'duesPeriod': return v === 'yearly' ? t('dues.yearly') : v === 'monthly' ? t('dues.monthly') : '—';
     default:
       // Lists and other values in words, never as raw JSON (review U-4).
       if (v === undefined || v === null || v === '') return '—';
@@ -403,6 +405,8 @@ export function ruleLabel(key: string) {
     case 'lapseAfterRounds': return t('np.ruleLapse');
     case 'payoutRound': return t('setup.payouts');
     case 'feePolicy': return t('fee.label');
+    case 'duesSats': return t('dues.amount');
+    case 'duesPeriod': return t('dues.period');
     default: return key;
   }
 }

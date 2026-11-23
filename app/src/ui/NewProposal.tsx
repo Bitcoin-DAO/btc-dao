@@ -151,6 +151,12 @@ export function NewProposal({ draftId }: { draftId?: string } = {}) {
     if (rule === 'payoutRound') return value === 'weekly' || value === 'monthly' ? value : undefined;
     if (rule === 'feePolicy') return value === 'fast' || value === 'economical' ? value : undefined;
     if (rule === 'quorum') return /^\d+\/\d+$/.test(value.trim()) ? value.trim() : undefined;
+    if (rule === 'duesPeriod') return value === 'monthly' || value === 'yearly' ? value : undefined;
+    if (rule === 'duesSats') {
+      // Whole sats; 0 turns dues off, any other amount must be above the dust limit.
+      const d = Number(value);
+      return value.trim() && Number.isInteger(d) && (d === 0 || d > DUST) ? d : undefined;
+    }
     const n = Number(value);
     return value.trim() && Number.isFinite(n) && n > 0 ? n : undefined;
   })();
@@ -388,8 +394,19 @@ export function NewProposal({ draftId }: { draftId?: string } = {}) {
                   <option value="weekly">{t('setup.weekly')}</option>
                 </select>
               </label>
+            ) : rule === 'duesPeriod' ? (
+              <label class="field">
+                {t('np.newValue')}
+                <select value={value} onChange={e => setValue((e.target as HTMLSelectElement).value)} style="min-height:48px;border:1px solid var(--field);border-radius:8px;padding:0 12px;font:inherit;font-size:16px;background:#fff">
+                  <option value="">—</option>
+                  <option value="monthly">{t('dues.monthly')}</option>
+                  <option value="yearly">{t('dues.yearly')}</option>
+                </select>
+              </label>
             ) : (
-              <label class="field">{t('np.newValue')}<input type="text" value={value} onInput={e => setValue((e.target as HTMLInputElement).value)} /></label>
+              <label class="field">{t('np.newValue')}<input type="text" inputMode={rule === 'duesSats' ? 'numeric' : undefined} value={value} onInput={e => setValue((e.target as HTMLInputElement).value)} />
+                {rule === 'duesSats' && <span class="small">{t('dues.hint', { dust: DUST })}</span>}
+              </label>
             )}
           </div>
         )}
