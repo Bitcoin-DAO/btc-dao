@@ -193,6 +193,22 @@ Decided 23 November 2026: Discussion stays the DAO's record, not its chat. Image
 - [ ] "New since your last visit": unread markers on the thread list and on posts within a thread, kept on the member's own device only (no server, nothing published)
 - [ ] Notifications: see E, stage 3 (member notifications by email to verified addresses); not duplicated here
 - [ ] Ideas held for later, not planned: tap-to-show images (no automatic loading, which would reveal members' IP addresses to the image host); attachments on a Blossom server with the file's SHA-256 in the post, so the record proves which file was discussed; reply-to and quoting.
+
+## N. Market DAO on OpenBazaar (idea; watch, don't build)
+
+Noted 23 November 2026. OpenBazaar is being rebuilt in Rust (github.com/OpenBazaar/openbazaar-rs, MIT): person-to-person trade for ordinary goods; a buyer's phone app; the vendor runs the desktop app or an always-on home node, reachable over Tor. Status: Phase 0, alpha builds on testnet4 (v0.1.0-alpha.12), not signed. Idea: a DAO-owned store, where the DAO sells what its members make and the money goes to the treasury.
+
+- [ ] Shape: the store's sales go to an address the DAO's treasury controls; makers are paid through ordinary payout rounds (a proposal, a vote and the council's signatures)
+- [ ] Operator role (E, stage 1) runs the store's home node, as part of the DAO's always-on infrastructure
+- [ ] Council as moderator: OpenBazaar 2 used 2-of-3 escrow (buyer, seller, moderator). Ask whether the Rust version will have escrow and moderators, and whether a DAO council can hold the moderator key
+- [ ] Possible first goods: Made in Bosa glass editions, Anonymous Art pieces, BUONO vouchers
+
+**Check before any build:**
+- Can a store's sales be paid to an address the vendor chooses (a multisig treasury address), rather than the node's own wallet?
+- Can a store accept only bitcoin? (The node mentions BTC, ZEC and XMR prices.)
+- Escrow and dispute resolution: present, planned, or absent?
+
+**Revisit when:** OpenBazaar has a release with escrow, real stores on testnet4, and signed builds. Until then this takes no slot.
       
 ## Open items
 
