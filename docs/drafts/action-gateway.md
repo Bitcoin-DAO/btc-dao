@@ -1,6 +1,6 @@
 # Draft: the action gateway (modules, Operators and Agents)
 
-17 November 2026 · **design discussion, not yet built.** Nothing here changes `protocol.md` until a later draft names the events and rules. Development and testing on UNO DAO (testnet4); ALPHA DAO stays on the current build for its workshop.
+17 November 2026 · **design discussion, not yet built.** Nothing here changes `protocol.md` until a later draft names the events and rules. Development and testing on ALPHA DAO (testnet4) once it is founded; its founding workshop runs on the current build. Agent tasks and the fiat bridge (3.4) come first, before mainnet (`NEXT-RELEASE.md` L).
 
 Not to be confused with the **chain gateway** ([`chain-gateway.md`](../chain-gateway.md), the `gateway/` Worker), which reads public chain services and holds no secrets.
 

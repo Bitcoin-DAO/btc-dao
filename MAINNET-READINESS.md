@@ -71,13 +71,13 @@
 - [ ] A confirmation removed by a reorg does not produce a receipt; the round waits again (seen on testnet4, 6 Nov 2026: round 2026-11 was mined, then its block dropped). v0.2.0: 3 confirmations; v0.4.0: the depth is taken per source from its own tip, the shallowest counts, and sources must agree on the block, after SEEDSIGNER DAO's payout got a receipt from mixed sources (10 Nov 2026). To prove on a real reorg
 - [x] Closing: the whole balance returns to the BTC DAO Testnet Treasury: UNO-0005, two-thirds vote, round 2026-W45, 4,541 sats back, block 159889 (UNO practice, v0.1.10, 8 Nov 2026). Reached a miner only after a manual push to Blockbook (finding 27)
 
-## 6. Hardware signing and recovery (UNO testnet)
+## 6. Hardware signing and recovery (testnet4 DAOs)
 
 - [x] SeedSigner signs a round: animated QR out, signed PSBT scanned back, signatures merged and checked (SEEDSIGNER DAO, v0.4.0, 10 Nov 2026: payout block 160349, closing block 160355; firmware 0.8.6, `docs/seedsigner.md`)
 - [x] Descriptor loaded on the SeedSigner, change shown as verified (S7, hard gate): "Your change" verified, cards A and B (9 and 10 Nov 2026)
 - [x] Every address shown in full and compared on the device (S1): the round page shows each address in full, grouped as on the device; checked by eye on both rounds
 - [x] Council founded on SeedSigner keys, scanned at sign-up; no key on any phone (SEEDSIGNER DAO, 10 Nov 2026)
-- [ ] UNO restores and spends its treasury in Sparrow without the website
+- [ ] ALPHA DAO restores and spends its treasury in Sparrow without the website
 
 ## 7. Infrastructure and security
 
@@ -93,6 +93,7 @@
 ## 8. Mainnet launch conditions
 
 - [ ] Sections 1 to 7 ticked
+- [ ] Section 10's before-mainnet items ticked
 - [ ] Treasury cap set in the charter at an amount the members can afford to lose (S9)
 - [ ] The mainnet descriptor meets the floor, and the council's treasury keys are made for this DAO only (S10)
 - [ ] Watcher passed in the wild: a spend made outside the app on a testnet4 DAO (ALPHA DAO) shown as unmatched on every member's Home page within minutes
@@ -126,6 +127,22 @@ Added 21 November 2026. GitHub has no general messaging layer: awareness comes f
 - [ ] Stacker News: an introduction post after the founding
 - [ ] Delving Bitcoin: specific protocol questions (the PSBT flow, the descriptor chain), once there are some to ask
 - [ ] Individual developers only with a specific question about their own project (an issue on their repo, or their listed contact), never as an advert
+
+## 10. Fiat in and fiat out
+
+**Why:** the first thing a real group asks is how euros get in (dues, donations) and how a fiat-only supplier gets paid. The DAO never touches fiat in either direction: members get their own sats, and Agents handle the fiat side of a purchase as their own business ([action gateway](docs/drafts/action-gateway.md) section 3.4; [how members get sats](docs/getting-sats.md)).
+
+Before mainnet:
+
+- [x] Members' guide to getting sats, with the rule that the DAO does not sell bitcoin ([`docs/getting-sats.md`](docs/getting-sats.md), 23 Nov 2026)
+- [ ] The guide walked through at an ALPHA DAO meeting: each member names the route they would use for dues (Italian version ready first)
+- [ ] Agent task rehearsal, step 1, on the current build (ALPHA DAO): one task as a bounty, member recipient, paid on completion in tBTC, delivery reported and confirmed. The outcome needs no real fiat, or is a token purchase the Agent agrees to absorb (`NEXT-RELEASE.md` L)
+- [ ] Agent task rehearsal, step 2, once claim codes are built (ALPHA DAO): one task to a non-member recipient, confirmed by the code in handover-scan mode; council members refused as claimants
+- [ ] Both Agent routes written up from a real use by the Agent (Bitrefill Card, wavecard), in the Agent's own words: what it cost and how long it took
+
+After launch, on the capped mainnet treasury:
+
+- [ ] The first mainnet DAO completes one Agent task with a fiat-only counterparty, within its first three rounds: its first real-world payment
 
 ## Findings from UNO's practice run
 

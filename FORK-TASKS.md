@@ -11,7 +11,7 @@
 - **The rule:** a btc-dao DAO is one that speaks the protocol in `docs/protocol.md` (event kinds 3570–3586 with its `D` tag) over a Bitcoin multisig treasury. Everything else a fork may change.
 - **The request:** to be decided by the owner (for example a link back to btc-dao). Not yet stated.
 - **The model:** fork and run separately. One DAO per codebase; each DAO owns its hosting, relays and keys. The dashboard only reads.
-- **The release condition:** UNO restores and spends its testnet4 treasury without the website, the first mainnet DAO completes three monthly rounds without developer help, and a second group deploys from the kit and runs one testnet4 round.
+- **The release condition:** ALPHA DAO restores and spends its testnet4 treasury without the website, the first mainnet DAO completes three monthly rounds without developer help, and a second group deploys from the kit and runs one testnet4 round.
 
 **What blocks forking today**
 
@@ -26,7 +26,7 @@
 ## Checklist
 
 ### 1. Work-in-progress notice
-- [ ] One line at the top of `README.md`: not yet licensed for reuse; a forkable release is planned after field testing (UNO and the first mainnet DAO). The licence section at the end says so, but readers stop before it.
+- [ ] One line at the top of `README.md`: not yet licensed for reuse; a forkable release is planned after field testing (ALPHA DAO and the first mainnet DAO). The licence section at the end says so, but readers stop before it.
 
 ### 2. One instance folder per DAO
 - [x] `config/` holds the DAO's settings (`dao.json`) and charter (`charter.<lang>.md`); the build reads the charter language from the settings.
@@ -87,7 +87,7 @@
 ### 9. Field test
 - [ ] v0.1.1 passes a full run in the Sandbox DAO (it is running v0.1.1 first, before any practice stage has proved it).
 - [ ] Decide whether uno-practice and uno-testnet move to v0.1.1 before UNO's practice.
-- [ ] UNO restores and spends its testnet4 treasury in Sparrow without the website.
+- [ ] ALPHA DAO restores and spends its testnet4 treasury in Sparrow without the website.
 - [ ] The first mainnet DAO completes three monthly rounds without developer help.
 
 ### 10. Release (last)
@@ -106,5 +106,5 @@
 | 4 | Config validation, relay deploy guard | No |
 | 5 | Fork guide, remote-founding module, group templates | No |
 | 6 | CI: end-to-end runs and the instance-values check | No |
-| 7 | Field test: Sandbox DAO, then UNO, then the first mainnet DAO | It is the DAOs |
+| 7 | Field test: UNO, SEEDSIGNER DAO and COUNCIL DAO (done), then ALPHA DAO, then the first mainnet DAO | It is the DAOs |
 | 8 | Licences, acknowledgement, v1.0 | No |

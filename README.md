@@ -11,7 +11,7 @@ A SputnikDAO-style DAO on Bitcoin alone: members propose and vote, a council of 
 
 ## Status
 
-**Testnet4 prototype, stages 1–3 built.** The app (`app/`) covers founding, passkey sign-in, identity cards, the treasury page, proposals and votes, new members, leaving, key replacement, and payout rounds signed by the council and broadcast on testnet4. Next: the phase 1 gate, a real testnet4 payout run by five testers. The DAO relay runs on Cloudflare. The first instance is **UNO**, the trial DAO that runs the practice and testnet stages; the mainnet DAO that follows is named by its council.
+**Testnet4 prototype, stages 1–3 built.** The app (`app/`) covers founding, passkey sign-in, identity cards, the treasury page, proposals and votes, new members, leaving, key replacement, and payout rounds signed by the council and broadcast on testnet4. Next: the phase 1 gate, a real testnet4 payout run by five testers. The DAO relay runs on Cloudflare. The first trial DAOs were **UNO**, SEEDSIGNER DAO and COUNCIL DAO; **ALPHA DAO**, the first founded with people other than the developer, is next. The mainnet DAO that follows is named by its council.
 
 Every DAO goes through three stages, each a separate DAO with its own tested build: a **practice** run on testnet4 with ten-minute votes, the **testnet** DAO with the real rules, and the **mainnet** DAO. The first two run on coins from the BTC DAO Testnet Treasury, end by closing the DAO and returning them, and are thrown away. See [`docs/guide.md`](docs/guide.md#8-the-three-stages-practice-testnet-mainnet).
 

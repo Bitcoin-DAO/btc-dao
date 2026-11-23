@@ -96,7 +96,7 @@ Design: `docs/protocol.md` 6.5 and 6.6, `docs/dashboard-spec.md` sections 2 and 
 
 ## E. Action gateway (design; after the mainnet path)
 
-Design in `docs/drafts/action-gateway.md`, decided 17 November 2026. Built and tried on UNO DAO (testnet4), not ALPHA DAO.
+Design in `docs/drafts/action-gateway.md`, decided 17 November 2026. Built and tried on ALPHA DAO (testnet4) after its founding workshop, which runs on the current build. Agent tasks and the fiat bridge are in L, ahead of the rest of this section.
 
 - [x] Stage 0: design written down (roles, modules, admission tests, credentials, handover ceremony, domain as anchor asset)
 - [ ] Stage 1: Operator role: badge, founding minimum 2 council + 1 Operator, the 1 → 3 (2-of-3) vote, dashboard display
@@ -169,6 +169,20 @@ Design in `docs/drafts/recovery-sheet.md`, agreed and reviewed 20 November 2026.
 - [ ] Notice, compare-aloud-and-confirm; confirmation kept on the member's phone, shown on their own Council page
 - [ ] Gates: signing needs the member's own confirmation; preparing a migration needs the required box "new council read the sheet aloud" ticked
 - [ ] Spec, guide and MAINNET-READINESS edits listed in the draft, section 9
+
+## L. Agent tasks and the fiat bridge (before mainnet, on ALPHA DAO)
+
+Design in `docs/drafts/action-gateway.md` section 3.4 (PR #19, #30). Brought forward from E on 23 November 2026: paying fiat-only suppliers is what holds adoption back, so it is rehearsed before mainnet, not after. Readiness items in `MAINNET-READINESS.md` section 10.
+
+- [x] Members' guide: [how members get sats](docs/getting-sats.md) (fiat in; the DAO does not sell bitcoin)
+- [ ] Italian version of the guide
+- [ ] Step 1 rehearsal on the current build: an Agent task run as a bounty (4.6), member recipient, paid on completion, delivery report confirmed
+- [ ] Claim codes: the six-word code made on the recipient's side, its commitment in the proposal, `dao.delivered` (app and handover-scan modes)
+- [ ] Agent role in the app: Agent badge and region on the profile; council members refused as claimants (separation of duties)
+- [ ] Payout outputs that pay a merchant directly beside the Agent's fee
+- [ ] The Agent's choice of staged or on completion, fixed in the schedule before the vote
+- [ ] Step 2 rehearsal: a non-member recipient, confirmed by handover scan
+- [ ] Reference rules for the trust ladder (counts for non-member recipients and staged payment) as rule settings with defaults
 
 ## Open items
 

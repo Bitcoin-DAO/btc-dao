@@ -43,6 +43,7 @@ The kit will become the "public beta: help and onboarding" docs site, in English
 
 - [SeedSigner formats](seedsigner.md): what the app reads from and shows to a SeedSigner.
 - [Your first bitcoin wallet in 5 minutes](wallet-guide.en.md) ([Italiano](wallet-guide.it.md)): for members who need an address to receive a payment.
+- [How members get sats](getting-sats.md): for members who want to pay dues, lend or donate and have only fiat today. The DAO does not sell bitcoin; this lists the routes members use themselves.
 
 ## 6. Growing
 
@@ -54,4 +55,5 @@ The kit will become the "public beta: help and onboarding" docs site, in English
 ## Gaps
 
 - **Step-by-step council and member onboarding,** with screenshots. Waits until after the ALPHA DAO workshop and any changes it brings, so the screenshots match the app (`NEXT-RELEASE.md`, open item "Onboarding process for the council").
+- **Italian version** of [How members get sats](getting-sats.md).
 - **Italian versions** of the checklist, the guide, the charter template and modules, and the workshop pages.
