@@ -78,7 +78,14 @@ The DAO works like a community **notice board**: jobs and needs are listed; a tr
 
 ### 3.4 Fiat, Agent tasks and claim codes (22 November 2026)
 
-**Decided:** the DAO never pays in fiat. It pays in bitcoin: directly to a counterparty who accepts it, or for a fiat-denominated voucher (a gift card bought for bitcoin, paid from the treasury like any merchant). When a counterparty takes only fiat, the DAO commissions an **Agent** at a price in sats, and the Agent delivers the outcome. How the Agent gets from sats to fiat is their own business: the first route considered is a **Bitrefill Card owned by the Agent personally** (a prepaid Visa topped up from bitcoin, KYC'd to the Agent). It is never DAO infrastructure.
+**Decided:** the DAO never pays in fiat. It pays in bitcoin: directly to a counterparty who accepts it, or for a fiat-denominated voucher (a gift card bought for bitcoin, paid from the treasury like any merchant). When a counterparty takes only fiat, the DAO commissions an **Agent** at a price in sats, and the Agent delivers the outcome. How the Agent gets from sats to fiat is their own business: routes considered so far, each owned by the Agent personally and KYC'd to them, never DAO infrastructure:
+
+| Route | How it works | Fit |
+| --- | --- | --- |
+| **Bitrefill Card** | prepaid Visa; the Agent tops up a EUR balance from bitcoin | a custodial EUR balance held between top-up and spend |
+| **wave.space wavecard** (Wave Space Exploration UAB, Lithuania) | Visa debit that spends from the Agent's own Lightning wallet through Nostr Wallet Connect, converting at the till; BTC can also be sold to EUR by bank transfer | no prepaid EUR balance; bitcoin-only service; with the Lightning Purse, the DAO can pay an Agent over Lightning straight into the wallet the card spends from. EEA residents or citizens only; 1% conversion fee plus a 0.5% spread, also on card spending; Tier 1 card limit €10,000 a month |
+
+Two routes for one function, in line with design by function: if a provider closes or changes its terms, Agents switch and the DAO changes nothing (the Fiat bridge badge is named for the function, 3.4.3).
 
 Consistent with "no card paid by a person and reimbursed" (4.2):
 
@@ -436,6 +443,7 @@ An **"Enable email"** proposal, guided in the app: addresses, retention period, 
 - [ ] Fallback when a non-member never confirms: the council's round (as now) or a members' step
 - [ ] Fiat bridge thresholds (count for non-member recipients, staged payment) as reference rules
 - [ ] Bitrefill checks: guest purchase with email only and on-chain payment (for vouchers bought by the treasury); its terms on passing codes to others; Bitrefill Card terms for an Agent buying on someone else's behalf
+- [ ] wave.space checks: whether EUR proceeds can go to a third party's IBAN (an Agent paying an invoice directly, the `payment` outcome) or only to the Agent's own account; card behaviour when the Lightning wallet is offline, and which NWC wallets are supported; its terms on buying on someone else's behalf
 - [ ] Operators in the protocol: settings fields, the Operator badge, the 1 → 3 change and its flag
 - [ ] Cloudflare details to confirm against its API docs: tokens that create tokens, token expiry, account-owned tokens
 - [ ] HostSailor checks (6); whether byob.zone moves
