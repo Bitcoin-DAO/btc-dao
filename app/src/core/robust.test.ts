@@ -101,11 +101,22 @@ describe('rule changes carry usable values (R-H2)', () => {
     expect(ruleValueError('lapseAfterRounds', 1.5, v)).toBeTruthy();
     expect(ruleValueError('maxFeeRateSatVb', -1, v)).toBeTruthy();
     expect(ruleValueError('charterSha256', 'xyz', v)).toBeTruthy();
+    expect(ruleValueError('duesSats', 500, v)).toBeTruthy();
+    expect(ruleValueError('duesSats', 546, v)).toBeTruthy();
+    expect(ruleValueError('duesSats', 10_000.5, v)).toBeTruthy();
+    expect(ruleValueError('duesSats', '10000', v)).toBeTruthy();
+    expect(ruleValueError('duesSats', -1, v)).toBeTruthy();
+    expect(ruleValueError('duesPeriod', 'weekly', v)).toBeTruthy();
   });
   it('accepts the values in use', () => {
-    for (const [k, x] of Object.entries({ ...site.rules, feePolicy: 'economical', fundingModel: 'mutual', charterLanguage: 'it', maxTranches: 4, maxScheduleDays: 90, payoutRound: 'weekly', votingPeriodDays: 0.006944 })) {
+    for (const [k, x] of Object.entries({ ...site.rules, feePolicy: 'economical', fundingModel: 'mutual', charterLanguage: 'it', maxTranches: 4, maxScheduleDays: 90, payoutRound: 'weekly', votingPeriodDays: 0.006944, duesSats: 10_000, duesPeriod: 'monthly' })) {
       expect(ruleValueError(k, x, v)).toBeUndefined();
     }
+  });
+  it('dues can be turned off with 0, and both periods are accepted', () => {
+    expect(ruleValueError('duesSats', 0, v)).toBeUndefined();
+    expect(ruleValueError('duesSats', 547, v)).toBeUndefined();
+    expect(ruleValueError('duesPeriod', 'yearly', v)).toBeUndefined();
   });
   it('a proposal setting a bad time zone is rejected, and the DAO keeps working', () => {
     const d = dao();

@@ -330,6 +330,23 @@ describe('settings (3.4)', () => {
     expect(view(s, p).closeAt).toBe(d.T + 7 * DAY); // earlier proposals keep their rules
   });
 
+  it('dues: a DAO with no dues sets them by one rules change (amount and period from unset)', () => {
+    const d = dao();
+    const p = d.propose(d.c[0], { type: 'change_rules', payload: { changes: [
+      { path: 'rules.duesSats', from: null, to: 10_000 },
+      { path: 'rules.duesPeriod', from: null, to: 'monthly' },
+    ] } }, d.T);
+    expect(d.state(d.T + 1).proposals.length).toBe(1);
+    for (const i of [0, 1, 2]) d.vote(d.f[i], p, 'yes', d.T + 1);
+    d.tally(d.c[0], d.state(d.T + 8 * DAY), p, d.T + 8 * DAY);
+    const e = d.ev(KIND.settings, nextSettings(d.state(d.T + 8 * DAY + 1))!, d.c[0], d.T + 8 * DAY + 2);
+    for (const i of [0, 1, 2]) d.endorse(d.c[i], e, 'settings', d.T + 8 * DAY + 3);
+    const s = d.state(d.T + 9 * DAY);
+    expect(s.settings.length).toBe(2);
+    expect(s.rules?.duesSats).toBe(10_000);
+    expect(s.rules?.duesPeriod).toBe('monthly');
+  });
+
   it('refuses settings that change more than the basis says', () => {
     const d = dao();
     const p = d.propose(d.c[0], { type: 'change_rules', payload: { changes: [{ path: 'rules.votingPeriodDays', from: 7, to: 3 }] } }, d.T);

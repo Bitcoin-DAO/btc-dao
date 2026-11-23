@@ -2,6 +2,10 @@
 
 Each release is a git tag (`v0.1.1`). A DAO's copy runs one tagged release and records it in its README; a release moves to a DAO's next stage only after passing the one before ([guide, section 8](docs/guide.md#8-the-three-stages-practice-testnet-mainnet)).
 
+## v0.9.8 · 23 November 2026
+
+- **Membership dues as rules.** Two new rules, set by an ordinary rule-change vote: **Membership dues** (`duesSats`, whole sats above the dust limit; 0 turns dues off) and **Dues period** (`duesPeriod`, monthly or yearly). Every member pays the same amount. A DAO founded without dues sets both in one proposal. Until this release a proposal naming these rules was invalid on every phone. The Paid-up badge and the Pay dues prompt that use them come in a later release; dues paid once the rules are in force will count when the badge arrives, since badges are worked out from the record.
+
 ## v0.9.7 · 16 November 2026
 
 - **Home: badges for information only.** The badge card below the donation card shows the four badges and the next step, worked out afresh every time Home opens, and stays until all four are earned. No buttons on it: the **OK** and **Not now** links are gone. **Share in the group** moves to the badges card on the Profile.
