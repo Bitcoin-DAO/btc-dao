@@ -124,6 +124,41 @@ export interface SiteConfig extends DaoConfig {
    * video calls in which the short code is read. A site setting, not part of the record: never copied into the genesis.
    */
   group?: { name: string; url: string };
+  /**
+   * The organiser's identity key (64 hex): before the DAO id is pinned, only a founding published by this key is
+   * accepted for this site, so nobody else can found a DAO at the DAO's address first. A site setting, never copied
+   * into the genesis. Unset or a placeholder: any founding for this site is accepted, as before.
+   */
+  organiser?: string;
+  /** Founding by invitation: the not-founded page shows no sign-up or setup buttons; invited founders use the link the organiser sends. */
+  foundingByInvitation?: boolean;
+  /** The DAO's own repository (https://github.com/owner/repo), for the council's "Pin the DAO id" link. */
+  repo?: string;
+}
+
+/** The organiser key in force, if the site file names a real one (64 hex). */
+export function organiserOf(site: Pick<SiteConfig, 'organiser'>): string | undefined {
+  const o = site.organiser;
+  return typeof o === 'string' && /^[0-9a-f]{64}$/.test(o) ? o : undefined;
+}
+
+/**
+ * Whether a founding (genesis event signer) may be considered for this site: before the DAO id is pinned and
+ * with an organiser named, only the organiser's. Once pinned, the DAO id decides.
+ */
+export function foundingAllowed(site: Pick<SiteConfig, 'organiser' | 'daoId'>, signer: string): boolean {
+  if (site.daoId) return true;
+  const o = organiserOf(site);
+  return !o || signer === o;
+}
+
+/** The council's to-do: the founded DAO's id is not yet pinned in the site file (or a different one is). */
+export const needsPin = (site: Pick<SiteConfig, 'daoId'>, foundedId: string | undefined) => !!foundedId && site.daoId !== foundedId;
+
+/** Where the council edits the site file to pin the DAO id, when the repository is known. */
+export function pinEditUrl(site: Pick<SiteConfig, 'repo'>): string | undefined {
+  const m = typeof site.repo === 'string' ? /^https:\/\/github\.com\/([\w.-]+)\/([\w.-]+?)\/?$/.exec(site.repo) : null;
+  return m ? `https://github.com/${m[1]}/${m[2]}/edit/main/config/dao.json` : undefined;
 }
 
 /** Values in square brackets in the example config are placeholders. */
@@ -148,7 +183,7 @@ export function buildGenesis(site: SiteConfig, fill: {
   /** The vote length chosen at founding, if not the site file's. */
   votingPeriodDays?: number;
 }): DaoConfig {
-  const { daoId: _ignored, group: _group, ...base } = site;
+  const { daoId: _ignored, group: _group, organiser: _organiser, foundingByInvitation: _invite, repo: _repo, ...base } = site;
   return {
     ...base,
     name: fill.name,

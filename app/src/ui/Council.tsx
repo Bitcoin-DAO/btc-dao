@@ -12,7 +12,8 @@ import { formatShortCode, shortCode } from '../core/shortcode';
 import { startCouncilChange } from './NewProposal';
 import { nextRoster, nextSettings, type SettingsContent, type Candidate, type DaoState, type Output, type RekeyView, type Verified } from '../core/state';
 import { hashJson, parseJson } from '../core/util';
-import { CouncilOnly, Footer, Header, ScanModal, ShortCode, errText } from './parts';
+import { CopyButton, CouncilOnly, Footer, Header, ScanModal, ShareButton, ShortCode, errText } from './parts';
+import { needsPin, pinEditUrl, type SiteConfig } from '../core/config';
 import { useNameOf } from './Proposals';
 
 /**
@@ -44,8 +45,9 @@ const roundOnChain = (s: DaoState) => {
 };
 
 /** How many things wait for this council member. */
-export function councilTodo(s: DaoState, myPerson: string): number {
+export function councilTodo(s: DaoState, myPerson: string, site?: SiteConfig): number {
   let n = 0;
+  if (site && needsPin(site, s.founded?.daoId)) n++;
   const open = <T,>(cands: Candidate<T>[], pending: string[]) => {
     const valid = cands.filter(c => !c.error && c.effectiveAt === undefined);
     if (valid.some(c => !c.endorsers.includes(myPerson))) return 1;
@@ -60,6 +62,29 @@ export function councilTodo(s: DaoState, myPerson: string): number {
   const mine = s.settings[s.settings.length - 1].content.council.find(c => s.personOf(c.identityKey) === myPerson);
   n += openSweeps(s).filter(r => !r.ready && !r.signatures.has(myPerson) && !!mine && walletOf(r.content.sweep!).includes(mine.xpub)).length;
   return n;
+}
+
+/**
+ * Founded but not pinned: the DAO id goes into the site file (config/dao.json, daoId), so the site reads this DAO
+ * alone, and into the relay's list. Gone once the deployed site carries the same id.
+ */
+function PinTask() {
+  const app = useApp();
+  const site = app.site!;
+  const id = app.dao?.founded?.daoId;
+  if (!id || !needsPin(site, id)) return null;
+  const edit = pinEditUrl(site);
+  return (
+    <section class="card">
+      <h3>{t('pin.title')}</h3>
+      <p class="small">{t(site.daoId ? 'pin.wrong' : 'pin.text')}</p>
+      <p class="mono" style="font-size:12px;word-break:break-all">{id}</p>
+      <CopyButton text={id} label={t('pin.copy')} />
+      <ShareButton text={t('pin.share', { dao: site.name, id })} />
+      {edit && <a class="btn link" href={edit} target="_blank" rel="noopener noreferrer">{t('pin.edit')}</a>}
+      <p class="small">{t('pin.after')}</p>
+    </section>
+  );
 }
 
 export function Council() {
@@ -154,6 +179,7 @@ export function Council() {
         {app.identity?.treasury && !app.identity.wordsChecked && app.site!.network !== 'mainnet' && (
           <p class="warnbox">{t('words.needed')} <a href="#/profile">{t('words.toProfile')}</a></p>
         )}
+        <PinTask />
         <LostKeys />
         {s.rosterDisputed && <p class="warnbox">{t('cn.disputed')}</p>}
 
@@ -208,7 +234,7 @@ export function Council() {
           </section>
         )}
 
-        {councilTodo(s, me) === 0 && awaiting === 0 && <p class="small">{t('cn.nothing')}</p>}
+        {councilTodo(s, me, app.site) === 0 && awaiting === 0 && <p class="small">{t('cn.nothing')}</p>}
 
         <section class="card">
           <h3>{t('cn.verify')}</h3>

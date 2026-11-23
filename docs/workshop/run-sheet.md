@@ -53,11 +53,11 @@ Each council member, with the steps on page 1 of the cards (A: the ready-made ke
 ## 7. First steps (10 min)
 
 - Everyone adds their test wallet address (Mycelium Testnet) on the home page's **Add your bitcoin address** card: the DAO's first badge.
-- The organiser sends the DAO id from the setup page to whoever pins the relay (checklist, section F).
+- **Pin the DAO id** (last step of the day): a council member opens the Council page, taps the **Pin the DAO id** task, and commits the id to `config/dao.json` from the GitHub link; the same id goes to whoever pins the relay, with the ids of the other DAOs still on it ([guide 4.1](../guide.md#41-pinning-the-dao-id)). Once the site rebuilds, the task disappears; no phone should show **Wrong DAO id**.
 - A first proposal, or a vote, if there is time: **Share in the group** sends it round.
 
 ## After
 
-- [ ] The DAO id into `config/dao.json`, and the relay pinned (checklist F).
+- [ ] The DAO id pinned in `config/dao.json` on the day, and the relay pinned with every DAO still on it (checklist F).
 - [ ] Unused cards shredded; the cards' PDF deleted.
 - [ ] A news post on byob.zone, with photos.

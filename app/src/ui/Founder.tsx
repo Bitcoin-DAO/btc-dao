@@ -10,7 +10,8 @@ import type { GenesisCandidate } from '../core/state';
 import { shortCode, formatShortCode } from '../core/shortcode';
 import { createPasskey, passkeysAvailable } from '../lib/passkey';
 import { store, type PendingFounder } from '../lib/store';
-import { GroupText, Header, ProtectKey, PrintCard, ShareButton, WordsCheck, Qr, ShortCode, Steps, errText, go, askConfirm } from './parts';
+import { organiserOf } from '../core/config';
+import { CopyButton, GroupText, Header, ProtectKey, PrintCard, ShareButton, WordsCheck, Qr, ShortCode, Steps, errText, go, askConfirm } from './parts';
 import { Candidate } from './Candidate';
 
 export function Founder() {
@@ -74,7 +75,17 @@ export function Founder() {
         {!pending.prfSupported && <p class="warnbox">{t('fs.noPrf')}</p>}
         <button type="button" class="btn primary" onClick={() => setCodeDone(true)}>{t('fs.done')}</button>
         <button type="button" class="btn link" onClick={() => void restartSignup(site.site)}>{t('fs.restart')}</button>
-        {pending.council && <button type="button" class="btn secondary" onClick={() => go('/setup')}>{t('fs.goSetup')}</button>}
+        {pending.council && (!organiserOf(site) || organiserOf(site) === pending.pubkey) && (
+          <button type="button" class="btn secondary" onClick={() => go('/setup')}>{t('fs.goSetup')}</button>
+        )}
+        {pending.council && !organiserOf(site) && (
+          // The organiser names their identity key in the site file before the founding (organiser), so only their founding counts.
+          <div class="card">
+            <p class="small">{t('fs.organiserKey')}</p>
+            <p class="mono" style="font-size:12px;word-break:break-all">{pending.pubkey}</p>
+            <CopyButton text={pending.pubkey} label={t('fs.copyKey')} />
+          </div>
+        )}
       </main>
     </>
   );
@@ -90,26 +101,6 @@ async function restartSignup(site: string) {
 
 /** Opens the phone's share sheet with one message: who, the short code and the full code. Copies it where sharing is not available. */
 
-function CopyButton({ text, label }: { text: string; label: string }) {
-  const [ok, setOk] = useState(false);
-  return (
-    <button
-      type="button"
-      class="btn secondary"
-      onClick={async () => {
-        try {
-          await navigator.clipboard.writeText(text);
-          setOk(true);
-          setTimeout(() => setOk(false), 2000);
-        } catch {
-          /* ignore */
-        }
-      }}
-    >
-      {ok ? t('home.copied') : label}
-    </button>
-  );
-}
 
 function SignUp() {
   const app = useApp();

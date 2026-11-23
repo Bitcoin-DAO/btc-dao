@@ -95,6 +95,7 @@ export function Header(props: { sub?: string; tabs?: ComponentChildren }) {
       {app.clockOffset !== undefined && Math.abs(app.clockOffset) >= CLOCK_WARN_MS && (
         <div class="banner">{t(app.clockOffset > 0 ? 'banner.clockSlow' : 'banner.clockFast', { min: Math.round(Math.abs(app.clockOffset) / 60_000) })}</div>
       )}
+      {app.pinMismatch && <div class="closedbar"><strong>{t('pin.mismatchTitle')}</strong> {t('pin.mismatchText')}</div>}
       {app.dao?.closed && (
         <div class="closedbar"><strong>{t('closed.title', { dao: site!.name })}</strong> {t('closed.text')}</div>
       )}
@@ -420,4 +421,26 @@ export const pageLink = (path: string) => `${getState().site!.site.replace(/\/$/
 export function ShareToGroup({ text }: { text: string }) {
   const group = useApp().site?.group;
   return <ShareButton text={text} label={group ? t('share.toGroup', { group: group.name }) : t('share.plain')} />;
+}
+
+/** Copies a text, and says so for two seconds. */
+export function CopyButton({ text, label }: { text: string; label: string }) {
+  const [ok, setOk] = useState(false);
+  return (
+    <button
+      type="button"
+      class="btn secondary"
+      onClick={async () => {
+        try {
+          await navigator.clipboard.writeText(text);
+          setOk(true);
+          setTimeout(() => setOk(false), 2000);
+        } catch {
+          /* ignore */
+        }
+      }}
+    >
+      {ok ? t('home.copied') : label}
+    </button>
+  );
 }
