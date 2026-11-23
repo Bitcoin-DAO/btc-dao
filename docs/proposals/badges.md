@@ -47,25 +47,24 @@ Each badge is one task done for real in the DAO; a member who has all four has u
 
 #### 1.2.1 Paid-up (proposed, 23 November 2026)
 
-A fifth member badge, for the other half of a member's wallet: Wallet shows they can **receive**, Paid-up shows they have **paid in** from a wallet of their own. In a DAO with dues (the Association kit, [`drafts/use-case-kits.md`](../drafts/use-case-kits.md)) it is the membership badge: it shows the member is paid up.
+A fifth member badge, for the other half of a member's wallet. **Wallet** shows the member can receive at their standing address; **Paid-up** shows they hold its keys and have paid in from it. In a DAO with dues (the Association kit, [`drafts/use-case-kits.md`](../drafts/use-case-kits.md)) it is the membership badge: it shows the member is paid up.
 
 | Badge | Task | Earned when the record shows | Protocol |
 | --- | --- | --- | --- |
-| 5. Paid-up | Pay your dues (or, in a DAO without dues, any contribution) to the treasury from your own wallet | a confirmed payment to a treasury address matched to their dues notice (below) | new: `dao.dues`, to be numbered |
+| 5. Paid-up | Pay your dues to the treasury from your standing address | a confirmed transaction that spends a coin from the member's standing address and pays at least `rules.duesSats` to a treasury address | 4.2 (standing address), 6.4 (treasury addresses) |
 
-**Matching a payment to a member.** The treasury address is shared, and the chain does not say who paid. The coins must still land on the ordinary receive branch, so that a standard wallet restoring from the recovery sheet finds them (6.4); per-member addresses at high indexes would break that. So the match is by amount, like a payment reference:
+**No extra steps.** Everyone pays the same amount, `rules.duesSats`, to the treasury address shown on the treasury page, from the wallet that holds their standing address. There is no notice to publish, no special amount and no txid to paste: every client reads the chain and sees which member's standing address the coin came from.
 
-1. The member taps **Pay my dues**. The app publishes a `dao.dues` notice signed by the member: the period, and an amount made unique by adding a few sats to the dues (for example 10,000 + 137 = 10,137 sats), checked against other open notices.
-2. The member pays exactly that amount to the treasury address shown, from their own wallet.
-3. Every client matches it: a confirmed output of exactly that amount to any treasury receive address, after the notice and within its time limit. First notice, first match. No txid to paste, no council confirmation: like the other badges, it is computed from the record, and nobody issues it.
-
-Fallback, if the amount is wrong: the member posts the txid on their notice; it counts once the council confirms it, as for a member loan's funding ([`drafts/member-loans.md`](../drafts/member-loans.md)).
-
-- **What it proves:** the member controlled a wallet holding bitcoin and sent from it. Not that they *bought* it: on a testnet DAO the coins may come from a faucet or another member. In ALPHA DAO's peer-to-peer rehearsal ([`MAINNET-READINESS.md`](../../MAINNET-READINESS.md) section 10) it is the visible end of the route: bought from a person, paid in.
-- **Dues rules:** `rules.duesSats` and `rules.duesPeriod` (for example monthly or yearly), set at founding and changed by a rules vote. Unset: the badge is earned by any matched contribution above the dust limit.
-- **Once or current?** The badge, like the others, stays once earned. Whether a member is paid up *for this period* is a separate status on the Members page, shown only inside the DAO.
-- **Privacy:** as for the other badges: inside the DAO beside the member's name; outside it, totals only ("14 of 15 members paid up").
-- **Accounts:** matched dues are an inflow line of their own in Accounts ([`drafts/payments-and-accounts.md`](../drafts/payments-and-accounts.md)), and count as steady inflow for a `mutual` DAO ([funding models](../funding-models.md)).
+- **Attribution cannot be faked.** Only the holder of the standing address's keys can spend from it. Someone else paying for a member earns no badge; a member cannot claim another's payment.
+- **It proves key control,** which Wallet does not (Wallet shows a valid address; Builder shows a payout arrived there; Paid-up shows the member spent from it).
+- **Which coin:** a wallet holding several coins may spend one that is not at the standing address. The member should pay from a wallet whose only coin, or chosen coin, is at the standing address. In ALPHA DAO's peer-to-peer rehearsal ([`MAINNET-READINESS.md`](../../MAINNET-READINESS.md) section 10) this is natural: the seller sends tBTC to the member's standing address, and the member pays their dues from that coin. Bought, received, paid in: two transactions, both on the record.
+- **Fallback:** if the payment came from another coin, the member posts its txid on their profile; it counts once a council member confirms it, as for a member loan's funding ([`drafts/member-loans.md`](../drafts/member-loans.md)). This is the only step a person takes, and only when the automatic route missed.
+- **Dues rules:** `rules.duesSats` and `rules.duesPeriod` (for example monthly or yearly), set at founding and changed by an ordinary rules vote. Setting dues is the decision; each payment is a record, not a proposal. Unset: dues are off, and the badge is earned by any payment above the dust limit spent from the standing address.
+- **Once or current?** The badge, like the others, stays once earned. Whether a member is paid up *for this period* (a qualifying payment dated within it) is a separate status on the Members page, shown only inside the DAO.
+- **Standing address changes:** a payment counts if it spends from the standing address in force when it confirmed, or from any earlier standing address of the same member.
+- **What it does not prove:** that the member *bought* the bitcoin. On a testnet DAO the coins may come from a faucet or another member.
+- **Privacy:** the standing address is already public on the record and exempt from the reuse warning (4.2), so linking it to dues payments reveals nothing new. Shown inside the DAO beside the member's name; outside it, totals only ("14 of 15 members paid up").
+- **Accounts:** dues are an inflow line of their own in Accounts ([`drafts/payments-and-accounts.md`](../drafts/payments-and-accounts.md)), and count as steady inflow for a `mutual` DAO ([funding models](../funding-models.md)).
 
 With Paid-up, "the four member badges" becomes five wherever this document and the competence path (section 4) count them, once it is built.
 
