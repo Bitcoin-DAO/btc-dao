@@ -30,7 +30,8 @@ Status: outline, 22 November 2026. Optional later: [meeting #3](third-meeting.md
 
 - [ ] **MT-0 dry run** done at home (protocol 8.3), summary time noted. If over 15 minutes, plan a longer break or try a smaller model.
 - [ ] Check Device Manager on the T480 for an NVIDIA GPU (some T480s have an MX150).
-- [ ] Drafts for the meeting posted in Discussion, so the chair can read them out.
+- [ ] Drafts for the meeting posted in Discussion, so the chair can read them out: at least [founding proposals](founding-proposals.md) 1 (dues) and 2 (how we meet), each by a different member.
+- [ ] ALPHA DAO running v0.9.8 or later (dues as rules).
 
 ## Setting up (30 min)
 
@@ -46,7 +47,7 @@ Status: outline, 22 November 2026. Optional later: [meeting #3](third-meeting.md
 | 0 | Opening | Recording announced; members say their names; who's in the room, who's remote |
 | 1 | Record | Site, relay and record working; unauthorised spends: 0 |
 | 2 | Members | Badges earned since the founding; who still needs to try a part of the DAO |
-| 3 | Proposals and treasury | Any open votes; a payout round signed at the table if one has passed |
+| 3 | Proposals and treasury | The [founding proposals](founding-proposals.md): dues and how we meet published, the bounty and a new member planned; any open votes; a payout round signed at the table if one has passed |
 | 4 | Council and keys | Recovery and card storage checked (first cycle) |
 | — | "Not yet" | Read as one line: "Not yet: Operate, Trade" |
 | 7 | Mainnet | What stands between ALPHA DAO and mainnet |
