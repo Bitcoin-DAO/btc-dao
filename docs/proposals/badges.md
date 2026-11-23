@@ -45,6 +45,30 @@ Each badge is one task done for real in the DAO; a member who has all four has u
 - **Privacy:** shown inside the DAO beside the member's DAO name; outside it (byob.zone) only totals, such as "12 of 15 members have a wallet", never who.
 - **Rewards** are an ordinary bounty: the DAO votes a "badge bounties" payout once, with an amount per badge; a member who holds a badge claims it; the council pays it in a round, **once per member and badge**.
 
+#### 1.2.1 Paid-up (proposed, 23 November 2026)
+
+A fifth member badge, for the other half of a member's wallet: Wallet shows they can **receive**, Paid-up shows they have **paid in** from a wallet of their own. In a DAO with dues (the Association kit, [`drafts/use-case-kits.md`](../drafts/use-case-kits.md)) it is the membership badge: it shows the member is paid up.
+
+| Badge | Task | Earned when the record shows | Protocol |
+| --- | --- | --- | --- |
+| 5. Paid-up | Pay your dues (or, in a DAO without dues, any contribution) to the treasury from your own wallet | a confirmed payment to a treasury address matched to their dues notice (below) | new: `dao.dues`, to be numbered |
+
+**Matching a payment to a member.** The treasury address is shared, and the chain does not say who paid. The coins must still land on the ordinary receive branch, so that a standard wallet restoring from the recovery sheet finds them (6.4); per-member addresses at high indexes would break that. So the match is by amount, like a payment reference:
+
+1. The member taps **Pay my dues**. The app publishes a `dao.dues` notice signed by the member: the period, and an amount made unique by adding a few sats to the dues (for example 10,000 + 137 = 10,137 sats), checked against other open notices.
+2. The member pays exactly that amount to the treasury address shown, from their own wallet.
+3. Every client matches it: a confirmed output of exactly that amount to any treasury receive address, after the notice and within its time limit. First notice, first match. No txid to paste, no council confirmation: like the other badges, it is computed from the record, and nobody issues it.
+
+Fallback, if the amount is wrong: the member posts the txid on their notice; it counts once the council confirms it, as for a member loan's funding ([`drafts/member-loans.md`](../drafts/member-loans.md)).
+
+- **What it proves:** the member controlled a wallet holding bitcoin and sent from it. Not that they *bought* it: on a testnet DAO the coins may come from a faucet or another member. In ALPHA DAO's peer-to-peer rehearsal ([`MAINNET-READINESS.md`](../../MAINNET-READINESS.md) section 10) it is the visible end of the route: bought from a person, paid in.
+- **Dues rules:** `rules.duesSats` and `rules.duesPeriod` (for example monthly or yearly), set at founding and changed by a rules vote. Unset: the badge is earned by any matched contribution above the dust limit.
+- **Once or current?** The badge, like the others, stays once earned. Whether a member is paid up *for this period* is a separate status on the Members page, shown only inside the DAO.
+- **Privacy:** as for the other badges: inside the DAO beside the member's name; outside it, totals only ("14 of 15 members paid up").
+- **Accounts:** matched dues are an inflow line of their own in Accounts ([`drafts/payments-and-accounts.md`](../drafts/payments-and-accounts.md)), and count as steady inflow for a `mutual` DAO ([funding models](../funding-models.md)).
+
+With Paid-up, "the four member badges" becomes five wherever this document and the competence path (section 4) count them, once it is built.
+
 **Built in v0.9.5, Home card as in v0.9.7** (`core/badges.ts`, `ui/Badges.tsx`), decided 16 November 2026:
 
 - **An onboarding tool, shown only to the member:** a "Learning by doing" card on their own Profile, with how to earn each badge or what earned it. Not on the Members page.

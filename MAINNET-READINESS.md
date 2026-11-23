@@ -136,6 +136,8 @@ Before mainnet:
 
 - [x] Members' guide to getting sats, with the rule that the DAO does not sell bitcoin ([`docs/getting-sats.md`](docs/getting-sats.md), 23 Nov 2026)
 - [ ] The guide walked through at an ALPHA DAO meeting: each member names the route they would use for dues (Italian version ready first)
+- [ ] Peer-to-peer route rehearsal (ALPHA DAO): a member buys tBTC from another person (no fiat changes hands; informally, an Agent with a wave.space account can play the seller), receives it in their own wallet, and pays dues to the ALPHA treasury from it. Outside the DAO: no proposal, no treasury coins, no badge for the seller; the seller's tBTC comes from a faucet or the BTC DAO Testnet Treasury, never from ALPHA's treasury
+- [ ] Paid-up badge built and earned in that rehearsal: the dues payment matched to the member's dues notice by its unique amount ([badges proposal](docs/proposals/badges.md) 1.2.1)
 - [ ] Agent task rehearsal, step 1, on the current build (ALPHA DAO): one task as a bounty, member recipient, paid on completion in tBTC, delivery reported and confirmed. The outcome needs no real fiat, or is a token purchase the Agent agrees to absorb (`NEXT-RELEASE.md` L)
 - [ ] Agent task rehearsal, step 2, once claim codes are built (ALPHA DAO): one task to a non-member recipient, confirmed by the code in handover-scan mode; council members refused as claimants
 - [ ] Both Agent routes written up from a real use by the Agent (Bitrefill Card, wavecard), in the Agent's own words: what it cost and how long it took

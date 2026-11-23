@@ -176,6 +176,8 @@ Design in `docs/drafts/action-gateway.md` section 3.4 (PR #19, #30). Brought for
 
 - [x] Members' guide: [how members get sats](docs/getting-sats.md) (fiat in; the DAO does not sell bitcoin)
 - [ ] Italian version of the guide
+- [ ] Paid-up badge (`docs/proposals/badges.md` 1.2.1): `dao.dues` notice with a unique amount, client-side matching to a treasury receive address, `rules.duesSats` and `rules.duesPeriod`, paid-up status on the Members page, txid fallback confirmed by the council
+- [ ] Peer-to-peer route rehearsal: a member buys tBTC from a person and pays dues from their own wallet (readiness 10)
 - [ ] Step 1 rehearsal on the current build: an Agent task run as a bounty (4.6), member recipient, paid on completion, delivery report confirmed
 - [ ] Claim codes: the six-word code made on the recipient's side, its commitment in the proposal, `dao.delivered` (app and handover-scan modes)
 - [ ] Agent role in the app: Agent badge and region on the profile; council members refused as claimants (separation of duties)
