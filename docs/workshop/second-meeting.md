@@ -7,7 +7,7 @@ Status: outline, 22 November 2026. Optional later: [meeting #3](third-meeting.md
 ## Goals
 
 1. Run the agenda template once, item by item, including the "Not yet" line and the silence rule.
-2. Do at least one *do* item at the table (a vote, a signing or a vouching in).
+2. Do at least one *do* item at the table (a vote, a signing or a vouching in): the live votes proposal, from publishing to the council confirming the new rules version.
 3. Produce the first minute with the local AI setup, check it against a by-hand minute, and post it.
 
 ## Roles
@@ -15,7 +15,7 @@ Status: outline, 22 November 2026. Optional later: [meeting #3](third-meeting.md
 - **Chair:** not the organiser, if possible (the chair rotates from the first meeting). Reads each item, pauses about ten seconds, names remote members on items with business.
 - **Laptop keeper:** runs the call and Meetily, watches the recording, generates the minute in the break.
 - **Minute-taker by hand:** fills in the printed agenda in parallel, for MT-1.
-- **Council members:** bring their SeedQR cards if a round is to be signed.
+- **Council members:** at least two of the three, in the room or on the call, to confirm the live votes rules version; they bring their SeedQR cards if a round is to be signed.
 
 ## Kit
 
@@ -30,7 +30,7 @@ Status: outline, 22 November 2026. Optional later: [meeting #3](third-meeting.md
 
 - [ ] **MT-0 dry run** done at home (protocol 8.3), summary time noted. If over 15 minutes, plan a longer break or try a smaller model.
 - [ ] Check Device Manager on the T480 for an NVIDIA GPU (some T480s have an MX150).
-- [ ] Drafts for the meeting posted in Discussion, so the chair can read them out: at least [founding proposals](founding-proposals.md) 1 (dues) and 2 (how we meet), each by a different member.
+- [ ] Drafts for the meeting posted in Discussion, so the chair can read them out: [founding proposals](founding-proposals.md) 1 (live votes), 2 (dues) and 3 (how we meet), each by a different member.
 - [ ] ALPHA DAO running v0.9.8 or later (dues as rules).
 
 ## Setting up (30 min)
@@ -47,7 +47,7 @@ Status: outline, 22 November 2026. Optional later: [meeting #3](third-meeting.md
 | 0 | Opening | Recording announced; members say their names; who's in the room, who's remote |
 | 1 | Record | Site, relay and record working; unauthorised spends: 0 |
 | 2 | Members | Badges earned since the founding; who still needs to try a part of the DAO |
-| 3 | Proposals and treasury | The [founding proposals](founding-proposals.md): dues and how we meet published, the bounty and a new member planned; any open votes; a payout round signed at the table if one has passed |
+| 3 | Proposals and treasury | The [founding proposals](founding-proposals.md): **live votes** published, voted (10 minutes), tallied and confirmed by two council members at the table; then dues and how we meet published as 3-day votes; the bounty and a new member planned; any open votes; a payout round signed at the table if one has passed |
 | 4 | Council and keys | Recovery and card storage checked (first cycle) |
 | — | "Not yet" | Read as one line: "Not yet: Operate, Trade" |
 | 7 | Mainnet | What stands between ALPHA DAO and mainnet |
