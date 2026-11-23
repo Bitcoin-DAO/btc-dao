@@ -364,7 +364,7 @@ Cloudflare Email Routing works only when Cloudflare is the domain's DNS provider
 | **B. Resend receiving → webhook to the Worker** | stays at Porkbun | no DNS move; testable now on `test.byob.zone` | sending and receiving on one provider unless KingSMTP takes sending; received mail counts toward the free quota (100 a day) |
 | **C. KingSMTP MX routing** | stays at Porkbun | paid in bitcoin; already the outbound second provider | untested; may only forward to a mailbox, not to a Worker |
 
-Next: test B (9.0.1). The DNS decision (Cloudflare as DNS provider in the final form, deSEC second, or DNS kept at the registrar) decides between A and B/C.
+**Decided 22 November 2026: DNS stays at Porkbun for now, and email runs on route B.** Resend sends and receives for the DAO's subdomains; KingSMTP stays the candidate second provider (exit test). Route A remains open for when the DNS module decides where DNS lives in the final form (Cloudflare with deSEC second, or kept at the registrar). Tests passed on `test.byob.zone`: sending (8.1) and receiving (9.0.1).
 
 #### 9.0.1 Test B
 
