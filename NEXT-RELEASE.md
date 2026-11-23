@@ -185,7 +185,15 @@ Design in `docs/drafts/action-gateway.md` section 3.4 (PR #19, #30). Brought for
 - [ ] The Agent's choice of staged or on completion, fixed in the schedule before the vote
 - [ ] Step 2 rehearsal: a non-member recipient, confirmed by handover scan
 - [ ] Reference rules for the trust ladder (counts for non-member recipients and staged payment) as rule settings with defaults
+      
+## M. Discussion: chat stays in WhatsApp (idea; future)
 
+Decided 23 November 2026: Discussion stays the DAO's record, not its chat. Images, documents and everyday conversation stay in the group's chat app (WhatsApp); a thread's "Share the link" is the bridge between the two. No uploads, previews or formatting are planned.
+
+- [ ] "New since your last visit": unread markers on the thread list and on posts within a thread, kept on the member's own device only (no server, nothing published)
+- [ ] Notifications: see E, stage 3 (member notifications by email to verified addresses); not duplicated here
+- [ ] Ideas held for later, not planned: tap-to-show images (no automatic loading, which would reveal members' IP addresses to the image host); attachments on a Blossom server with the file's SHA-256 in the post, so the record proves which file was discussed; reply-to and quoting.
+      
 ## Open items
 
 - [x] **Paid on delivery** (protocol 4.6): staged payouts and bounties, v0.8.0. Built: staged payouts (schedule in the form, reports as thread cards, a tranche joins a round only after its report, lapse, the committed line on the treasury page), then bounties (claims; the council's round picks the claimant). Reports are read in Discussion (a chip on the thread and a Reports filter) and on the proposal page (the schedule with each tranche's status); not on Home or in the footer
