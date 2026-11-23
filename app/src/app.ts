@@ -1,6 +1,6 @@
 // App state: the site file, the DAO rebuilt from relays, this device's identity, the treasury.
 import { useEffect, useState } from 'preact/hooks';
-import { stageError, stageOf, usable, type SiteConfig } from './core/config';
+import { foundingAllowed, organiserOf, stageError, stageOf, usable, type SiteConfig } from './core/config';
 import { KIND, sign, template, type Event } from './core/events';
 import { rebuild, type DaoState, type Member } from './core/state';
 import { walletOf, parseDescriptor } from './core/descriptor';
@@ -38,6 +38,8 @@ export interface AppState {
   othersLoading?: boolean;
   lang: Lang;
   lastSync?: number;
+  /** The site file pins a DAO id that is not one the organiser founded at this address (checked once per load). */
+  pinMismatch?: boolean;
   /** How far the phone's clock is from the app's time, in ms (positive: the phone is slow). */
   clockOffset?: number;
 }
@@ -73,7 +75,7 @@ async function fetchEvents(site: SiteConfig): Promise<Event[]> {
   const ids = [
     ...new Set(
       gens
-        .filter(g => parseJson<{ site?: string }>(g.content)?.site === site.site)
+        .filter(g => parseJson<{ site?: string }>(g.content)?.site === site.site && foundingAllowed(site, g.pubkey))
         .map(g => g.tags.find(t => t[0] === 'D')?.[1])
         .filter((x): x is string => !!x),
     ),
@@ -81,6 +83,27 @@ async function fetchEvents(site: SiteConfig): Promise<Event[]> {
   if (!ids.length) return gens;
   const rest = await queryAll(relays, { '#D': ids });
   return [...gens, ...rest];
+}
+
+/**
+ * With a DAO id pinned and an organiser named: does the pinned id belong to a founding the organiser published for
+ * this site? A wrong id (a typo, or someone else's DAO) is shown to everyone at once, instead of trusting whoever
+ * edited the site file. Runs once per load; a relay that cannot be read leaves the answer unknown, not a warning.
+ */
+let pinChecked = false;
+async function checkPin(site: SiteConfig) {
+  const organiser = organiserOf(site);
+  if (pinChecked || !site.daoId || !organiser) return;
+  pinChecked = true;
+  try {
+    const gens = await queryAll(relaysOf(site), { kinds: [KIND.genesis], authors: [organiser] }, 4);
+    const ids = gens
+      .filter(g => parseJson<{ site?: string }>(g.content)?.site === site.site)
+      .map(g => g.tags.find(t => t[0] === 'D')?.[1]);
+    if (gens.length && !ids.includes(site.daoId)) setState({ pinMismatch: true });
+  } catch {
+    // unknown: no warning
+  }
 }
 
 function derive(events: Event[], extra: Partial<AppState> = {}) {
@@ -252,6 +275,7 @@ export async function sync() {
   const site = state.site;
   if (!site) return;
   void checkClock();
+  void checkPin(site);
   const events = await fetchEvents(site);
   const pending = await store.getPending(site.site);
   const dao = rebuild(site, events, pending?.pubkey);

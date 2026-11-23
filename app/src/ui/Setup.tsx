@@ -3,7 +3,7 @@ import { periodText, ruleValue } from './Proposals';
 import { useEffect, useState } from 'preact/hooks';
 import { publishSigned, sync, useApp } from '../app';
 import { fmtSats, t } from '../i18n';
-import { buildGenesis, isPlaceholder, PRACTICE_VOTE_DAYS, isPracticeVotes, settleThreshold } from '../core/config';
+import { buildGenesis, isPlaceholder, organiserOf, PRACTICE_VOTE_DAYS, isPracticeVotes, settleThreshold } from '../core/config';
 import { buildDescriptor, parseKeyOrigin } from '../core/descriptor';
 import { KIND, sign, template } from '../core/events';
 import { parseFounderCode, type FounderCode } from '../core/identity';
@@ -22,6 +22,8 @@ export function Setup() {
   const app = useApp();
   const site = app.site!;
   const me = app.pending;
+  // Only the organiser named in the site file can publish a founding that counts here (organiser).
+  const notOrganiser = !!organiserOf(app.site!) && organiserOf(app.site!) !== me?.pubkey;
   const [s, setS] = useState<SetupState>();
   const [tab, setTab] = useState<Tab>(1);
   const [scan, setScan] = useState<'council' | 'founder'>();
@@ -275,7 +277,8 @@ export function Setup() {
             {!locked ? (
               <>
                 <p class="small">{t('setup.publishNote')}</p>
-                <button type="button" class="btn primary" disabled={!genesis || busy || isPlaceholder(s.name)} onClick={publishGenesis}>{t('setup.signPublish')}</button>
+                {notOrganiser && <p class="warnbox">{t('setup.notOrganiser')}</p>}
+                <button type="button" class="btn primary" disabled={!genesis || busy || isPlaceholder(s.name) || notOrganiser} onClick={publishGenesis}>{t('setup.signPublish')}</button>
               </>
             ) : app.daoId === s.daoId ? (
               <div class="card">

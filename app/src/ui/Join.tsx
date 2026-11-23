@@ -18,9 +18,16 @@ export function Join() {
         <main>
           <h1>{t('join.title', { dao })}</h1>
           <p class="lead">{t('join.intro')}</p>
-          <div class="note"><strong>{t('fs.mode')}</strong> {t('join.notFounded', { dao })}</div>
-          <button type="button" class="btn primary" onClick={() => go('/founder')}>{t('join.founderSignup')}</button>
-          {pending?.council && <button type="button" class="btn secondary" onClick={() => go('/setup')}>{t('join.setup')}</button>}
+          {app.site!.foundingByInvitation && !pending ? (
+            // Founding by invitation: no buttons; invited founders open the link the organiser sends (#/founder).
+            <div class="note"><strong>{t('fs.mode')}</strong> <GroupText withKey="join.invitationGroup" withoutKey="join.invitation" vars={{ dao }} /></div>
+          ) : (
+            <>
+              <div class="note"><strong>{t('fs.mode')}</strong> {t('join.notFounded', { dao })}</div>
+              <button type="button" class="btn primary" onClick={() => go('/founder')}>{t('join.founderSignup')}</button>
+              {pending?.council && <button type="button" class="btn secondary" onClick={() => go('/setup')}>{t('join.setup')}</button>}
+            </>
+          )}
         </main>
       </>
     );

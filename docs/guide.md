@@ -149,6 +149,8 @@ Rules that never bend: never type a seed into a phone or computer; never photogr
 
 ## 4. The founding meeting
 
+**Before the meeting: name the organiser.** Until the DAO id is pinned (below), anyone who opens the site could publish a founding of their own at the DAO's address, and visitors' phones would follow whichever was founded first. To stop that, the organiser signs up as a founder (with a council seat) on their own phone ahead of time, copies their identity key from the code page (**Copy the key**), and puts it in `config/dao.json` as `"organiser"`. From then on only a founding published by that key counts at this address; anyone else's is ignored. Set `"foundingByInvitation": true` too: the site then shows no sign-up or setup buttons, and invited founders use the link the organiser sends (`<site>/#/founder`). Both are site settings, never part of the record. Keep the organiser's sign-up on that phone until the founding: a new sign-up makes a new key, and the site file must then be changed again.
+
 The first members join here, because the normal route needs a sponsor, a council member and a vote that do not exist yet. Being listed in the founding settings, approved by the council, takes their place. Remote founders can join by video call.
 
 1. **Open the setup page.** The organiser (a council member) opens it on their phone. Tab 1 holds the basics: name, purpose, address, passkey domain, network and starting rules. On testnet4 the founders also choose the vote length: **practice** (10-minute votes, to try everything in one sitting) or **live** (the site file's period, 3 days by default). The members switch from practice to live later by a rule-change vote, without founding again. Keep at least one spare key on the council (2 of 3, 3 of 5): the page warns when every key is needed.
@@ -160,7 +162,21 @@ The first members join here, because the normal route needs a sponsor, a council
 7. **Protect and print.** Each founder's app now knows the DAO id. The passkey protects the identity key, and the founder can print their identity card. Council members print theirs before signing anything else.
 8. **Hand-out** (mainnet, and testnet from phase 2). Each council member takes their copy of the recovery sheet. The shared SeedSigner and the spare are sealed and stored.
 
-Next comes funding (section 5). In the practice and testnet stages, also add the new DAO id to the relay's list and to the site's `config/dao.json` (`daoId`); the setup page shows it once the DAO is founded.
+Next comes funding (section 5), and pinning the DAO id the same day.
+
+### 4.1 Pinning the DAO id
+
+Once the DAO is founded, its id goes into two places:
+
+1. **The site file:** `config/dao.json`, field `"daoId"`. The site then reads this DAO alone, and the byob.zone pulse goes live.
+2. **The relay's list** (trial stages, on the shared relay): `ALLOWED_DAO_IDS` in btc-dao's `relay/src/config.ts`. The list must hold **every DAO still in use on that relay**, not only the new one: once it has entries, the relay refuses events from any DAO not listed.
+
+The app helps with the first:
+
+- **A task on the Council page,** "Pin the DAO id", from the moment the DAO is founded. It shows the id with **Copy the id** and **Share**, and, when the site file names the DAO's repository (`"repo": "https://github.com/owner/repo"`), a link that opens `config/dao.json` for editing on GitHub. One council member pastes the id there and commits; the site rebuilds by itself. The task goes when the published site carries the same id.
+- **No separate confirmation:** every phone checks the pin. With an organiser named, each phone looks up the organiser's foundings at this address; if the pinned id is not one of them (a typo, or someone else's DAO), every page shows **Wrong DAO id** in red. Whoever pins makes the change; every phone checks it.
+
+Pin on the founding day, as its last step: until then the organiser setting is what protects the address.
 
 > **Gap G-07.** Who keeps the shared SeedSigner and the spare between rounds, and where, is not assigned. S8 says sealed, bought from different sources, and signing times not announced, but not who holds them.
 

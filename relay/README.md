@@ -45,7 +45,7 @@ If Cloudflare's own builds fail (they timed out while initialising on the organi
 
 ## After founding
 
-After each founding, add that DAO's id to `ALLOWED_DAO_IDS` in `src/config.ts`, run `npm run build` and commit. Cloudflare redeploys by itself. This relay serves UNO's practice and testnet stages; a mainnet DAO gets its own relay on its own domain.
+After each founding, add that DAO's id to `ALLOWED_DAO_IDS` in `src/config.ts`, run `npm run build` and commit. The list must hold the ids of **every** DAO still using this relay: once it has entries, events from any DAO not listed are refused. While it is empty, any DAO id is accepted. Cloudflare redeploys by itself. This relay serves UNO's practice and testnet stages; a mainnet DAO gets its own relay on its own domain.
 
 ## To do: a database with a generic name
 

@@ -19,6 +19,7 @@ Every DAO, trial stages included, gets its **own origin** (a host name of its ow
 - [ ] **DNS:** a CNAME from the subdomain to `<organisation>.github.io`. No wildcard (`*`) records on the domain.
 - [ ] **Repository:** an empty public repository, filled from btc-dao at a released version (`git archive` of the release), with a README note saying which version it runs ([guide 2.5](guide.md#25-set-up-the-software)).
 - [ ] **`config/dao.json`:** stage, name, purpose, network; `site` and `passkeyDomain` set to the DAO's own host; relays and chain sources; the starting rules; the testnet treasury's return address (trial stages); `branding`; and `group` (step C). Council, founders and descriptor stay placeholders: the founding fills them in.
+- [ ] **Founding guard,** in `config/dao.json`, before the site goes public: `"organiser"` (the organiser's identity key: they sign up as a founder with a council seat on their own phone, then **Copy the key** on the code page), `"foundingByInvitation": true` (no sign-up buttons; invited founders get the `#/founder` link), and `"repo"` (this repository's address, for the Council page's pin link). Until the DAO id is pinned, only the organiser's founding counts at this address ([guide 4](guide.md#4-the-founding-meeting)).
 - [ ] **Pages:** Settings → Pages → Source: **GitHub Actions**; Custom domain: the DAO's host; once the certificate is issued, **Enforce HTTPS**.
 - [ ] **Chain gateway:** add the DAO's origin (`https://alpha.byob.zone`) to `ALLOWED_ORIGINS` in btc-dao's `gateway/wrangler.toml` and push to btc-dao's main branch; Cloudflare redeploys the gateway ([chain gateway](chain-gateway.md)). Without it the site cannot read the treasury.
 - [ ] **Listing on byob.zone** (optional): add the DAO to `src/daos.ts` in the byob.zone site (its site, network, and its relays and chain sources for the page's policy), and a news post in `content/news.json`.
@@ -48,8 +49,8 @@ On the day, the organiser works from the [run sheet](workshop/run-sheet.md).
 
 ## F. After the founding
 
-- [ ] **The DAO id** into `config/dao.json` (`daoId`), from the founding's summary. This also switches the DAO's pulse on byob.zone from "founding" to live.
-- [ ] **Pin the relay:** add the DAO id to `ALLOWED_DAO_IDS` in btc-dao's `relay/src/config.ts`, build and push to main; Cloudflare redeploys the relay ([relay README](../relay/README.md)).
+- [ ] **The DAO id** into `config/dao.json` (`daoId`), from the **Pin the DAO id** task on the Council page (Copy, or the link that opens the file on GitHub), the same day ([guide 4.1](guide.md#41-pinning-the-dao-id)). This also switches the DAO's pulse on byob.zone from "founding" to live. If any phone then shows **Wrong DAO id**, fix the file at once.
+- [ ] **Pin the relay:** add the DAO id to `ALLOWED_DAO_IDS` in btc-dao's `relay/src/config.ts`, **with the ids of every other DAO still using the relay**, build and push to main; Cloudflare redeploys the relay ([relay README](../relay/README.md)).
 - [ ] **The group as the DAO's notice board:** on an open vote, and on a round waiting for council signatures, **Share in the group** sends a ready message with the link.
 - [ ] **Fund the treasury** (trial stages: from the [testnet treasury](testnet-treasury.md)), and run the first rounds ([guide 5](guide.md#5-funding-the-treasury), [6.4](guide.md#64-payout-rounds-and-signing-sessions)).
 - [ ] **Badges:** the members' four (Wallet, Voice, Proposer, Builder) come by doing, shown on each member's Profile; a "badge bounties" payout, if the DAO wants one, is an ordinary vote ([proposal](proposals/badges.md)).

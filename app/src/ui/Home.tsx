@@ -96,9 +96,9 @@ export function Home() {
 
         {app.me && <BadgesHome />}
 
-        {app.isCouncil && app.me && councilTodo(app.dao!, app.me.person) > 0 && (
+        {app.isCouncil && app.me && councilTodo(app.dao!, app.me.person, app.site) > 0 && (
           <a class="card tint" style="text-decoration:none;color:var(--teal-ink)" href="#/council">
-            <strong>{t('home.councilTodo', { n: councilTodo(app.dao!, app.me.person) })}</strong>
+            <strong>{t('home.councilTodo', { n: councilTodo(app.dao!, app.me.person, app.site) })}</strong>
           </a>
         )}
 

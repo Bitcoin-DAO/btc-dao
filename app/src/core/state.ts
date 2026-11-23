@@ -1,7 +1,7 @@
 // Rebuilding the DAO from events (protocol 8): genesis, rosters, settings, membership events,
 // proposals, confirmations, votes and tallies. Pure: the same events give the same state everywhere.
 import { Address } from '@scure/btc-signer';
-import { ruleValueError, type CouncilEntry, type DaoConfig, type Network, type Rules, type SiteConfig } from './config';
+import { foundingAllowed, ruleValueError, type CouncilEntry, type DaoConfig, type Network, type Rules, type SiteConfig } from './config';
 import { KIND, byTime, tagValue, verified, type Event } from './events';
 import { btcNetwork, parseDescriptor, sameWallet, treasuryAddress } from './descriptor';
 import { shortCode } from './shortcode';
@@ -415,6 +415,10 @@ function rebuildOnce(site: SiteConfig, events: Event[], prefer?: string, now = n
   for (const e of all.filter(e => e.kind === KIND.genesis)) {
     const g = genesisCandidate(e, rejected);
     if (!g) continue;
+    if (!foundingAllowed(site, e.pubkey)) {
+      rejected.push({ event: e, reason: 'genesis: not published by the organiser' });
+      continue;
+    }
     if (site.daoId ? g.daoId !== site.daoId : g.config.site !== site.site) continue;
     if (g.config.network !== site.network) continue;
     candidates.push(g);

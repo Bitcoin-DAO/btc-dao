@@ -2,6 +2,14 @@
 
 Each release is a git tag (`v0.1.1`). A DAO's copy runs one tagged release and records it in its README; a release moves to a DAO's next stage only after passing the one before ([guide, section 8](docs/guide.md#8-the-three-stages-practice-testnet-mainnet)).
 
+## v0.9.9 · 23 November 2026
+
+- **Founding guard: only the organiser can found the DAO at its address.** Until a DAO's id is pinned, anyone could open its site, publish a founding of their own there, and visitors' phones would follow whichever was founded first. A new site setting, `organiser` (the organiser's identity key), closes this: before the pin, only a founding published by that key is accepted at the address; any other is set aside as "not published by the organiser". The founder code page offers the key to copy (**Copy the key**) to a council founder while no organiser is set, and the setup page refuses to publish for anyone but the organiser. Unset or a placeholder: as before.
+- **Founding by invitation.** With `foundingByInvitation: true`, the not-founded page shows no **Sign up as a founder** or **Prepare the founding** buttons, only that invited founders use the organiser's link, and the group link to ask. The founding pages still open from the link (`#/founder`), so nothing needs changing on the day.
+- **Pin the DAO id: a council task.** From the founding until the published site carries the founded DAO's id, the Council page shows **Pin the DAO id** (counted in the council's to-do): the id, **Copy the id**, **Share**, and, with the new `repo` site setting, a link that opens `config/dao.json` for editing on GitHub.
+- **Every phone checks the pin.** With an organiser named and an id pinned, each page load looks up the organiser's foundings at the address; if the pinned id is not one of them, every page shows **Wrong DAO id** in red. No separate confirmation step.
+- **Docs:** the guide's founding section starts with naming the organiser, and a new section 4.1 explains pinning the DAO id (site file and relay, the relay's list holding every DAO still on it); the new-DAO checklist (B, F), the run sheet and the relay README follow. The example config carries the three new settings as placeholders.
+
 ## v0.9.8 · 23 November 2026
 
 - **Membership dues as rules.** Two new rules, set by an ordinary rule-change vote: **Membership dues** (`duesSats`, whole sats above the dust limit; 0 turns dues off) and **Dues period** (`duesPeriod`, monthly or yearly). Every member pays the same amount. A DAO founded without dues sets both in one proposal. Until this release a proposal naming these rules was invalid on every phone. The Paid-up badge and the Pay dues prompt that use them come in a later release; dues paid once the rules are in force will count when the badge arrives, since badges are worked out from the record.
