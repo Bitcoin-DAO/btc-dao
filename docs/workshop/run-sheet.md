@@ -4,14 +4,26 @@ One page for the room, for the organiser. The [checklist](../new-dao.md) is for 
 
 ## Roles
 
-- **Organiser:** a council member. Prepares the founding on their phone (Prepare the founding), adds every code, publishes.
+- **Organiser:** a council member, named in the site file as `organiser` before the day (step 0). Prepares the founding on their phone (Prepare the founding), adds every code, publishes. Only the organiser's founding counts at the DAO's address.
 - **Council members:** each has a phone, their SeedQR card (or makes a key from dice) and a turn at the SeedSigner.
 - **Founders:** each has a phone. Remote founders join the group's video call.
 - **A helper,** if there is one: watches the clock, checks the three checks below, takes photos (cards and dice, never a SeedQR or words).
 
+## 0. Organiser, before the workshop (a day or more ahead)
+
+Until this is done, anyone who knows the setup page could found a DAO of their own at the DAO's address first ([guide 4](../guide.md#4-the-founding-meeting)).
+
+- [ ] **Your council key, made for this DAO only:** on your SeedSigner (network set to the DAO's), a new seed, kept on its SeedQR card or plate. It is the key you found with and sign with.
+- [ ] **Sign up on your own phone** at `<site>/#/founder` (with founding by invitation there is no button: use the link). Tick **I request a council seat**, scan your key from the SeedSigner, create the passkey.
+- [ ] **Copy the key** on the code page, and put it in the DAO's `config/dao.json` as `"organiser"` (GitHub: open the file, edit, commit to main). The site rebuilds in a few minutes.
+- [ ] **Check:** reload the site on your phone. Your code page shows **Prepare the founding**; the site's home page shows only the invitation note, no sign-up button.
+- [ ] **Keep that sign-up:** same phone, same browser, no clearing data, until the founding. If it is lost, sign up again and change `organiser` to the new key before the day.
+- [ ] **Send the invited founders the link** `<site>/#/founder`, or share it in the group on the day.
+
 ## Before people arrive (30 min)
 
 - [ ] WiFi works; the DAO's site opens on a test phone; the printer prints from a phone.
+- [ ] `organiser` is set in `config/dao.json` (not a placeholder), and your phone still shows your sign-up's code page (step 0).
 - [ ] SeedSigners on, network set to the DAO's network, persistent settings on.
 - [ ] Cards cut out and laid out per council member; dice on the tables.
 - [ ] For the KEY route, on each table: eleven d2 dice (2 orange, 5 white, 4 black), the dice strip cut out, word sheets A–D and page 1 of the step sheet; a roll log (page 2) per KEY member; pens ([KEY route](key/README.md)).
@@ -28,7 +40,7 @@ Each council member, with the steps on page 1 of the cards (A: the ready-made ke
 
 ## 3. Sign-up (20 min)
 
-- Everyone opens the DAO's site and taps **Sign up as a founder**: name, then a key protected by a passkey.
+- Everyone opens the founder link (`<site>/#/founder`, shared in the group) and signs up: name, then a key protected by a passkey. The organiser does not sign up again: their sign-up from step 0 is their founder entry.
 - **Council members tick "I request a council seat"**, then export the key from the SeedSigner (step C on the cards) and scan it. The phone shows the fingerprint: it must match the card.
 - **Check 1:** every council member says aloud that they ticked the box and their fingerprint matched.
 
