@@ -99,13 +99,13 @@ function deviceSign(psbtB64, card) {
 }
 async function signOnDevice(page, rid, card, expectOk = true) {
   await open(page, `#/round/${rid}`);
-  await page.getByText(/Firma con il SeedSigner/).waitFor({ timeout: 20000 });
+  await page.getByText(/Firma con il tuo dispositivo di firma/).waitFor({ timeout: 20000 });
   // The PSBT the device would scan from the animated QR (the page also offers it for other wallets).
   await page.getByRole('button', { name: /Firma con un altro wallet/ }).click();
   await page.getByRole('button', { name: 'Copia la PSBT' }).click();
   const psbt = await copied(page);
   await page.getByRole('button', { name: 'Fatto, avanti' }).click();
-  await page.getByRole('button', { name: 'Ho firmato sul SeedSigner' }).click();
+  await page.getByRole('button', { name: 'Ho firmato sul dispositivo di firma' }).click();
   await page.getByRole('button', { name: 'Scansiona la transazione firmata' }).click();
   await paste(page, deviceSign(psbt, card));
   if (expectOk) await page.getByText('Hai firmato ✓').waitFor({ timeout: 20000 });
@@ -118,9 +118,9 @@ async function signUpHw(page, name, scanned) {
   await page.getByLabel('Chiedo un posto nel Consiglio').check();
   await page.getByLabel(/Ho almeno 18 anni/).check();
   await page.getByRole('button', { name: 'Avanti' }).click();
-  check(await page.getByLabel(/Su un SeedSigner/).isChecked(), `${name}: SeedSigner is the default`);
+  check(await page.getByLabel(/Su un dispositivo di firma/).isChecked(), `${name}: SeedSigner is the default`);
   check(await page.getByRole('button', { name: 'Crea con impronta o volto' }).isDisabled(), `${name}: no sign-up before the key is scanned`);
-  await page.getByRole('button', { name: 'Scansiona la chiave dal SeedSigner' }).click();
+  await page.getByRole('button', { name: 'Scansiona la chiave dal dispositivo di firma' }).click();
   await paste(page, scanned);
   await page.getByText(/48h\/1h\/0h\/2h ✓/).waitFor();
   await page.getByRole('button', { name: 'Crea con impronta o volto' }).click();
@@ -152,7 +152,7 @@ async function signUpHw(page, name, scanned) {
   await a.getByRole('button', { name: 'Scansiona un membro del Consiglio' }).click();
   await paste(a, codes['@dora']);
   check(await seen(a.getByText(/La chiave della tesoreria 49c2d730 è già nel Consiglio/)), 'a card already on the council is refused');
-  check(await a.locator('.chip', { hasText: 'SeedSigner' }).count() === 3, 'each council key shown as on a SeedSigner');
+  check(await a.locator('.chip', { hasText: 'Dispositivo di firma' }).count() === 3, 'each council key shown as on a SeedSigner');
   check(!(await a.getByText(/mescola chiavi/).count()), 'no mixed-keys warning');
   check(await seen(a.getByText('2 di 3')), '2 of 3');
   await a.getByRole('button', { name: '3 · Fondatori' }).click();
@@ -174,7 +174,7 @@ async function signUpHw(page, name, scanned) {
 
   log('After founding');
   await open(a, '#/profile');
-  check(await seen(a.getByText(/È sul tuo SeedSigner e sulla sua tessera SeedQR \(impronta d3bdd580\)/)), 'profile: the key is on the SeedSigner');
+  check(await seen(a.getByText(/È sul tuo dispositivo di firma e sulla sua tessera SeedQR \(impronta d3bdd580\)/)), 'profile: the key is on the SeedSigner');
   check(!(await a.getByText(/Scrivi le 12 parole/).count()) && !(await a.getByText(/Questo telefono non ha la tua chiave/).count()), 'profile: no words to write or type');
   await open(a, '#/council');
   await a.getByRole('heading', { name: /Consiglio/ }).first().waitFor();
@@ -189,7 +189,7 @@ d=Descriptor.from_string("wsh(sortedmulti(2,${CARDS.A}/0/*,${CARDS.B}/0/*,${CARD
 print(d.derive(0).address(NETWORKS["test"]))`]).toString().trim();
   check(addr0 === fromEmbit, `treasury address matches embit's for cards A, B, C (${addr0})`);
   await open(a, '#/profile');
-  await a.getByText(/È sul tuo SeedSigner/).waitFor();
+  await a.getByText(/È sul tuo dispositivo di firma/).waitFor();
   await shot(a, 'profile');
 
   log('A payout before the treasury holds anything');
@@ -232,7 +232,7 @@ print(d.derive(0).address(NETWORKS["test"]))`]).toString().trim();
   await a.waitForURL(/#\/round\/[0-9a-f]{64}$/);
   const rid = a.url().split('/round/')[1];
   check(await seen(a.getByText('Firme: 0 di 2')), 'no signature yet: nothing signs on the phone');
-  await a.getByText(/Firma con il SeedSigner/).waitFor();
+  await a.getByText(/Firma con il tuo dispositivo di firma/).waitFor();
   const qrText = await a.locator('svg.qr').first().getAttribute('aria-label');
   check(await seen(a.getByText('Carica il portafoglio della tesoreria')), 'step 1: load the treasury wallet (descriptor QR)');
   await signOnDevice(a, rid, 'A');

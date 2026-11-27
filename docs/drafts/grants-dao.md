@@ -12,10 +12,10 @@ Activity is separated into DAOs that each do one job, joined up by their public 
 | DAO | Job |
 |---|---|
 | **GRANTS DAO** | The verification gateway for outside funding. Donors give here; it checks and funds programme DAOs; repayments come back here. Its website shows every project supported. |
-| **Programme DAO** (first: **SEEDSIGNER DAO**) | The decision-making DAO for one purpose. It decides which local DAOs receive support, and is measured by how well its repayable grants are repaid. |
+| **Programme DAO** (first: **SIGNER DAO**, renamed from SEEDSIGNER DAO on 27 November 2026: the hardware it funds is any tested stateless signer, and the project does not use another project's name as its own) | The decision-making DAO for one purpose. It decides which local DAOs receive support, and is measured by how well its repayable grants are repaid. |
 | **Local DAOs** | Apply to a programme DAO, use what they receive, and repay the GRANTS DAO when they can. |
 
-Because every step is on a public record, a donor can follow a sat from their wallet into the GRANTS DAO, through the SEEDSIGNER DAO, to a local DAO's kit, and back again as a repayment that funds the next kit.
+Because every step is on a public record, a donor can follow a sat from their wallet into the GRANTS DAO, through the SIGNER DAO, to a local DAO's kit, and back again as a repayment that funds the next kit.
 
 ---
 
@@ -43,12 +43,12 @@ The GRANTS DAO is where funds start, not a head office. It can fund or decline; 
 | Stage | Who | What happens |
 |---|---|---|
 | **Give** | Donors → GRANTS DAO | Sats sent to the GRANTS DAO treasury, optionally labelled (name or nickname, a note). |
-| **Fund the programme** | GRANTS DAO → SEEDSIGNER DAO | The SEEDSIGNER DAO applies (signed by its DAO npub); a GRANTS DAO member sponsors it into a payout proposal with tranches. |
-| **Apply** | Local DAO → SEEDSIGNER DAO | A local DAO applies for a kit, signed by its DAO npub. |
-| **Decide** | SEEDSIGNER DAO | Its members check the applicant's record and vote. This is the decision that counts. |
-| **Supply** | SEEDSIGNER DAO → local DAO | A kit (bought and sent by the SEEDSIGNER DAO) or its value in sats to the local DAO's treasury. The amount owed is fixed in sats on the day of delivery. |
+| **Fund the programme** | GRANTS DAO → SIGNER DAO | The SIGNER DAO applies (signed by its DAO npub); a GRANTS DAO member sponsors it into a payout proposal with tranches. |
+| **Apply** | Local DAO → SIGNER DAO | A local DAO applies for a kit, signed by its DAO npub. |
+| **Decide** | SIGNER DAO | Its members check the applicant's record and vote. This is the decision that counts. |
+| **Supply** | SIGNER DAO → local DAO | A kit (bought and sent by the SIGNER DAO) or its value in sats to the local DAO's treasury. The amount owed is fixed in sats on the day of delivery. |
 | **Repay** | Local DAO → GRANTS DAO | When it can, the local DAO votes a repayment payout to the GRANTS DAO treasury, referencing the grant. Partial repayments count. |
-| **Next tranche** | GRANTS DAO → SEEDSIGNER DAO | Later tranches depend on the programme's repayment record (section 5). |
+| **Next tranche** | GRANTS DAO → SIGNER DAO | Later tranches depend on the programme's repayment record (section 5). |
 
 ---
 
@@ -67,7 +67,7 @@ A repayable grant is a grant with an amount owed and no deadline: "repay when yo
 
 ## 5. How a programme DAO is measured
 
-The SEEDSIGNER DAO makes the decisions, so it is measured by the outcome of its repayable grants. Computed from the records, shown on the GRANTS DAO website and the dashboard:
+The SIGNER DAO makes the decisions, so it is measured by the outcome of its repayable grants. Computed from the records, shown on the GRANTS DAO website and the dashboard:
 
 | Measure | Meaning |
 |---|---|
@@ -135,7 +135,7 @@ A grants pot runs dry when the gifts stop; repayments slow that down but do not 
 ## 10. Open questions
 
 - Only btc-dao DAOs as applicants, or any group with a Bitcoin multisig and a public descriptor? Leaning: btc-dao DAOs; the checks depend on their record.
-- Kits or sats: does the SEEDSIGNER DAO buy and ship hardware, or pay sats for the local DAO to buy its own? Leaning: kits, so quality and the SD card ceremony are consistent.
+- Kits or sats: does the SIGNER DAO buy and ship hardware, or pay sats for the local DAO to buy its own? Leaning: kits, so quality and the SD card ceremony are consistent.
 - When does a repayable grant count as defaulted, if ever? Leaning: never formally; the record shows its age, and silence or closing is visible.
 - Should the application and repayable-grant events be part of the btc-dao NIP? Leaning: yes.
 - Legal: collecting donations from the public and passing them on may carry rules in some countries; check before promoting.

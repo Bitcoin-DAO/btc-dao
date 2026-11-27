@@ -337,7 +337,7 @@ function Payload({ p }: { p: ProposalView }) {
         <>
           <div class="kv"><span>{t('cc.reason')}</span><span>{t(`cc.r.${pl.reason}` as 'cc.r.lost_key')}</span></div>
           <div class="kv"><span>{t('cc.out')}</span><span>{pl.out_key ? nameOf(pl.out_key) : t('cc.none')}</span></div>
-          <div class="kv"><span>{t('cc.in')}</span><span>{pl.in_key ? `${nameOf(pl.in_key)} · ${pl.in_fingerprint}${pl.in_device === 'seedsigner' ? ' · SeedSigner' : ''}` : t('cc.none')}</span></div>
+          <div class="kv"><span>{t('cc.in')}</span><span>{pl.in_key ? `${nameOf(pl.in_key)} · ${pl.in_fingerprint}${pl.in_device === 'seedsigner' ? ` · ${t('setup.onDevice')}` : ''}` : t('cc.none')}</span></div>
           <div class="kv"><span>{t('cc.threshold')}</span><span>{pl.threshold}</span></div>
           {addr && (
             <>
