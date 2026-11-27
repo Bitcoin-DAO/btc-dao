@@ -217,7 +217,9 @@ Generic wording and a signer guide ([`docs/signers.md`](docs/signers.md)): the a
 - [x] App wording: generic, with SeedSigner menu paths kept as "on a SeedSigner: …" (v0.9.10)
 - [x] Signer guide: requirements, tested list, per-device steps; SeedSigner tested, Krux planned
 - [x] Programme DAO renamed SIGNER DAO (was SEEDSIGNER DAO)
+- [ ] **Krux test board:** one Yahboom K210 vision module (about €49), Krux flashed, Testnet and Multisig set, settings in flash (`docs/signers.md` §3)
 - [ ] **Krux test, after the ALPHA DAO workshop,** on a testnet4 DAO: key export scanned at sign-up, wallet descriptor loaded, a round signed with one SeedSigner and one Krux on the same council, the descriptor's change check confirmed on the Krux; results recorded in `docs/signers.md` like `docs/seedsigner.md`
+- [ ] **Jade:** add to the test bench as the independent code line (separate firmware from SeedSigner and Krux)
 - [ ] **SIGNER DAO, test bench** (after ALPHA DAO): a testnet4 DAO with a mixed council, each member on their own device and signing remotely; every device run through the signer test; then the switch to programme DAO (grants draft)
 - [ ] **Phone signer:** ask Cypher Box upstream for a testnet4 network switch in Seed-Signer mode (raised by the project lead, in their repository); if added, run it through the signer test on the SIGNER DAO; otherwise test it later on a low-cap mainnet DAO, recorded as a separate result
 - [ ] Phone-signer limits in the app and dashboard: mark phone-signer keys; on mainnet, refuse a council whose phone-signer keys reach the threshold (design first)
