@@ -88,7 +88,7 @@ An old Android phone, set up offline from its first boot and used for nothing el
 
 - **Testnet:** allowed, for practice.
 - **Mainnet:** only with a low treasury cap (`treasuryCapSats`), and **fewer phone-signer keys than the threshold** (in 2 of 3, at most one), so phones alone can never move the money and every payment also passes an independent signer.
-- **Visible:** phone-signer keys to be marked in the app and on the dashboard (`NEXT-RELEASE.md` M).
+- **Visible:** phone-signer keys to be marked in the app and on the dashboard as declared (`NEXT-RELEASE.md` M); the threshold rule is a declared charter article, not something the app can check (section 7).
 
 **Candidate app: Cypher Box, Seed-Signer mode** (github.com/CypherBoxLLC/Cypher-Box, MIT, reviewed at 0.1.14):
 
@@ -99,6 +99,18 @@ An old Android phone, set up offline from its first boot and used for nothing el
 
 **Set-up** (council hardware workshop): [workshop/phone-signer.md](workshop/phone-signer.md).
 
-## 7. In the record
+## 7. Declared, witnessed, enforced
+
+Which device holds a key **cannot be checked from the record or the chain**: a public key and a signature look the same whatever made them, a QR format can be copied, and device attestation exists only for some commercial devices, through their own apps. So btc-dao is honest about three levels:
+
+| Level | What | How |
+| --- | --- | --- |
+| **Enforced** by the protocol | The treasury cap (`treasuryCapSats`), the threshold, the keys in the descriptor | Every client checks them; nobody can sign around them |
+| **Witnessed** | Which device a key was scanned from | At founding and every council change, the key is scanned while another council member watches (in person or on a call); the minute records device and witness |
+| **Declared** in the charter | Phone-signer keys fewer than the threshold; mixed device types and code lines | Council handbook articles 8 to 10 ([charter module](charter-modules/council-handbook.md)); the council holds itself to them, visibly in its minutes |
+
+The device type stored with a key is a declaration: the app and the dashboard show it as **declared**, never as fact. For the phone-signer limits, the cap is the real safeguard; the threshold rule is the council's declared commitment.
+
+## 8. In the record
 
 A council key on a signer is stored as `device: "seedsigner"` in the founding settings and council changes, a name kept from the first device for compatibility. It means "key on a stateless signer", whatever the device. Whether the NIP should also accept a generic value is an open item (`NEXT-RELEASE.md` M).
