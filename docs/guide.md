@@ -82,6 +82,8 @@ For the practice stage (section 8), 3 to 5 people are enough: the council-to-be,
 
 ### 2.4 Get the equipment
 
+The council's keys live on a **stateless signer**. Any device on the tested list in [signers.md](signers.md) can be used; today that is the SeedSigner, with Krux to be tested next. The table lists a SeedSigner kit.
+
 | Item | How many | Notes |
 | --- | --- | --- |
 | SeedSigner (Raspberry Pi Zero without radio, 1.3" screen, camera) | 2: one in use, one spare | Bought from different sources and kept sealed between rounds (S8) |

@@ -130,7 +130,7 @@ Design in `docs/drafts/member-loans.md`, idea agreed 18 November 2026. Interest-
 
 ## H. GRANTS DAO and repayable grants (design)
 
-Design in `docs/drafts/grants-dao.md`, idea agreed 18 November 2026. The GRANTS DAO is the verification gateway for outside funding; programme DAOs (first: SEEDSIGNER DAO) decide, and are measured by how well their repayable grants are repaid; local DAOs repay the GRANTS DAO when they can.
+Design in `docs/drafts/grants-dao.md`, idea agreed 18 November 2026. The GRANTS DAO is the verification gateway for outside funding; programme DAOs (first: SIGNER DAO) decide, and are measured by how well their repayable grants are repaid; local DAOs repay the GRANTS DAO when they can.
 
 - [x] Stage 0: idea written down (roles, flow, repayable grants, programme measures, website, additions to the core)
 - [ ] Design settled: open questions answered
@@ -140,7 +140,7 @@ Design in `docs/drafts/grants-dao.md`, idea agreed 18 November 2026. The GRANTS 
 - [ ] Applicant record shown beside the proposal; payout address checked against the applicant's descriptor
 - [ ] Programme measures (repayment rate, fully repaid, time to repay, outstanding, still active) on the dashboard
 - [ ] GRANTS DAO website from the `btc-dao-homepage` wrapper: projects supported, repayment chain
-- [ ] In the wild: a testnet4 GRANTS DAO funds a testnet4 SEEDSIGNER DAO, which gives a repayable kit grant to a testnet4 local DAO, which repays
+- [ ] In the wild: a testnet4 GRANTS DAO funds a testnet4 SIGNER DAO, which gives a repayable kit grant to a testnet4 local DAO, which repays
 
 ## I. Language of DAO content (idea to test)
 
@@ -210,6 +210,16 @@ Noted 23 November 2026. OpenBazaar is being rebuilt in Rust (github.com/OpenBaza
 
 **Revisit when:** OpenBazaar has a release with escrow, real stores on testnet4, and signed builds. Until then this takes no slot.
       
+## M. Stateless signers (27 November 2026)
+
+Generic wording and a signer guide ([`docs/signers.md`](docs/signers.md)): the app and docs say **signer** (*stateless signer*, *dispositivo di firma*); a device's name appears only in its own steps. Any device meeting the requirements can be tested; only tested devices are recommended.
+
+- [x] App wording: generic, with SeedSigner menu paths kept as "on a SeedSigner: …" (v0.9.10)
+- [x] Signer guide: requirements, tested list, per-device steps; SeedSigner tested, Krux planned
+- [x] Programme DAO renamed SIGNER DAO (was SEEDSIGNER DAO)
+- [ ] **Krux test, after the ALPHA DAO workshop,** on a testnet4 DAO: key export scanned at sign-up, wallet descriptor loaded, a round signed with one SeedSigner and one Krux on the same council, the descriptor's change check confirmed on the Krux; results recorded in `docs/signers.md` like `docs/seedsigner.md`
+- [ ] Protocol note: the record's `device: "seedsigner"` value means "key on a stateless signer"; decide whether to accept a generic `"signer"` value in the NIP (old records keep theirs)
+
 ## Open items
 
 - [x] **Paid on delivery** (protocol 4.6): staged payouts and bounties, v0.8.0. Built: staged payouts (schedule in the form, reports as thread cards, a tranche joins a round only after its report, lapse, the committed line on the treasury page), then bounties (claims; the council's round picks the claimant). Reports are read in Discussion (a chip on the thread and a Reports filter) and on the proposal page (the schedule with each tranche's status); not on Home or in the footer

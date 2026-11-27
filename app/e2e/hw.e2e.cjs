@@ -24,7 +24,7 @@ const device = fs.readFileSync(__dirname + '/../src/core/fixtures/seedsigner-0.8
   const p = await ctx.newPage();
   p.on('pageerror', e => console.log('  pageerror', e.message));
   await p.goto(URL0 + '#/qrtest');
-  await p.getByRole('heading', { name: 'SeedSigner QR test' }).waitFor({ timeout: 20000 });
+  await p.getByRole('heading', { name: 'Signer QR test' }).waitFor({ timeout: 20000 });
 
   console.log('• A real SeedSigner key export (recorded frames, pasted)');
   await p.getByRole('button', { name: 'Scan a key' }).click();

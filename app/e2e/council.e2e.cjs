@@ -100,13 +100,13 @@ function deviceSign(psbtB64, card) {
 }
 async function signOnDevice(page, rid, card, expectOk = true) {
   await open(page, `#/round/${rid}`);
-  await page.getByText(/Firma con il SeedSigner/).waitFor({ timeout: 20000 });
+  await page.getByText(/Firma con il tuo dispositivo di firma/).waitFor({ timeout: 20000 });
   // The PSBT the device would scan from the animated QR (the page also offers it for other wallets).
   await page.getByRole('button', { name: /Firma con un altro wallet/ }).click();
   await page.getByRole('button', { name: 'Copia la PSBT' }).click();
   const psbt = await copied(page);
   await page.getByRole('button', { name: 'Fatto, avanti' }).click();
-  await page.getByRole('button', { name: 'Ho firmato sul SeedSigner' }).click();
+  await page.getByRole('button', { name: 'Ho firmato sul dispositivo di firma' }).click();
   await page.getByRole('button', { name: 'Scansiona la transazione firmata' }).click();
   await paste(page, deviceSign(psbt, card));
   if (expectOk) await page.getByText('Hai firmato ✓').waitFor({ timeout: 20000 });
@@ -119,9 +119,9 @@ async function signUpHw(page, name, scanned) {
   await page.getByLabel('Chiedo un posto nel Consiglio').check();
   await page.getByLabel(/Ho almeno 18 anni/).check();
   await page.getByRole('button', { name: 'Avanti' }).click();
-  check(await page.getByLabel(/Su un SeedSigner/).isChecked(), `${name}: SeedSigner is the default`);
+  check(await page.getByLabel(/Su un dispositivo di firma/).isChecked(), `${name}: SeedSigner is the default`);
   check(await page.getByRole('button', { name: 'Crea con impronta o volto' }).isDisabled(), `${name}: no sign-up before the key is scanned`);
-  await page.getByRole('button', { name: 'Scansiona la chiave dal SeedSigner' }).click();
+  await page.getByRole('button', { name: 'Scansiona la chiave dal dispositivo di firma' }).click();
   await paste(page, scanned);
   await page.getByText(/48h\/1h\/0h\/2h ✓/).waitFor();
   await page.getByRole('button', { name: 'Crea con impronta o volto' }).click();
@@ -209,7 +209,7 @@ async function signRound(a, mb, more = []) {
   await c.getByRole('button', { name: 'Avvisa il Consiglio che la mia chiave è persa' }).click({ timeout: 20000 });
   await c.getByText(/Il Consiglio è stato avvisato/).waitFor({ timeout: 15000 });
   check(!(await c.getByText(/Se ritrovi le parole/).count()) && await seen(c.getByText(/Le parole non si scrivono mai sul telefono/)), 'no advice to type the words');
-  check(await seen(c.getByRole('button', { name: 'Ritrovata: scansiona la chiave dal SeedSigner' })), 'found again: scan the key export');
+  check(await seen(c.getByRole('button', { name: 'Ritrovata: scansiona la chiave dal dispositivo di firma' })), 'found again: scan the key export');
 
   log('@anna starts the council change from the report');
   await open(a, '#/council');
@@ -235,7 +235,7 @@ async function signRound(a, mb, more = []) {
   await a.getByRole('button', { name: 'Firma e pubblica' }).click();
   await a.waitForURL(/#\/p\/[0-9a-f]{64}$/);
   const pid = a.url().split('/p/')[1];
-  check(await seen(a.getByText('6b7fa6f3 · SeedSigner', { exact: false })), 'proposal page: the incoming key');
+  check(await seen(a.getByText('6b7fa6f3 · Dispositivo di firma', { exact: false })), 'proposal page: the incoming key');
   await voteAll([A, B, C, F], pid);
   await closeVote(a);
 

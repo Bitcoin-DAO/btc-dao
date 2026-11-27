@@ -2,6 +2,13 @@
 
 Each release is a git tag (`v0.1.1`). A DAO's copy runs one tagged release and records it in its README; a release moves to a DAO's next stage only after passing the one before ([guide, section 8](docs/guide.md#8-the-three-stages-practice-testnet-mainnet)).
 
+## v0.9.10 · 27 November 2026
+
+- **Stateless signers, not one brand.** The app's wording is generic: **signer** in English, **dispositivo di firma** in Italian (key sign-up, signing a round, the QR test page, the profile, council change, errors). SeedSigner's menu paths stay, as device steps: "on a SeedSigner: Export Xpub → Multisig → Native Segwit → Sparrow". Nothing changes in what is scanned or signed. The record still stores `device: "seedsigner"` for a key on a signer.
+- **Signer guide** (`docs/signers.md`): what a signer must do for btc-dao, the tested list (SeedSigner 0.8.x), and the steps per device; Krux is listed as planned, to be tested after the ALPHA DAO workshop. A mixed council (different devices per key) is encouraged once more than one device is tested.
+- **SIGNER DAO:** the planned programme DAO for hardware kits is renamed from SEEDSIGNER DAO. The past trial DAO of that name keeps it in the records.
+- End-to-end tests updated for the new wording.
+
 ## v0.9.9 · 23 November 2026
 
 - **Founding guard: only the organiser can found the DAO at its address.** Until a DAO's id is pinned, anyone could open its site, publish a founding of their own there, and visitors' phones would follow whichever was founded first. A new site setting, `organiser` (the organiser's identity key), closes this: before the pin, only a founding published by that key is accepted at the address; any other is set aside as "not published by the organiser". The founder code page offers the key to copy (**Copy the key**) to a council founder while no organiser is set, and the setup page refuses to publish for anyone but the organiser. Unset or a placeholder: as before.
