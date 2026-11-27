@@ -19,6 +19,9 @@ Because every step is on a public record, a donor can follow a sat from their wa
 
 ---
 
+
+**The SIGNER DAO's two phases** (decided 27 November 2026). It starts as a **test bench** on testnet4, before it funds anything: its council is deliberately mixed (SeedSigner, Krux, an offline phone if its signer app supports testnet), each council member signs remotely on their own device, and each device is run through the signer test in [`../signers.md`](../signers.md); a pass puts the device on the tested list, which is the DAO's output. When the GRANTS DAO is live, the SIGNER DAO changes its funding model by rules vote and becomes the programme DAO described here, funding kits drawn from the tested list. It keeps its record and badges.
+
 ## 2. Principles
 
 - Uses the existing core: proposals, votes, staged payouts, the public record. Each of these DAOs is a btc-dao DAO, not a separate product.

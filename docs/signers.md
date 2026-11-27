@@ -26,6 +26,8 @@ Device names are used here only to say which device a step is for. The project's
 | **SeedSigner** | 0.8.6 | **Tested** (9–10 November 2026: sign-up, founding, signing, council change on testnet4 DAOs) | Formats recorded in [seedsigner.md](seedsigner.md). Starts on Mainnet unless settings are saved. |
 | **Krux** | current release | **Planned:** test after the ALPHA DAO workshop (`NEXT-RELEASE.md` M) | Its documentation lists multisig key export, wallet descriptor loading, animated PSBT signing and SeedQR (standard and compact). Not yet checked against the app. |
 
+| **Old Android phone** with Cypher Box (Seed-Signer mode) | 0.1.14, reviewed 27 November 2026 | **Candidate, staging only;** mainnet only: its signer refuses testnet wallets, so it cannot join a testnet4 DAO until it adds a network switch | See section 6. |
+
 Other devices can be added the same way: check R1–R8 on a testnet4 DAO, record the formats as for SeedSigner, then list it as tested.
 
 **A mixed council** (different devices for different keys) is stronger than one brand for every key: a fault or a supply problem in one device's firmware cannot stop or compromise the treasury alone. Once a second device is tested, mixing is encouraged. A workshop still runs on one device type, for simplicity.
@@ -61,6 +63,27 @@ On a testnet4 DAO, with the device and at least one tested device on the same co
 
 Record the formats (as in [seedsigner.md](seedsigner.md)) and move the device to "Tested".
 
-## 5. In the record
+## 6. Phone signers (staging)
+
+An old Android phone, set up offline from its first boot and used for nothing else, can act as a signer. It is a **staging device**: a way for council members to learn to sign remotely on hardware they already have, not a replacement for a stateless signer.
+
+**Why it is weaker than a stateless signer:** the phone runs a full operating system, old phones get no security updates, and the signer app is a whole wallet app whose network code is still there; "offline" is a promise to never connect, not hardware with no radio. A browser page is not used: it would have to be loaded from the web, and a browser cannot reach the camera from a local file.
+
+**Limits:**
+
+- **Testnet:** allowed, for practice.
+- **Mainnet:** only with a low treasury cap (`treasuryCapSats`), and **fewer phone-signer keys than the threshold** (in 2 of 3, at most one), so phones alone can never move the money and every payment also passes an independent signer.
+- **Visible:** phone-signer keys to be marked in the app and on the dashboard (`NEXT-RELEASE.md` M).
+
+**Candidate app: Cypher Box, Seed-Signer mode** (github.com/CypherBoxLLC/Cypher-Box, MIT, reviewed at 0.1.14):
+
+- Holds no seed: loads it from SeedQR or words for one signature and drops it; blocks screenshots while a secret is shown; signs only while no server answers.
+- Multisig only for a wallet registered first: native SegWit `sortedmulti`, 2 to 15 keys, descriptor checksum checked, change checked against the registered wallet. Formats match btc-dao: key export `[fp/48h/0h/0h/2h]xpub…`, PSBTs as UR `crypto-psbt`.
+- One-way: once Seed-Signer mode is on, the app is a signer until deleted.
+- **Against:** mainnet only (testnet wallets refused); the same app carries internet permission and online features; runs back to Android 7; young (0.1.x, one company); Android reproducible builds described as a goal; iOS builds cannot be checked against the source (Android only for btc-dao).
+
+**Set-up** (council hardware workshop): [workshop/phone-signer.md](workshop/phone-signer.md).
+
+## 7. In the record
 
 A council key on a signer is stored as `device: "seedsigner"` in the founding settings and council changes, a name kept from the first device for compatibility. It means "key on a stateless signer", whatever the device. Whether the NIP should also accept a generic value is an open item (`NEXT-RELEASE.md` M).
